@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "products": "Products",
+    "contact": "Contact Us",
+    "quote": "Request a Quote"
+  },
+  "home": {
+    "hero": {
+      "title": "Quality Plastics, Built to Your Spec",
+      "subtitle": "Yasmine Plastics — custom manufacturing for over 35 years, serving Jordan and the wider region.",
+      "browseCta": "Browse Products",
+      "quoteCta": "Request a Quote"
+    },
+    "whyUs": {
+      "title": "Why Choose Us",
+      "item1Title": "Custom Manufacturing",
+      "item1Text": "We produce to your exact specifications — dimensions, colour, print, and packaging tailored to your brand.",
+      "item2Title": "35+ Years in Business",
+      "item2Text": "Trusted by hundreds of businesses across Jordan and the wider MENA region since 1989.",
+      "item3Title": "Wide Product Range",
+      "item3Text": "Cups, containers, bags, and more — all under one roof with fast lead times and competitive pricing."
+    },
+    "categories": {
+      "title": "Our Product Categories",
+      "viewAll": "View All Products"
+    },
+    "trustedBy": {
+      "title": "Trusted By",
+      "context": "Supplying packaging solutions across Jordan and the Levant since 1989"
+    },
+    "cta": {
+      "headline": "Ready to Place an Order?",
+      "subtext": "Get a custom quote tailored to your quantity and specifications. Our team responds within 24 hours.",
+      "button": "Request a Quote"
+    }
+  },
+  "about": {
+    "title": "About Yasmine Plastics",
+    "stat1Value": "35+",
+    "stat1Label": "Years of Experience",
+    "stat2Value": "100+",
+    "stat2Label": "Clients Across the Region",
+    "stat3Value": "4",
+    "stat3Label": "Core Product Lines",
+    "story": {
+      "title": "Our Story",
+      "body": "Founded in 1989 in Amman, Yasmine Plastics began as a small local manufacturer serving the Jordanian food-service industry. Over three decades we grew into one of the region's most trusted suppliers of plastic packaging, serving clients across retail, hospitality, catering, and industrial sectors. Today we operate a modern production facility and ship to clients throughout Jordan and the wider Levant region."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "body": "To deliver high-quality, durable, and customisable plastic packaging solutions that meet the real-world needs of our clients — on time, at the right price, with the flexibility to adapt. We measure success by our clients' satisfaction and the long-term relationships we build together."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "body": "To be the leading plastic packaging manufacturer in the Levant region, known for innovation, sustainability, and an unwavering commitment to client satisfaction. We aim to continuously invest in technology and talent to deliver products that set the benchmark for quality."
+    },
+    "values": {
+      "title": "Our Values",
+      "body": "Quality, reliability, transparency, and partnership define everything we do. We treat every client relationship as a long-term collaboration, not a transaction. We hold ourselves accountable to the highest standards — in our materials, our processes, and our service."
+    }
+  },
+  "products": {
+    "title": "Our Products",
+    "subtitle": "Browse our full catalogue of plastic packaging solutions",
+    "allCategories": "All Products",
+    "viewDetails": "View Details",
+    "customBanner": {
+      "title": "Need a Custom Order?",
+      "text": "We manufacture to your exact specifications. Contact us to discuss quantities, dimensions, and custom printing."
+    },
+    "notFound": "No products found."
+  },
+  "product": {
+    "category": "Category",
+    "options": {
+      "color": "Choose a Colour",
+      "size": "Choose a Size"
+    },
+    "whatsapp": "Contact via WhatsApp",
+    "quote": "Get a Quote",
+    "notFound": "Product not found.",
+    "notFoundText": "The product you are looking for does not exist or has been removed."
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We are here to help. Reach out through any of the channels below.",
+    "info": {
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "address": "Address",
+      "hours": "Working Hours",
+      "openInMaps": "Open in Google Maps"
+    },
+    "form": {
+      "title": "Send us a Message",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "message": "Message",
+      "submit": "Send Message",
+      "success": "Message sent! We will get back to you within 24 hours.",
+      "placeholderName": "Your full name",
+      "placeholderEmail": "your@email.com",
+      "placeholderPhone": "+962...",
+      "placeholderMessage": "How can we help you?"
+    }
+  },
+  "quote": {
+    "title": "Request a Quote",
+    "subtitle": "Fill the form below and our team will reply with a custom quote for your needs.",
+    "step1": "Submit your requirements",
+    "step2": "We review & prepare your quote",
+    "step3": "Reply within 24 hours",
+    "stepsTitle": "What happens next?",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "company": "Company / Business Name",
+      "email": "Email Address",
+      "phone": "Phone / WhatsApp Number",
+      "product": "Product Interested In",
+      "selectProduct": "Select a product...",
+      "delivery": "Delivery Location / City",
+      "details": "Additional Details",
+      "submit": "Send Request",
+      "success": "Your quote request has been sent! Our team will contact you shortly.",
+      "placeholderFirstName": "First name",
+      "placeholderLastName": "Last name",
+      "placeholderCompany": "Your company name",
+      "placeholderEmail": "Your email address",
+      "placeholderPhone": "+962...",
+      "placeholderDelivery": "e.g. Amman",
+      "placeholderDetails": "Please provide the name of the item(s) you are interested in, quantities, and any other relevant information (e.g., specifications, colours)."
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 Yasmine Plastics. All rights reserved.",
+    "openWhatsApp": "Chat on WhatsApp",
+    "links": "Quick Links"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "backToProducts": "Back to Products",
+    "learnMore": "Learn More",
+    "contactUs": "Contact Us"
+  }
+}
