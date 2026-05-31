@@ -90,7 +90,14 @@ export function Footer() {
               </p>
               <p>
                 <span className="text-gray-400 dark:text-gray-500">{t('contact.info.address')}: </span>
-                <span>{address}</span>
+                <a
+                  href={company.mapShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  {address}
+                </a>
               </p>
             </div>
           </div>
