@@ -12,5 +12,4 @@ export const company: CompanyInfo = {
   mapEmbedUrl:
     'https://maps.google.com/maps?q=مصنع+اليسمين+للبلاستيك&t=&z=14&ie=UTF8&iwloc=&output=embed',
   mapShareUrl: 'https://maps.app.goo.gl/vqjHJ1jBPACNNA9x6',
-  clientName: 'Jordan Food Industries Co.',
 }

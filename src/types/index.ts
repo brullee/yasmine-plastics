@@ -32,7 +32,6 @@ export type CompanyInfo = {
   hoursAr: string
   mapEmbedUrl: string
   mapShareUrl: string
-  clientName: string
 }
 
 export type ContactFormFields = {

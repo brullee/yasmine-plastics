@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { Metadata } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -12,6 +13,26 @@ import '../globals.css'
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+
+  if (locale === 'ar') {
+    return {
+      title: { default: 'ياسمين للبلاستيك', template: '%s | ياسمين للبلاستيك' },
+      description: 'منتجات بلاستيكية وقوالب، مصنّعة وفق المواصفات منذ عام 1989. نخدم الأردن والعالم العربي.',
+    }
+  }
+
+  return {
+    title: { default: 'Yasmine Plastics', template: '%s | Yasmine Plastics' },
+    description: 'Plastic products and molds, manufactured to spec since 1989. Serving Jordan and the Arab world.',
+  }
 }
 
 interface Props {
