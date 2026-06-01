@@ -6,13 +6,14 @@ import { useTheme } from 'next-themes'
 import { usePathname, useRouter, Link } from '@/i18n/navigation'
 import { company } from '@/data/company'
 
-const NAV_LINKS = [
-  { key: 'home' as const, href: '/' },
-  { key: 'about' as const, href: '/about' },
-  { key: 'products' as const, href: '/products' },
-  { key: 'contact' as const, href: '/contact' },
-  { key: 'quote' as const, href: '/quote' },
-] as const
+type FooterNavKey = 'home' | 'about' | 'products' | 'contact' | 'quote'
+const NAV_LINKS: { key: FooterNavKey; href: string; wip?: boolean }[] = [
+  { key: 'home', href: '/' },
+  { key: 'about', href: '/about' },
+  { key: 'products', href: '/products', wip: true },
+  { key: 'contact', href: '/contact' },
+  { key: 'quote', href: '/quote' },
+]
 
 function SunIcon() {
   return (
@@ -63,23 +64,20 @@ export function Footer() {
     <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Left: brand + contact info */}
+          {/* Left: contact info */}
           <div className="space-y-4">
-            <p className="text-gray-900 dark:text-white font-bold text-xl">Yasmine Plastics</p>
+            <p className="text-brand-navy dark:text-white font-semibold text-sm uppercase tracking-widest mb-4">{t('footer.ourInfo')}</p>
 
             <div className="space-y-2 text-sm">
+              <div className="flex items-start gap-1">
+                <span className="text-gray-500 dark:text-gray-500 shrink-0">{t('contact.info.phone')}: </span>
+                <div className="flex flex-col gap-0.5">
+                  <a href={`tel:${company.phone}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone}</a>
+                  <a href={`tel:${company.phone2}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone2}</a>
+                </div>
+              </div>
               <p>
-                <span className="text-gray-400 dark:text-gray-500">{t('contact.info.phone')}: </span>
-                <a
-                  href={`tel:${company.phone}`}
-                  dir="ltr"
-                  className="hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  {company.phone}
-                </a>
-              </p>
-              <p>
-                <span className="text-gray-400 dark:text-gray-500">{t('contact.info.email')}: </span>
+                <span className="text-gray-500 dark:text-gray-500">{t('contact.info.email')}: </span>
                 <a
                   href={`mailto:${company.email}`}
                   dir="ltr"
@@ -88,8 +86,8 @@ export function Footer() {
                   {company.email}
                 </a>
               </p>
-              <p>
-                <span className="text-gray-400 dark:text-gray-500">{t('contact.info.address')}: </span>
+              <div className="max-w-[22rem]">
+                <span className="text-gray-500 dark:text-gray-500">{t('contact.info.address')}: </span>
                 <a
                   href={company.mapShareUrl}
                   target="_blank"
@@ -98,23 +96,32 @@ export function Footer() {
                 >
                   {address}
                 </a>
-              </p>
+              </div>
             </div>
           </div>
 
           {/* Right: navigation */}
           <div>
-            <p className="text-gray-900 dark:text-white font-semibold text-sm uppercase tracking-widest mb-4">
+            <p className="text-brand-navy dark:text-white font-semibold text-sm uppercase tracking-widest mb-4">
               {t('footer.links')}
             </p>
             <nav className="flex flex-col gap-2" aria-label="Footer navigation">
-              {NAV_LINKS.map(({ key, href }) => (
+              {NAV_LINKS.map(({ key, href, wip }) => (
                 <Link
                   key={key}
                   href={href}
-                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors w-fit"
+                  className={`inline-flex items-center gap-1.5 text-sm transition-colors w-fit ${
+                    wip
+                      ? 'text-gray-400 dark:text-gray-500 pointer-events-none cursor-default'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
                 >
                   {t(`nav.${key}`)}
+                  {wip && (
+                    <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+                      {t('nav.comingSoon')}
+                    </span>
+                  )}
                 </Link>
               ))}
             </nav>

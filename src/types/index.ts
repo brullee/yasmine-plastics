@@ -23,6 +23,7 @@ export type Category = {
 
 export type CompanyInfo = {
   phone: string
+  phone2: string
   whatsapp: string
   email: string
   addressEn: string

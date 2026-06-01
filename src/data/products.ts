@@ -309,7 +309,7 @@ export const products: Product[] = [
   },
   {
     slug: 'container-hummus-abu-samir',
-    nameEn: 'Hummus Container — Abu Samir',
+    nameEn: 'Hummus Container -Abu Samir',
     nameAr: 'علبة حمص أبو سمير',
     descriptionEn:
       'Abu Samir–specification hummus container manufactured to precise dimensions for food-producer packaging lines. Sold in cartons of 450 units.',
@@ -321,7 +321,7 @@ export const products: Product[] = [
   },
   {
     slug: 'container-hummus-al-aysar',
-    nameEn: 'Hummus Container — Al-Aysar',
+    nameEn: 'Hummus Container -Al-Aysar',
     nameAr: 'علبة حمص الأيسر',
     descriptionEn:
       'Al-Aysar–specification hummus container with unique dimensional requirements for specific food brands. Sold in cartons of 450 units.',
@@ -333,7 +333,7 @@ export const products: Product[] = [
   },
   {
     slug: 'container-fatteh-domed-450',
-    nameEn: 'Fatteh Container 450g — Domed',
+    nameEn: 'Fatteh Container 450g -Domed',
     nameAr: 'علبة فتة 450 غم قبة',
     descriptionEn:
       '450g fatteh container with a domed lid for extra headroom on garnished dishes. Suitable for take-away and retail. Sold in cartons of 300 units.',
@@ -345,7 +345,7 @@ export const products: Product[] = [
   },
   {
     slug: 'container-fatteh-flat',
-    nameEn: 'Fatteh Container — Flat',
+    nameEn: 'Fatteh Container -Flat',
     nameAr: 'علبة فتة فلات',
     descriptionEn:
       'Fatteh container with a flat lid for space-efficient stacking and display. Suitable for take-away and food-service packaging. Sold in cartons of 300 units.',
@@ -393,7 +393,7 @@ export const products: Product[] = [
   },
   {
     slug: 'lid-fatteh-flat-2',
-    nameEn: 'Fatteh Container Lid — Flat 2',
+    nameEn: 'Fatteh Container Lid -Flat 2',
     nameAr: 'غطاء فتة فلات 2',
     descriptionEn:
       'Second-type flat lid for fatteh containers. Available in white. Sold in cartons of 300 units.',
@@ -405,7 +405,7 @@ export const products: Product[] = [
   },
   {
     slug: 'lid-rice-flat',
-    nameEn: 'Rice Container Lid — Flat',
+    nameEn: 'Rice Container Lid -Flat',
     nameAr: 'غطاء وعاء رز فلات',
     descriptionEn:
       'Flat lid for rice containers used in portion-packed rice and grain products. Sold in cartons of 450 units.',
@@ -417,7 +417,7 @@ export const products: Product[] = [
   },
   {
     slug: 'lid-rice-high-dome',
-    nameEn: 'Rice Container Lid — High Dome',
+    nameEn: 'Rice Container Lid -High Dome',
     nameAr: 'غطاء وعاء رز قبة عالي',
     descriptionEn:
       'High-dome lid for rice containers. The raised dome provides extra space for garnished rice dishes and mounded servings. Sold in cartons of 450 units.',

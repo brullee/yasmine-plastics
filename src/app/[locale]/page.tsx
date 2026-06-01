@@ -9,10 +9,12 @@ import type { Locale } from '@/types'
 function ManufacturingIcon() {
   return (
     <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <rect x="6" y="18" width="36" height="24" rx="2" />
-      <path d="M16 18V10a2 2 0 012-2h12a2 2 0 012 2v8" />
-      <line x1="24" y1="26" x2="24" y2="34" />
-      <line x1="20" y1="30" x2="28" y2="30" />
+      <line x1="6" y1="14" x2="42" y2="14" />
+      <circle cx="18" cy="14" r="4" fill="currentColor" stroke="none" />
+      <line x1="6" y1="24" x2="42" y2="24" />
+      <circle cx="30" cy="24" r="4" fill="currentColor" stroke="none" />
+      <line x1="6" y1="34" x2="42" y2="34" />
+      <circle cx="20" cy="34" r="4" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -77,7 +79,7 @@ export default async function HomePage({
       {/* Why choose us */}
       <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-14">
+          <h2 className="text-3xl font-bold text-center text-brand-navy dark:text-white mb-14">
             {t('whyUs.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -92,7 +94,7 @@ export default async function HomePage({
                 <div className="p-3 bg-brand-sky dark:bg-blue-900/30 rounded-full">
                   {icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h3>
+                <h3 className="text-xl font-semibold text-brand-navy dark:text-white">{title}</h3>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{text}</p>
               </div>
             ))}
@@ -100,8 +102,8 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* Product categories grid */}
-      <section className="py-20">
+      {/* Product categories grid — hidden until products page is ready */}
+      {/* <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -128,20 +130,9 @@ export default async function HomePage({
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Trusted by */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900 border-y border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-6 font-semibold">
-            {t('trustedBy.title')}
-          </p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-3" dir="ltr">{company.clientName}</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">{t('trustedBy.context')}</p>
-        </div>
-      </section>
-
-      {/* Bottom CTA banner */}
+{/* Bottom CTA banner */}
       <section className="py-20 bg-brand-sky dark:bg-blue-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-4">
@@ -152,11 +143,23 @@ export default async function HomePage({
           </p>
           <Link
             href="/quote"
-            className="inline-flex items-center px-8 py-3.5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors text-base"
+            className="inline-flex items-center px-8 py-3.5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 dark:bg-white dark:text-brand-navy dark:hover:bg-blue-50 transition-colors text-base"
           >
             {t('cta.button')}
           </Link>
         </div>
+      </section>
+      {/* Full-width map */}
+      <section className="h-96 w-full">
+        <iframe
+          title="Yasmine Plastics location"
+          src={company.mapEmbedUrl}
+          width="100%"
+          height="100%"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="w-full h-full block"
+        />
       </section>
     </>
   )

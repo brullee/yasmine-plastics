@@ -5,12 +5,13 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
-const NAV_LINKS = [
-  { key: 'home' as const, href: '/' },
-  { key: 'about' as const, href: '/about' },
-  { key: 'products' as const, href: '/products' },
-  { key: 'contact' as const, href: '/contact' },
-] as const
+type NavKey = 'home' | 'about' | 'products' | 'contact'
+const NAV_LINKS: { key: NavKey; href: string; wip?: boolean }[] = [
+  { key: 'home', href: '/' },
+  { key: 'about', href: '/about' },
+  { key: 'products', href: '/products', wip: true },
+  { key: 'contact', href: '/contact' },
+]
 
 function MenuIcon() {
   return (
@@ -36,7 +37,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
@@ -49,13 +50,23 @@ export function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-            {NAV_LINKS.map(({ key, href }) => (
+            {NAV_LINKS.map(({ key, href, wip }) => (
               <Link
                 key={key}
                 href={href}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  wip
+                    ? 'text-gray-500 dark:text-gray-500 pointer-events-none cursor-default'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+                )}
               >
                 {t(key)}
+                {wip && (
+                  <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+                    {t('comingSoon')}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
@@ -65,7 +76,7 @@ export function Header() {
             {/* CTA button */}
             <Link
               href="/quote"
-              className="hidden sm:inline-flex items-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-blue-900 transition-colors"
+              className="hidden sm:inline-flex items-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-blue-900 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
             >
               {t('quote')}
             </Link>
@@ -91,14 +102,24 @@ export function Header() {
         )}
       >
         <nav className="px-4 pt-2 pb-4 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-1" aria-label="Mobile navigation">
-          {NAV_LINKS.map(({ key, href }) => (
+          {NAV_LINKS.map(({ key, href, wip }) => (
             <Link
               key={key}
               href={href}
-              onClick={() => setMenuOpen(false)}
-              className="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              onClick={wip ? undefined : () => setMenuOpen(false)}
+              className={cn(
+                'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                wip
+                  ? 'text-gray-500 dark:text-gray-500 pointer-events-none cursor-default'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+              )}
             >
               {t(key)}
+              {wip && (
+                <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+                  {t('comingSoon')}
+                </span>
+              )}
             </Link>
           ))}
           <Link

@@ -18,7 +18,7 @@ export default async function ContactPage({ params }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-3">
+        <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">
           {t('title')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400 text-lg">{t('subtitle')}</p>
@@ -27,23 +27,17 @@ export default async function ContactPage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
         {/* Left: contact form — primary action comes first */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            {t('form.title')}
-          </h2>
           <ContactForm />
         </div>
 
         {/* Right: contact info + map */}
-        <div className="space-y-8">
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 space-y-5">
+        <div className="flex flex-col gap-8">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 space-y-5">
             <ContactItem label={t('info.phone')}>
-              <a
-                href={`tel:${company.phone}`}
-                dir="ltr"
-                className="text-brand-navy dark:text-blue-400 hover:underline font-medium"
-              >
-                {company.phone}
-              </a>
+              <div className="flex flex-col gap-0.5">
+                <a href={`tel:${company.phone}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start">{company.phone}</a>
+                <a href={`tel:${company.phone2}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start">{company.phone2}</a>
+              </div>
             </ContactItem>
 
             <ContactItem label={t('info.email')}>
@@ -68,7 +62,7 @@ export default async function ContactPage({ params }: Props) {
           </div>
 
           {/* Google Maps embed */}
-          <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700 h-64">
+          <div className="flex-1 min-h-48 rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
             <iframe
               title="Yasmine Plastics location"
               src={company.mapEmbedUrl}
@@ -79,14 +73,6 @@ export default async function ContactPage({ params }: Props) {
               className="w-full h-full"
             />
           </div>
-          <a
-            href={company.mapShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-navy dark:text-sky-400 hover:underline"
-          >
-            {t('info.openInMaps')} →
-          </a>
         </div>
       </div>
     </div>

@@ -4,7 +4,8 @@ import { useTranslations, useLocale } from 'next-intl'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import { products } from '@/data/products'
 import type { Locale } from '@/types'
-import { localizedName } from '@/lib/utils'
+import { localizedName, buildWhatsAppUrl } from '@/lib/utils'
+import { company } from '@/data/company'
 
 interface Props {
   initialProduct?: string
@@ -12,6 +13,7 @@ interface Props {
 
 export function QuoteForm({ initialProduct = '' }: Props) {
   const t = useTranslations('quote.form')
+  const tWip = useTranslations('wip')
   const locale = useLocale() as Locale
   const { form, submitted, handleChange, handleSubmit } = useQuoteForm(initialProduct)
 
@@ -27,6 +29,21 @@ export function QuoteForm({ initialProduct = '' }: Props) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
+      {/* WIP notice */}
+      <div className="rounded-xl bg-brand-sky dark:bg-blue-950 px-4 py-3">
+        <p className="text-sm text-brand-navy dark:text-blue-200">
+          {tWip('formNotice')}{' '}
+          <a
+            href={buildWhatsAppUrl(company.whatsapp)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-green-700 dark:text-green-400 hover:underline"
+          >
+            {tWip('formWhatsAppCta')}
+          </a>
+        </p>
+      </div>
+
       {/* Honeypot */}
       <input
         type="text"
@@ -111,11 +128,12 @@ export function QuoteForm({ initialProduct = '' }: Props) {
           id="q-phone"
           type="tel"
           name="phone"
+          dir="ltr"
           required
           value={form.phone}
           onChange={handleChange}
           placeholder={t('placeholderPhone')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500 rtl:text-right"
         />
       </div>
 
@@ -171,7 +189,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
 
       <button
         type="submit"
-        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors"
+        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
       >
         {t('submit')}
       </button>

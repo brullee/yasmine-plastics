@@ -24,7 +24,7 @@ export function WhatsAppFAB({ locale }: { locale: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="fixed bottom-6 right-6 rtl:right-auto rtl:left-6 z-50 flex items-center gap-2.5 bg-brand-navy text-white p-3 sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-blue-900 transition-colors"
+      className="fixed bottom-6 right-6 rtl:right-auto rtl:left-6 z-50 flex items-center gap-2.5 bg-brand-navy text-white p-3 sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-blue-900 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
     >
       <span className="hidden sm:inline text-sm font-semibold">{label}</span>
       <WhatsAppIcon />

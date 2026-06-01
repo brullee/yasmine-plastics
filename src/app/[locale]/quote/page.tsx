@@ -27,7 +27,7 @@ export default async function QuotePage({ params, searchParams }: Props) {
         {/* Form — takes 2/3 width */}
         <div className="lg:col-span-2">
           <div className="mb-10">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-3">
+            <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">
               {t('title')}
             </h1>
             <p className="text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
@@ -44,7 +44,7 @@ export default async function QuotePage({ params, searchParams }: Props) {
             <ol className="space-y-4">
               {steps.map((step, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-navy text-white text-sm font-bold flex items-center justify-center">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-navy text-white dark:bg-white dark:text-brand-navy text-sm font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
                   <p className="text-sm text-gray-700 dark:text-blue-200 pt-0.5 leading-relaxed">
