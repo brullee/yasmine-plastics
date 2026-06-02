@@ -38,7 +38,7 @@
     }
   },
   "about": {
-    "title": "About Yasmine Plastics",
+    "title": "About Yasmine",
     "stat1Value": "35+",
     "stat1Label": "Years of Experience",
     "stat2Value": "100+",
@@ -47,7 +47,7 @@
     "stat3Label": "Core Product Lines",
     "story": {
       "title": "Our Story",
-      "body": "Yasmine Plastics was established in Amman in 2008. The experience behind it goes back to 1989: years spent making molds and servicing plastic machinery for other manufacturers, learning the trade from the inside. When the time felt right, we started making products of our own. We have been growing steadily since."
+      "body": "Yasmine was established in Amman in 2008. The experience behind it goes back to 1989: years spent making molds and servicing plastic machinery for other manufacturers, learning the trade from the inside. When the time felt right, we started making products of our own. We have been growing steadily since."
     },
     "mission": {
       "title": "Our Mission",
@@ -64,7 +64,7 @@
   },
   "products": {
     "title": "Our Products",
-    "subtitle": "Browse our full catalogue of plastic packaging solutions",
+    "subtitle": "Browse our full catalogue of plastic products",
     "allCategories": "All Products",
     "viewDetails": "View Details",
     "customBanner": {
@@ -139,7 +139,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 Yasmine Company for Plastic Products. All rights reserved.",
+    "copyright": "© 2026 Yasmine Co. for Plastic Products. All rights reserved.",
     "openWhatsApp": "Chat on WhatsApp",
     "links": "Navigation",
     "ourInfo": "Our Information",

@@ -23,12 +23,12 @@ export default async function ProductsPage({ params }: Props) {
       </div>
 
       {/* WIP notice */}
-      <div className="mb-8 rounded-xl bg-brand-sky dark:bg-blue-900 px-5 py-4 flex items-start gap-3">
-        <p className="text-sm text-brand-navy dark:text-blue-100">{t('wipNotice')}</p>
+      <div className="mb-8 rounded-xl bg-brand-sky dark:bg-brand-navyDark px-5 py-4 flex items-start gap-3">
+        <p className="text-sm text-brand-navy dark:text-gray-300">{t('wipNotice')}</p>
       </div>
 
       {/* Custom order callout */}
-      <div className="rounded-xl bg-brand-navy p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="rounded-xl bg-brand-navy dark:bg-[#002952] p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <p className="font-semibold text-white text-lg mb-1">
             {t('customBanner.title')}
@@ -39,7 +39,7 @@ export default async function ProductsPage({ params }: Props) {
         </div>
         <Link
           href="/contact"
-          className="flex-shrink-0 px-5 py-2.5 bg-white text-brand-navy text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors"
+          className="flex-shrink-0 px-5 py-2.5 bg-white text-brand-navy text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors"
         >
           {tNav('contact')}
         </Link>

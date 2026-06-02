@@ -37,15 +37,13 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white dark:bg-brand-navyDeep border-b border-gray-200 dark:border-white/10 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
-          <Link
-            href="/"
-            className="flex-shrink-0 text-brand-navy dark:text-white font-bold text-xl tracking-tight"
-          >
-            Yasmine Plastics
+          <Link href="/" className="flex-shrink-0">
+            <img src="/Yasmine Logo 2.svg" alt="Yasmine Plastics" className="h-10 w-auto dark:hidden" />
+            <img src="/Yasmine Logo 2 Dark.svg" alt="Yasmine Plastics" className="h-10 w-auto hidden dark:block" />
           </Link>
 
           {/* Desktop nav */}
@@ -58,7 +56,7 @@ export function Header() {
                   'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   wip
                     ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark'
                 )}
               >
                 {t(key)}
@@ -76,14 +74,14 @@ export function Header() {
             {/* CTA button */}
             <Link
               href="/quote"
-              className="hidden sm:inline-flex items-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-blue-900 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
+              className="hidden sm:inline-flex items-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
             >
               {t('quote')}
             </Link>
 
             {/* Mobile burger */}
             <button
-              className="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors"
               onClick={() => setMenuOpen((o) => !o)}
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
@@ -111,7 +109,7 @@ export function Header() {
                 'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                 wip
                   ? 'text-gray-500 dark:text-gray-500 pointer-events-none cursor-default'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark'
               )}
             >
               {t(key)}
@@ -125,7 +123,7 @@ export function Header() {
           <Link
             href="/quote"
             onClick={() => setMenuOpen(false)}
-            className="mt-2 block text-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-blue-900 transition-colors"
+            className="mt-2 block text-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark transition-colors"
           >
             {t('quote')}
           </Link>

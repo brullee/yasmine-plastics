@@ -18,9 +18,11 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          navy: '#1B2A4A',
-          blue: '#2563EB',
-          sky: '#DBEAFE',
+          navy: '#005496',
+          navyDark: '#003d6e',
+          navyDeep: '#0d1b2a',
+          blue: '#ed145b',
+          sky: '#f5f7fa',
         },
       },
       fontFamily: {

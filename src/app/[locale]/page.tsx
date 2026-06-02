@@ -8,7 +8,7 @@ import type { Locale } from '@/types'
 
 function ManufacturingIcon() {
   return (
-    <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-300" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <line x1="6" y1="14" x2="42" y2="14" />
       <circle cx="18" cy="14" r="4" fill="currentColor" stroke="none" />
       <line x1="6" y1="24" x2="42" y2="24" />
@@ -21,7 +21,7 @@ function ManufacturingIcon() {
 
 function YearsIcon() {
   return (
-    <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-300" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <circle cx="24" cy="24" r="18" />
       <polyline points="24 12 24 24 32 28" />
     </svg>
@@ -30,7 +30,7 @@ function YearsIcon() {
 
 function RangeIcon() {
   return (
-    <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-300" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <rect x="4" y="10" width="16" height="12" rx="2" />
       <rect x="28" y="10" width="16" height="12" rx="2" />
       <rect x="16" y="28" width="16" height="12" rx="2" />
@@ -51,7 +51,7 @@ export default async function HomePage({
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-navy via-blue-900 to-blue-800 text-white">
+      <section className="bg-gradient-to-br from-brand-navy to-brand-navyDark text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 max-w-3xl mx-auto">
             {t('hero.title')}
@@ -62,7 +62,7 @@ export default async function HomePage({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/products"
-              className="px-8 py-3.5 bg-white text-brand-navy font-semibold rounded-lg hover:bg-blue-50 transition-colors text-base"
+              className="px-8 py-3.5 bg-white text-brand-navy font-semibold rounded-lg hover:bg-gray-200 transition-colors text-base"
             >
               {t('hero.browseCta')}
             </Link>
@@ -77,7 +77,7 @@ export default async function HomePage({
       </section>
 
       {/* Why choose us */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+      <section className="py-20 bg-gray-50 dark:bg-brand-navyDeep">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-brand-navy dark:text-white mb-14">
             {t('whyUs.title')}
@@ -91,7 +91,7 @@ export default async function HomePage({
               ] as const
             ).map(({ icon, title, text }) => (
               <div key={title} className="flex flex-col items-center text-center gap-4">
-                <div className="p-3 bg-brand-sky dark:bg-blue-900/30 rounded-full">
+                <div className="p-3 bg-brand-navy/10 dark:bg-brand-navy/40 rounded-full">
                   {icon}
                 </div>
                 <h3 className="text-xl font-semibold text-brand-navy dark:text-white">{title}</h3>
@@ -106,12 +106,12 @@ export default async function HomePage({
       {/* <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-blue-300">
               {t('categories.title')}
             </h2>
             <Link
               href="/products"
-              className="text-sm font-medium text-brand-blue dark:text-blue-400 hover:underline hidden sm:block"
+              className="text-sm font-medium text-brand-blue dark:text-blue-300 hover:underline hidden sm:block"
             >
               {t('categories.viewAll')} {locale === 'ar' ? '←' : '→'}
             </Link>
@@ -124,7 +124,7 @@ export default async function HomePage({
           <div className="mt-6 text-center sm:hidden">
             <Link
               href="/products"
-              className="text-sm font-medium text-brand-blue dark:text-blue-400 hover:underline"
+              className="text-sm font-medium text-brand-blue dark:text-blue-300 hover:underline"
             >
               {t('categories.viewAll')} {locale === 'ar' ? '←' : '→'}
             </Link>
@@ -133,7 +133,7 @@ export default async function HomePage({
       </section> */}
 
 {/* Bottom CTA banner */}
-      <section className="py-20 bg-brand-sky dark:bg-blue-950">
+      <section className="py-20 bg-brand-navy/10 dark:bg-brand-navy/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-4">
             {t('cta.headline')}
@@ -143,7 +143,7 @@ export default async function HomePage({
           </p>
           <Link
             href="/quote"
-            className="inline-flex items-center px-8 py-3.5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 dark:bg-white dark:text-brand-navy dark:hover:bg-blue-50 transition-colors text-base"
+            className="inline-flex items-center px-8 py-3.5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-white dark:text-brand-navy dark:hover:bg-gray-200 transition-colors text-base"
           >
             {t('cta.button')}
           </Link>
