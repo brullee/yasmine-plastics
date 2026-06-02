@@ -71,31 +71,18 @@ export function Footer() {
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-1">
                 <span className="text-gray-500 dark:text-gray-400 shrink-0">{t('contact.info.phone')}: </span>
-                <div className="flex flex-col gap-1 -mt-1">
-                  <a href={`tel:${company.phone}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors py-1 inline-block">{company.phone}</a>
-                  <a href={`tel:${company.phone2}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors py-1 inline-block">{company.phone2}</a>
+                <div className="flex flex-col gap-1">
+                  <a href={`tel:${company.phone}`} dir="ltr" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone}</a>
+                  <a href={`tel:${company.phone2}`} dir="ltr" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone2}</a>
                 </div>
               </div>
               <p>
                 <span className="text-gray-500 dark:text-gray-400">{t('contact.info.email')}: </span>
-                <a
-                  href={`mailto:${company.email}`}
-                  dir="ltr"
-                  className="hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  {company.email}
-                </a>
+                <a href={`mailto:${company.email}`} dir="ltr" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{company.email}</a>
               </p>
               <div className="max-w-[22rem]">
                 <span className="text-gray-500 dark:text-gray-400">{t('contact.info.address')}: </span>
-                <a
-                  href={company.mapShareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  {address}
-                </a>
+                <a href={company.mapShareUrl} target="_blank" rel="noopener noreferrer" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{address}</a>
               </div>
             </div>
           </div>
