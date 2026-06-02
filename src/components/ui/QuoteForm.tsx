@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
+import { Turnstile } from '@marsidev/react-turnstile'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import { products } from '@/data/products'
 import type { Locale } from '@/types'
@@ -15,6 +17,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
   const t = useTranslations('quote.form')
   const tWip = useTranslations('wip')
   const locale = useLocale() as Locale
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const { form, submitted, handleChange, handleSubmit } = useQuoteForm(initialProduct)
 
   if (submitted) {
@@ -190,9 +193,17 @@ export function QuoteForm({ initialProduct = '' }: Props) {
         />
       </div>
 
+      <Turnstile
+        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        options={{ size: "flexible" }}
+        onSuccess={setTurnstileToken}
+        onExpire={() => setTurnstileToken(null)}
+      />
+
       <button
         type="submit"
-        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
+        disabled={!turnstileToken}
+        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {t('submit')}
       </button>
