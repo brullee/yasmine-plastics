@@ -70,14 +70,14 @@ export function Footer() {
 
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-1">
-                <span className="text-gray-500 dark:text-gray-500 shrink-0">{t('contact.info.phone')}: </span>
-                <div className="flex flex-col gap-0.5">
-                  <a href={`tel:${company.phone}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone}</a>
-                  <a href={`tel:${company.phone2}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone2}</a>
+                <span className="text-gray-500 dark:text-gray-400 shrink-0">{t('contact.info.phone')}: </span>
+                <div className="flex flex-col gap-1 -mt-1">
+                  <a href={`tel:${company.phone}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors py-1 inline-block">{company.phone}</a>
+                  <a href={`tel:${company.phone2}`} dir="ltr" className="hover:text-gray-900 dark:hover:text-white transition-colors py-1 inline-block">{company.phone2}</a>
                 </div>
               </div>
               <p>
-                <span className="text-gray-500 dark:text-gray-500">{t('contact.info.email')}: </span>
+                <span className="text-gray-500 dark:text-gray-400">{t('contact.info.email')}: </span>
                 <a
                   href={`mailto:${company.email}`}
                   dir="ltr"
@@ -87,7 +87,7 @@ export function Footer() {
                 </a>
               </p>
               <div className="max-w-[22rem]">
-                <span className="text-gray-500 dark:text-gray-500">{t('contact.info.address')}: </span>
+                <span className="text-gray-500 dark:text-gray-400">{t('contact.info.address')}: </span>
                 <a
                   href={company.mapShareUrl}
                   target="_blank"
@@ -112,13 +112,13 @@ export function Footer() {
                   href={href}
                   className={`inline-flex items-center gap-1.5 text-sm transition-colors w-fit ${
                     wip
-                      ? 'text-gray-400 dark:text-gray-500 pointer-events-none cursor-default'
+                      ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   {t(`nav.${key}`)}
                   {wip && (
-                    <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+                    <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">
                       {t('nav.comingSoon')}
                     </span>
                   )}
@@ -130,7 +130,7 @@ export function Footer() {
       </div>
 
       {/* Bottom bar — copyright + utility controls */}
-      <div className="border-t border-gray-100 dark:border-gray-800">
+      <div id="footer-bottom-bar" className="border-t border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
           <p>{t('footer.copyright')}</p>
 

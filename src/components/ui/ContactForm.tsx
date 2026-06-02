@@ -31,7 +31,8 @@ export function ContactForm() {
             href={buildWhatsAppUrl(company.whatsapp)}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-green-700 dark:text-green-400 hover:underline"
+            aria-label="Contact via WhatsApp"
+            className="font-semibold text-brand-blue dark:text-blue-400 hover:underline"
           >
             {tWip('formWhatsAppCta')}
           </a>
