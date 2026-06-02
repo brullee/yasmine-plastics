@@ -7,6 +7,10 @@
     scroll-behavior: smooth;
   }
 
+  html:lang(ar) {
+    font-size: 1.05em;
+  }
+
   body {
     @apply text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900;
   }

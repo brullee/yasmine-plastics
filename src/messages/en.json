@@ -72,7 +72,7 @@
       "text": "We manufacture to your exact specifications. Contact us to discuss quantities, dimensions, and custom printing."
     },
     "notFound": "No products found.",
-    "wipNotice": "This page is still being built. Our full product range is available. Reach us by phone, email, or WhatsApp and we'll be happy to help."
+    "wipNotice": "This page is still being built, reach us by phone, WhatsApp, or email to explore our full product range."
   },
   "product": {
     "category": "Category",
@@ -139,10 +139,12 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 Yasmine Plastics. All rights reserved.",
+    "copyright": "© 2026 Yasmine Company for Plastic Products. All rights reserved.",
     "openWhatsApp": "Chat on WhatsApp",
     "links": "Navigation",
-    "ourInfo": "Our Information"
+    "ourInfo": "Our Information",
+    "light": "Light",
+    "dark": "Dark"
   },
   "wip": {
     "formNotice": "Our online form is temporarily unavailable.",
