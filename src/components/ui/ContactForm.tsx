@@ -31,7 +31,7 @@ export function ContactForm() {
             href={buildWhatsAppUrl(company.whatsapp)}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-green-700 dark:text-green-400 hover:underline"
+            className="font-semibold text-blue-800 dark:text-blue-400 hover:underline"
           >
             {tWip('formWhatsAppCta')}
           </a>
@@ -92,7 +92,10 @@ export function ContactForm() {
           name="phone"
           dir="ltr"
           value={form.phone}
-          onChange={handleChange}
+          onChange={(e) => {
+            e.target.value = e.target.value.replace(/[^0-9+\-()\s#*]/g, '')
+            handleChange(e)
+          }}
           placeholder={t('placeholderPhone')}
           className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500 rtl:text-right"
         />

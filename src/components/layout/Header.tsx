@@ -57,13 +57,13 @@ export function Header() {
                 className={cn(
                   'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   wip
-                    ? 'text-gray-500 dark:text-gray-500 pointer-events-none cursor-default'
+                    ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
                     : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                 )}
               >
                 {t(key)}
                 {wip && (
-                  <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+                  <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">
                     {t('comingSoon')}
                   </span>
                 )}
@@ -116,7 +116,7 @@ export function Header() {
             >
               {t(key)}
               {wip && (
-                <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+                <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">
                   {t('comingSoon')}
                 </span>
               )}
