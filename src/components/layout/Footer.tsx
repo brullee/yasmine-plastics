@@ -17,7 +17,7 @@ const NAV_LINKS: { key: FooterNavKey; href: string; wip?: boolean }[] = [
 
 function SunIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="5" />
       <line x1="12" y1="1" x2="12" y2="3" />
       <line x1="12" y1="21" x2="12" y2="23" />
@@ -33,7 +33,7 @@ function SunIcon() {
 
 function MoonIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
   )
@@ -142,16 +142,16 @@ export function Footer() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               {isDark ? <SunIcon /> : <MoonIcon />}
-              <span className="text-xs">{isDark ? 'Light' : 'Dark'}</span>
+              <span className="text-xs font-arabic font-medium">{isDark ? t('footer.light') : t('footer.dark')}</span>
             </button>
 
-            <span className="text-gray-300 dark:text-gray-700" aria-hidden="true">·</span>
+            <span className="text-sm font-sans text-gray-300 dark:text-gray-600 select-none" aria-hidden="true">•</span>
 
             {/* Language toggle */}
             <button
               onClick={toggleLocale}
               aria-label={locale === 'en' ? 'Switch to Arabic' : 'Switch to English'}
-              className="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs font-medium"
+              className="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs font-medium font-arabic"
             >
               {locale === 'en' ? 'العربية' : 'English'}
             </button>

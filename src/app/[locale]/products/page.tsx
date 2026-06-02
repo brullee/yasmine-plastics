@@ -23,8 +23,8 @@ export default async function ProductsPage({ params }: Props) {
       </div>
 
       {/* WIP notice */}
-      <div className="mb-8 rounded-xl bg-brand-sky dark:bg-blue-950 px-5 py-4 flex items-start gap-3">
-        <p className="text-sm text-brand-navy dark:text-blue-200">{t('wipNotice')}</p>
+      <div className="mb-8 rounded-xl bg-brand-sky dark:bg-blue-900 px-5 py-4 flex items-start gap-3">
+        <p className="text-sm text-brand-navy dark:text-blue-100">{t('wipNotice')}</p>
       </div>
 
       {/* Custom order callout */}

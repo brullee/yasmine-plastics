@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Inter, Noto_Sans_Arabic } from 'next/font/google'
+import { Inter, Tajawal } from 'next/font/google'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -7,10 +7,10 @@ const inter = Inter({
   display: 'swap',
 })
 
-const notoSansArabic = Noto_Sans_Arabic({
+const notoSansArabic = Tajawal({
   subsets: ['arabic'],
   variable: '--font-arabic',
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '700'],
   display: 'swap',
 })
 
