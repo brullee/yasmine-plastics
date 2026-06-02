@@ -26,8 +26,10 @@ export function WhatsAppFAB({ locale }: { locale: string }) {
 
   useEffect(() => {
     const fab = fabRef.current
-    const footerBar = document.getElementById('footer-bottom-bar')
-    if (!fab || !footerBar) return
+    const footerBarEl = document.getElementById('footer-bottom-bar')
+    if (!fab || !footerBarEl) return
+    const el = fab
+    const footerBar = footerBarEl
 
     let isRaised = false
 
@@ -37,14 +39,14 @@ export function WhatsAppFAB({ locale }: { locale: string }) {
       if (shouldRaise === isRaised) return
       isRaised = shouldRaise
 
-      fab.style.transition = 'bottom 0.25s ease'
+      el.style.transition = 'bottom 0.25s ease'
       if (shouldRaise) {
         const barHeight = footerBar.getBoundingClientRect().height
         // On mobile the FAB is icon-only so needs less clearance above the bar
         const gap = window.innerWidth < 640 ? 6 : BASE
-        fab.style.bottom = `${barHeight + gap}px`
+        el.style.bottom = `${barHeight + gap}px`
       } else {
-        fab.style.bottom = ''
+        el.style.bottom = ''
       }
     }
 
