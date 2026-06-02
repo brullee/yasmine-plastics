@@ -9,6 +9,8 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { HtmlAttributes } from '@/components/HtmlAttributes'
 import { WhatsAppFAB } from '@/components/ui/WhatsAppFAB'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import '../globals.css'
 
 export function generateStaticParams() {
@@ -64,6 +66,8 @@ export default async function LocaleLayout({ children, params }: Props) {
             <Footer />
             <WhatsAppFAB locale={locale} />
           </div>
+          <Analytics />
+          <SpeedInsights />
         </Providers>
       </NextIntlClientProvider>
     </>
