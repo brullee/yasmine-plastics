@@ -61,7 +61,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400">
+    <footer className="bg-white dark:bg-brand-navyDeep border-t border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Left: contact info */}
@@ -117,7 +117,7 @@ export function Footer() {
       </div>
 
       {/* Bottom bar — copyright + utility controls */}
-      <div id="footer-bottom-bar" className="border-t border-gray-100 dark:border-gray-800">
+      <div id="footer-bottom-bar" className="border-t border-gray-100 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
           <p>{t('footer.copyright')}</p>
 
@@ -126,7 +126,7 @@ export function Footer() {
             <button
               onClick={toggleTheme}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors"
             >
               {isDark ? <SunIcon /> : <MoonIcon />}
               <span className="text-xs font-arabic font-medium">{isDark ? t('footer.light') : t('footer.dark')}</span>
@@ -138,7 +138,7 @@ export function Footer() {
             <button
               onClick={toggleLocale}
               aria-label={locale === 'en' ? 'Switch to Arabic' : 'Switch to English'}
-              className="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-xs font-medium font-arabic"
+              className="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors text-xs font-medium font-arabic"
             >
               {locale === 'en' ? 'العربية' : 'English'}
             </button>

@@ -37,7 +37,7 @@ export default async function QuotePage({ params, searchParams }: Props) {
 
         {/* Sidebar — what happens next */}
         <div className="lg:sticky lg:top-24">
-          <div className="bg-brand-sky dark:bg-blue-950 rounded-2xl p-6">
+          <div className="bg-brand-sky dark:bg-brand-navyDark rounded-2xl p-6">
             <h2 className="text-base font-bold text-brand-navy dark:text-white mb-5 uppercase tracking-wide">
               {t('stepsTitle')}
             </h2>
@@ -47,7 +47,7 @@ export default async function QuotePage({ params, searchParams }: Props) {
                   <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-navy text-white dark:bg-white dark:text-brand-navy text-sm font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
-                  <p className="text-sm text-gray-700 dark:text-blue-200 pt-0.5 leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 pt-0.5 leading-relaxed">
                     {step}
                   </p>
                 </li>

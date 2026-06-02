@@ -6,10 +6,10 @@ type SectionKey = 'story' | 'mission' | 'vision' | 'values'
 const sections: SectionKey[] = ['story', 'mission', 'vision', 'values']
 
 const cardStyles: { bg: string; title: string; body: string }[] = [
-  { bg: 'bg-brand-navy',                 title: 'text-white',                      body: 'text-blue-200' },
-  { bg: 'bg-brand-sky dark:bg-[#1e3272]', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-300' },
-  { bg: 'bg-brand-navy',                 title: 'text-white',                      body: 'text-blue-200' },
-  { bg: 'bg-brand-sky dark:bg-[#1e3272]', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-300' },
+  { bg: 'bg-brand-navy',                         title: 'text-white',                      body: 'text-blue-200' },
+  { bg: 'bg-brand-navy/10 dark:bg-[#002952]', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-200' },
+  { bg: 'bg-brand-navy',                         title: 'text-white',                      body: 'text-blue-200' },
+  { bg: 'bg-brand-navy/10 dark:bg-[#002952]', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-200' },
 ]
 
 export default async function AboutPage({

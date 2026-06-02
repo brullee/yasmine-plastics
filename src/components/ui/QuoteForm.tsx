@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
+import { Turnstile } from '@marsidev/react-turnstile'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import { products } from '@/data/products'
 import type { Locale } from '@/types'
@@ -15,6 +17,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
   const t = useTranslations('quote.form')
   const tWip = useTranslations('wip')
   const locale = useLocale() as Locale
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const { form, submitted, handleChange, handleSubmit } = useQuoteForm(initialProduct)
 
   if (submitted) {
@@ -30,14 +33,14 @@ export function QuoteForm({ initialProduct = '' }: Props) {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       {/* WIP notice */}
-      <div className="rounded-xl bg-brand-sky dark:bg-blue-950 px-4 py-3">
-        <p className="text-sm text-brand-navy dark:text-blue-200">
+      <div className="rounded-xl bg-brand-sky dark:bg-brand-navyDark px-4 py-3">
+        <p className="text-sm text-brand-navy dark:text-gray-300">
           {tWip('formNotice')}{' '}
           <a
             href={buildWhatsAppUrl(company.whatsapp)}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-blue-800 dark:text-blue-400 hover:underline"
+            className="font-semibold text-blue-800 dark:text-white hover:underline transition-colors"
           >
             {tWip('formWhatsAppCta')}
           </a>
@@ -69,7 +72,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
             value={form.firstName}
             onChange={handleChange}
             placeholder={t('placeholderFirstName')}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
           />
         </div>
         <div>
@@ -84,7 +87,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
             value={form.lastName}
             onChange={handleChange}
             placeholder={t('placeholderLastName')}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500"
+            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
           />
         </div>
       </div>
@@ -100,7 +103,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
           value={form.company}
           onChange={handleChange}
           placeholder={t('placeholderCompany')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
         />
       </div>
 
@@ -116,7 +119,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
           value={form.email}
           onChange={handleChange}
           placeholder={t('placeholderEmail')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
         />
       </div>
 
@@ -136,7 +139,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
             handleChange(e)
           }}
           placeholder={t('placeholderPhone')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500 rtl:text-right"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy rtl:text-right"
         />
       </div>
 
@@ -149,7 +152,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
           name="product"
           value={form.product}
           onChange={handleChange}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
         >
           <option value="">{t('selectProduct')}</option>
           {products.map((p) => (
@@ -171,7 +174,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
           value={form.delivery}
           onChange={handleChange}
           placeholder={t('placeholderDelivery')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
         />
       </div>
 
@@ -186,13 +189,21 @@ export function QuoteForm({ initialProduct = '' }: Props) {
           value={form.details}
           onChange={handleChange}
           placeholder={t('placeholderDetails')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-blue-500 resize-y min-h-[120px]"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]"
         />
       </div>
 
+      <Turnstile
+        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+        options={{ size: "flexible" }}
+        onSuccess={setTurnstileToken}
+        onExpire={() => setTurnstileToken(null)}
+      />
+
       <button
         type="submit"
-        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 dark:bg-blue-900 dark:hover:bg-blue-800 transition-colors"
+        disabled={!turnstileToken}
+        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {t('submit')}
       </button>

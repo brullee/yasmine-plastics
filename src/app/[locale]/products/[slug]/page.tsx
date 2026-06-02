@@ -59,7 +59,7 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* Product info */}
         <div className="space-y-6">
           <div>
-            <span className="inline-block text-xs font-semibold text-brand-blue bg-brand-sky dark:bg-blue-900/40 dark:text-blue-300 px-2.5 py-1 rounded-full uppercase tracking-wide mb-3">
+            <span className="inline-block text-xs font-semibold text-brand-blue bg-brand-sky dark:bg-brand-navy/30 dark:text-gray-200 px-2.5 py-1 rounded-full uppercase tracking-wide mb-3">
               {t('category')}: {categoryName}
             </span>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">
@@ -90,7 +90,7 @@ export default async function ProductDetailPage({ params }: Props) {
             </a>
             <Link
               href={`/quote?product=${product.slug}`}
-              className="flex-1 flex items-center justify-center py-3 px-5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-blue-900 transition-colors"
+              className="flex-1 flex items-center justify-center py-3 px-5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
             >
               {t('quote')}
             </Link>
