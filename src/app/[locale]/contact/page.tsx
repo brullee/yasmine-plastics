@@ -34,9 +34,9 @@ export default async function ContactPage({ params }: Props) {
         <div className="flex flex-col gap-8">
           <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 space-y-5">
             <ContactItem label={t('info.phone')}>
-              <div className="flex flex-col gap-1 -mt-1">
-                <a href={`tel:${company.phone}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start py-1 inline-block">{company.phone}</a>
-                <a href={`tel:${company.phone2}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start py-1 inline-block">{company.phone2}</a>
+              <div className="flex flex-col gap-1">
+                <a href={`tel:${company.phone}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start inline-block">{company.phone}</a>
+                <a href={`tel:${company.phone2}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start inline-block">{company.phone2}</a>
               </div>
             </ContactItem>
 

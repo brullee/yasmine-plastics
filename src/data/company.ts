@@ -4,7 +4,7 @@ export const company: CompanyInfo = {
   phone: '+962 79 521 0389',
   phone2: '+962 79 600 9587',
   whatsapp: '+962796009587',
-  email: 'info@yasmineplastics.com',
+  email: 'contact@yasmineplastics.com',
   addressEn: 'Amman, Sahab, Salem Village, Behind the Development Industrial Zone',
   addressAr: 'عمان، سحاب، قرية سالم، خلف التجمعات الصناعية التنموية',
   hoursEn: 'Saturday – Thursday: 8:00 AM – 5:00 PM\nFriday: Closed',
