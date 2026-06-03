@@ -10,14 +10,29 @@ export function BottomFade() {
 
   useEffect(() => {
     setMounted(true)
+
     const update = () => {
-      const maxScroll = document.body.scrollHeight - window.innerHeight
-      if (maxScroll <= 0) { setOpacity(0); return }
-      setOpacity(Math.max(0, 1 - window.scrollY / maxScroll))
+      const maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight
+      if (maxScroll < 200) { setOpacity(0); return }
+      const progress = window.scrollY / maxScroll
+      const eased = Math.pow(1 - Math.min(progress, 1), 0.4)
+      setOpacity(eased)
     }
-    update()
+
+    requestAnimationFrame(() => requestAnimationFrame(update))
+    setTimeout(update, 300)
+    setTimeout(update, 1000)
+
+    const ro = new ResizeObserver(update)
+    ro.observe(document.body)
+
     window.addEventListener('scroll', update, { passive: true })
-    return () => window.removeEventListener('scroll', update)
+    window.addEventListener('resize', update, { passive: true })
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
   }, [])
 
   if (!mounted) return null
@@ -29,6 +44,7 @@ export function BottomFade() {
       className="pointer-events-none fixed bottom-0 left-0 right-0 h-40 z-30"
       style={{
         opacity,
+        transition: 'opacity 300ms ease-out',
         background: resolvedTheme === 'dark'
           ? `linear-gradient(to top,
               rgba(${color}, 0.9) 0%,
