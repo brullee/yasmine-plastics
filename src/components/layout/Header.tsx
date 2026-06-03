@@ -42,8 +42,8 @@ export function Header() {
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <img src="/Yasmine Logo.svg" alt="Yasmine Plastics" className="h-10 w-auto dark:hidden" />
-            <img src="/Yasmine Logo Dark.svg" alt="Yasmine Plastics" className="h-10 w-auto hidden dark:block" />
+            <img src="/YasmineLogo.svg" alt="Yasmine Plastics" className="h-10 w-auto dark:hidden" />
+            <img src="/YasmineLogoDark.svg" alt="Yasmine Plastics" className="h-10 w-auto hidden dark:block" />
           </Link>
 
           {/* Desktop nav */}
