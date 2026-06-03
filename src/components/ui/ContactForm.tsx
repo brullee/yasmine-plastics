@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
+import { useTheme } from 'next-themes'
 import { useContactForm } from '@/hooks/useContactForm'
 import { company } from '@/data/company'
 import { buildWhatsAppUrl } from '@/lib/utils'
@@ -13,6 +14,7 @@ export function ContactForm() {
   const locale = useLocale()
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const { form, submitted, handleChange, handleSubmit } = useContactForm()
+  const { resolvedTheme } = useTheme()
 
   if (submitted) {
     return (
@@ -122,7 +124,7 @@ export function ContactForm() {
 
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-        options={{ size: "flexible" }}
+        options={{ size: "flexible", theme: resolvedTheme === 'dark' ? 'dark' : 'light' }}
         onSuccess={setTurnstileToken}
         onExpire={() => setTurnstileToken(null)}
       />

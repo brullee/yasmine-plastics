@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
+import { useTheme } from 'next-themes'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import { products } from '@/data/products'
 import type { Locale } from '@/types'
@@ -19,6 +20,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
   const locale = useLocale() as Locale
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const { form, submitted, handleChange, handleSubmit } = useQuoteForm(initialProduct)
+  const { resolvedTheme } = useTheme()
 
   if (submitted) {
     return (
@@ -195,7 +197,7 @@ export function QuoteForm({ initialProduct = '' }: Props) {
 
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-        options={{ size: "flexible" }}
+        options={{ size: "flexible", theme: resolvedTheme === 'dark' ? 'dark' : 'light' }}
         onSuccess={setTurnstileToken}
         onExpire={() => setTurnstileToken(null)}
       />
