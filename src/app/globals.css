@@ -5,6 +5,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   html:lang(ar) {
@@ -13,6 +14,7 @@
 
   body {
     @apply text-gray-900 bg-white;
+    overflow-x: hidden;
   }
 
   .dark body {
