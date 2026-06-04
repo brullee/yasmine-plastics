@@ -2,6 +2,8 @@ import { getTranslations, getLocale } from 'next-intl/server'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import { CategoryCard } from '@/components/ui/CategoryCard'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { MapEmbed } from '@/components/ui/MapEmbed'
 import { categories } from '@/data/categories'
 import { company } from '@/data/company'
 import type { Locale } from '@/types'
@@ -85,18 +87,20 @@ export default async function HomePage({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {(
               [
-                { icon: <ManufacturingIcon />, title: t('whyUs.item1Title'), text: t('whyUs.item1Text') },
-                { icon: <YearsIcon />, title: t('whyUs.item2Title'), text: t('whyUs.item2Text') },
-                { icon: <RangeIcon />, title: t('whyUs.item3Title'), text: t('whyUs.item3Text') },
+                { icon: <ManufacturingIcon />, title: t('whyUs.item1Title'), text: t('whyUs.item1Text'), dir: 'left'  },
+                { icon: <YearsIcon />,         title: t('whyUs.item2Title'), text: t('whyUs.item2Text'), dir: 'up'    },
+                { icon: <RangeIcon />,          title: t('whyUs.item3Title'), text: t('whyUs.item3Text'), dir: 'right' },
               ] as const
-            ).map(({ icon, title, text }) => (
-              <div key={title} className="flex flex-col items-center text-center gap-4">
-                <div className="p-3 bg-brand-navy/10 dark:bg-brand-navy/40 rounded-full">
-                  {icon}
+            ).map(({ icon, title, text, dir }, i) => (
+              <ScrollReveal key={title} direction={dir} delay={i * 100}>
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="p-3 bg-brand-navy/10 dark:bg-brand-navy/40 rounded-full">
+                    {icon}
+                  </div>
+                  <h3 className="text-xl font-semibold text-brand-navy dark:text-white">{title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{text}</p>
                 </div>
-                <h3 className="text-xl font-semibold text-brand-navy dark:text-white">{title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{text}</p>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -134,33 +138,24 @@ export default async function HomePage({
 
 {/* Bottom CTA banner */}
       <section className="py-20 bg-brand-navy/10 dark:bg-brand-navy/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-4">
-            {t('cta.headline')}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 max-w-xl mx-auto">
-            {t('cta.subtext')}
-          </p>
-          <Link
-            href="/quote"
-            className="inline-flex items-center px-8 py-3.5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-white dark:text-brand-navy dark:hover:bg-gray-200 transition-colors text-base"
-          >
-            {t('cta.button')}
-          </Link>
-        </div>
+        <ScrollReveal direction="up">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-4">
+              {t('cta.headline')}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 max-w-xl mx-auto">
+              {t('cta.subtext')}
+            </p>
+            <Link
+              href="/quote"
+              className="inline-flex items-center px-8 py-3.5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-white dark:text-brand-navy dark:hover:bg-gray-200 transition-colors text-base"
+            >
+              {t('cta.button')}
+            </Link>
+          </div>
+        </ScrollReveal>
       </section>
-      {/* Full-width map */}
-      <section className="h-96 w-full">
-        <iframe
-          title="Yasmine Plastics location"
-          src={company.mapEmbedUrl}
-          width="100%"
-          height="100%"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="w-full h-full block"
-        />
-      </section>
+      <MapEmbed />
     </>
   )
 }

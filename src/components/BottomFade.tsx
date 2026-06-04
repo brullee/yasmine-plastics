@@ -1,31 +1,43 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
+import { usePathname } from 'next/navigation'
 
 export function BottomFade() {
   const [mounted, setMounted] = useState(false)
-  const [opacity, setOpacity] = useState(1)
+  const divRef = useRef<HTMLDivElement>(null)
   const { resolvedTheme } = useTheme()
+  const pathname = usePathname()
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
-    setMounted(true)
+    if (!mounted) return
 
     const update = () => {
+      const el = divRef.current
+      if (!el) return
       const maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight
-      if (maxScroll < 200) { setOpacity(0); return }
+      if (maxScroll < 200) { el.style.opacity = '0'; return }
       const progress = window.scrollY / maxScroll
-      const eased = Math.pow(1 - Math.min(progress, 1), 0.4)
-      setOpacity(eased)
+      el.style.opacity = String(Math.pow(1 - Math.min(progress, 1), 0.4))
     }
 
-    requestAnimationFrame(() => requestAnimationFrame(update))
-    setTimeout(update, 300)
-    setTimeout(update, 1000)
+    // Snap to correct opacity instantly on navigation, then re-enable transition
+    const el = divRef.current
+    if (el) {
+      el.style.transition = 'none'
+      requestAnimationFrame(() => {
+        update()
+        requestAnimationFrame(() => {
+          if (divRef.current) divRef.current.style.transition = 'opacity 300ms ease-out'
+        })
+      })
+    }
 
     const ro = new ResizeObserver(update)
     ro.observe(document.body)
-
     window.addEventListener('scroll', update, { passive: true })
     window.addEventListener('resize', update, { passive: true })
     return () => {
@@ -33,7 +45,7 @@ export function BottomFade() {
       window.removeEventListener('scroll', update)
       window.removeEventListener('resize', update)
     }
-  }, [])
+  }, [mounted, pathname])
 
   if (!mounted) return null
 
@@ -41,23 +53,23 @@ export function BottomFade() {
 
   return (
     <div
+      ref={divRef}
       className="pointer-events-none fixed bottom-0 left-0 right-0 h-40 z-30"
       style={{
-        opacity,
-        transition: 'opacity 300ms ease-out',
+        opacity: 1,
         background: resolvedTheme === 'dark'
           ? `linear-gradient(to top,
               rgba(${color}, 0.9) 0%,
-              rgba(${color}, 0.65) 25%,
-              rgba(${color}, 0.35) 55%,
-              rgba(${color}, 0.1) 80%,
-              rgba(${color}, 0) 100%)`
+              rgba(${color}, 0.6) 18%,
+              rgba(${color}, 0.25) 38%,
+              rgba(${color}, 0.05) 55%,
+              rgba(${color}, 0) 65%)`
           : `linear-gradient(to top,
-              rgba(${color}, 0.9) 0%,
-              rgba(${color}, 0.65) 25%,
-              rgba(${color}, 0.35) 55%,
-              rgba(${color}, 0.1) 80%,
-              rgba(${color}, 0) 100%)`,
+              rgba(${color}, 0.55) 0%,
+              rgba(${color}, 0.3) 18%,
+              rgba(${color}, 0.1) 38%,
+              rgba(${color}, 0.02) 55%,
+              rgba(${color}, 0) 65%)`,
       }}
     />
   )
