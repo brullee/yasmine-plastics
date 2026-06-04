@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface Props {
   children: React.ReactNode
@@ -9,33 +9,45 @@ interface Props {
   className?: string
 }
 
+const animName: Record<string, string> = {
+  left:  'reveal-left',
+  right: 'reveal-right',
+  up:    'reveal-up',
+}
+
 export function ScrollReveal({ children, direction = 'up', delay = 0, className }: Props) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
+
+    const play = () => {
+      el.style.animation = 'none'
+      void el.offsetHeight // flush so the browser resets the animation
+      el.style.animation = `${animName[direction]} 0.7s ${delay}ms ease-out both`
+    }
+
+    el.style.opacity = '0'
+
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect() } },
-      { threshold: 0.12 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          play()
+        } else {
+          el.style.animation = 'none'
+          el.style.opacity = '0'
+        }
+      },
+      { threshold: 0.15 }
     )
+
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
-
-  const transforms: Record<string, string> = {
-    left:  'opacity-0 -translate-x-10',
-    right: 'opacity-0 translate-x-10',
-    up:    'opacity-0 translate-y-8',
-  }
+  }, [direction, delay])
 
   return (
-    <div
-      ref={ref}
-      className={`transition-all ease-out duration-700 ${visible ? 'opacity-100 translate-x-0 translate-y-0' : transforms[direction]} ${className ?? ''}`}
-      style={{ transitionDelay: `${delay}ms`, willChange: 'transform, opacity' }}
-    >
+    <div ref={ref} className={className}>
       {children}
     </div>
   )
