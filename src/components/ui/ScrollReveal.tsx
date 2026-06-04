@@ -17,6 +17,7 @@ const animName: Record<string, string> = {
 
 export function ScrollReveal({ children, direction = 'up', delay = 0, className }: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const inView = useRef(false)
 
   useEffect(() => {
     const el = ref.current
@@ -24,7 +25,7 @@ export function ScrollReveal({ children, direction = 'up', delay = 0, className 
 
     const play = () => {
       el.style.animation = 'none'
-      void el.offsetHeight // flush so the browser resets the animation
+      void el.offsetHeight
       el.style.animation = `${animName[direction]} 0.7s ${delay}ms ease-out both`
     }
 
@@ -32,14 +33,18 @@ export function ScrollReveal({ children, direction = 'up', delay = 0, className 
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.intersectionRatio >= 0.15 && !inView.current) {
+          // Enough of the element is visible — animate in
+          inView.current = true
           play()
-        } else {
+        } else if (entry.intersectionRatio === 0 && inView.current) {
+          // Fully off screen — silently reset so it re-animates next time
+          inView.current = false
           el.style.animation = 'none'
           el.style.opacity = '0'
         }
       },
-      { threshold: 0.15 }
+      { threshold: [0, 0.15] }
     )
 
     observer.observe(el)
