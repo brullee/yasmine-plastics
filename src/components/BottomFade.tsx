@@ -45,19 +45,12 @@ export function BottomFade() {
       style={{
         opacity,
         transition: 'opacity 300ms ease-out',
-        background: resolvedTheme === 'dark'
-          ? `linear-gradient(to top,
-              rgba(${color}, 0.9) 0%,
-              rgba(${color}, 0.65) 25%,
-              rgba(${color}, 0.35) 55%,
-              rgba(${color}, 0.1) 80%,
-              rgba(${color}, 0) 100%)`
-          : `linear-gradient(to top,
-              rgba(${color}, 0.9) 0%,
-              rgba(${color}, 0.65) 25%,
-              rgba(${color}, 0.35) 55%,
-              rgba(${color}, 0.1) 80%,
-              rgba(${color}, 0) 100%)`,
+        background: `linear-gradient(to top,
+            rgba(${color}, 0.9) 0%,
+            rgba(${color}, 0.6) 18%,
+            rgba(${color}, 0.25) 38%,
+            rgba(${color}, 0.05) 55%,
+            rgba(${color}, 0) 65%)`,
       }}
     />
   )

@@ -5,3 +5,5 @@ tsconfig.tsbuildinfo
 .env
 .env.local
 .env.*.local
+Plan.md
+yasmine-logo-preview.png
