@@ -53,7 +53,9 @@ export function Footer() {
   const isDark = mounted && resolvedTheme === 'dark'
 
   function toggleLocale() {
-    router.replace(pathname, { locale: locale === 'en' ? 'ar' : 'en' })
+    const newLocale = locale === 'en' ? 'ar' : 'en'
+    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
+    router.replace(pathname, { locale: newLocale })
   }
 
   function toggleTheme() {
