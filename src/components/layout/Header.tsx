@@ -69,7 +69,11 @@ export function Header() {
   const pathname = usePathname()
 
   const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
-  const toggleLocale = () => router.replace(pathname, { locale: locale === 'ar' ? 'en' : 'ar' })
+  const toggleLocale = () => {
+    const newLocale = locale === 'ar' ? 'en' : 'ar'
+    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
+    router.replace(pathname, { locale: newLocale })
+  }
 
   // Avoid hydration mismatch — system theme is unknown during SSR
   useEffect(() => setThemeMounted(true), [])
