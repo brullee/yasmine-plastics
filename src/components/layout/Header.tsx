@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
+import { useState, useEffect } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
+import { useTheme } from 'next-themes'
+import { Link, useRouter, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
 type NavKey = 'home' | 'about' | 'products' | 'contact'
@@ -32,9 +33,46 @@ function CloseIcon() {
   )
 }
 
+function SunIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" />
+      <line x1="12" y1="2" x2="12" y2="5" />
+      <line x1="12" y1="19" x2="12" y2="22" />
+      <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+      <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+      <line x1="2" y1="12" x2="5" y2="12" />
+      <line x1="19" y1="12" x2="22" y2="12" />
+      <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+      <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+    </svg>
+  )
+}
+
+function MoonIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  )
+}
+
+const subtleBtn = 'p-2 rounded-md text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors'
+
 export function Header() {
   const t = useTranslations('nav')
   const [menuOpen, setMenuOpen] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+  const [themeMounted, setThemeMounted] = useState(false)
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  const toggleLocale = () => router.replace(pathname, { locale: locale === 'ar' ? 'en' : 'ar' })
+
+  // Avoid hydration mismatch — system theme is unknown during SSR
+  useEffect(() => setThemeMounted(true), [])
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-brand-navyDeep border-b border-gray-200 dark:border-white/10 shadow-sm">
@@ -70,11 +108,23 @@ export function Header() {
           </nav>
 
           {/* Right-side controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Theme toggle — rendered only after mount to avoid SSR/client mismatch */}
+            {themeMounted && (
+              <button onClick={toggleTheme} aria-label="Toggle theme" className={subtleBtn}>
+                {resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}
+              </button>
+            )}
+
+            {/* Language toggle */}
+            <button onClick={toggleLocale} aria-label="Switch language" className={cn(subtleBtn, 'text-xs font-semibold tracking-wide')}>
+              {locale === 'ar' ? 'EN' : 'AR'}
+            </button>
+
             {/* CTA button */}
             <Link
               href="/quote"
-              className="hidden sm:inline-flex items-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+              className="hidden sm:inline-flex items-center ms-1 px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
             >
               {t('quote')}
             </Link>

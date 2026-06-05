@@ -59,16 +59,16 @@ export function BottomFade() {
         opacity: 1,
         background: resolvedTheme === 'dark'
           ? `linear-gradient(to top,
-              rgba(${color}, 0.9) 0%,
-              rgba(${color}, 0.6) 18%,
-              rgba(${color}, 0.25) 38%,
-              rgba(${color}, 0.05) 55%,
+              rgba(${color}, 0.95) 0%,
+              rgba(${color}, 0.7) 18%,
+              rgba(${color}, 0.3) 38%,
+              rgba(${color}, 0.07) 55%,
               rgba(${color}, 0) 65%)`
           : `linear-gradient(to top,
-              rgba(${color}, 0.55) 0%,
-              rgba(${color}, 0.3) 18%,
-              rgba(${color}, 0.1) 38%,
-              rgba(${color}, 0.02) 55%,
+              rgba(${color}, 0.88) 0%,
+              rgba(${color}, 0.55) 18%,
+              rgba(${color}, 0.22) 38%,
+              rgba(${color}, 0.05) 55%,
               rgba(${color}, 0) 65%)`,
       }}
     />
