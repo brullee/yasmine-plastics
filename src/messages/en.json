@@ -65,20 +65,46 @@
   "products": {
     "title": "Our Products",
     "subtitle": "Browse our full catalogue of plastic products",
+    "browseByCategory": "Browse our full range by category",
     "allCategories": "All Products",
     "viewDetails": "View Details",
+    "viewProducts": "View Products",
+    "quickView": "Quick View",
     "customBanner": {
       "title": "Need a Custom Order?",
       "text": "We manufacture to your exact specifications. Contact us to discuss quantities, dimensions, and custom printing."
+    },
+    "cantFind": {
+      "title": "Can't find what you're looking for?",
+      "text": "Contact us and we'll make it for you.",
+      "cta": "Contact Us"
     },
     "notFound": "No products found.",
     "wipNotice": "This page is still being built, reach us by phone, WhatsApp, or email to explore our full product range."
   },
   "product": {
     "category": "Category",
+    "keyAttributes": "Key Attributes",
+    "artCode": "ART",
+    "material": "Material",
+    "capacity": "Capacity",
+    "piecesPerBox": "Pcs / Box",
+    "dimensions": "Dimensions",
+    "cbm": "CBM",
+    "availableColors": "Available Colours",
+    "availableSizes": "Available Sizes",
+    "compatibleLids": "Compatible Lids",
+    "fitsContainers": "Fits these containers",
+    "relatedItems": "Related Items",
+    "sendInquiry": "Send Inquiry",
+    "chatNow": "Chat Now",
     "options": {
-      "color": "Choose a Colour",
-      "size": "Choose a Size"
+      "color": "Colour",
+      "size": "Size",
+      "lid": "Lid",
+      "custom": "Custom",
+      "moqNotice": "Custom colours require a minimum order quantity (MOQ). Contact us to discuss your order.",
+      "moqNoticeForm": "Custom colours require a minimum order quantity (MOQ)."
     },
     "whatsapp": "Contact via WhatsApp",
     "quote": "Get a Quote",
@@ -123,6 +149,8 @@
       "company": "Company / Business Name",
       "email": "Email Address",
       "phone": "Phone / WhatsApp Number",
+      "category": "Category",
+      "selectCategory": "Select a category...",
       "product": "Product Interested In",
       "selectProduct": "Select a product...",
       "delivery": "Delivery Location / City",
@@ -149,6 +177,11 @@
   "wip": {
     "formNotice": "Our online form is temporarily unavailable.",
     "formWhatsAppCta": "Message us on WhatsApp in the meantime."
+  },
+  "validation": {
+    "required": "This field is required.",
+    "invalidEmail": "Please enter a valid email address.",
+    "invalidPhone": "Please enter a valid phone number."
   },
   "common": {
     "loading": "Loading...",

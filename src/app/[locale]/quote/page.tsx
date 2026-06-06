@@ -4,16 +4,19 @@ import type { Locale } from '@/types'
 
 interface Props {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ product?: string }>
+  searchParams: Promise<{ product?: string; color?: string; size?: string; lid?: string }>
 }
 
 export default async function QuotePage({ params, searchParams }: Props) {
   const { locale: localeRaw } = await params
   const locale = localeRaw as Locale
-  const { product } = await searchParams
+  const { product, color, size, lid } = await searchParams
   const t = await getTranslations({ locale, namespace: 'quote' })
 
   const initialProduct = product ?? ''
+  const initialColor = color ?? ''
+  const initialSize = size ?? ''
+  const initialLid = lid ?? ''
 
   const steps = [
     t('step1'),
@@ -32,7 +35,12 @@ export default async function QuotePage({ params, searchParams }: Props) {
             </h1>
             <p className="text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
-          <QuoteForm initialProduct={initialProduct} />
+          <QuoteForm
+            initialProduct={initialProduct}
+            initialColor={initialColor}
+            initialSize={initialSize}
+            initialLid={initialLid}
+          />
         </div>
 
         {/* Sidebar — what happens next */}

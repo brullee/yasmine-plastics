@@ -10,7 +10,7 @@ type NavKey = 'home' | 'about' | 'products' | 'contact'
 const NAV_LINKS: { key: NavKey; href: string; wip?: boolean }[] = [
   { key: 'home', href: '/' },
   { key: 'about', href: '/about' },
-  { key: 'products', href: '/products', wip: true },
+  { key: 'products', href: '/products' },
   { key: 'contact', href: '/contact' },
 ]
 

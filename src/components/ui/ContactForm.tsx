@@ -6,14 +6,18 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import { useTheme } from 'next-themes'
 import { useContactForm } from '@/hooks/useContactForm'
 import { company } from '@/data/company'
-import { buildWhatsAppUrl } from '@/lib/utils'
+import { cn, buildWhatsAppUrl } from '@/lib/utils'
+
+const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy'
+const inputCls = (hasError: boolean | undefined) =>
+  cn(BASE_INPUT, hasError ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600')
 
 export function ContactForm() {
   const t = useTranslations('contact.form')
+  const tVal = useTranslations('validation')
   const tWip = useTranslations('wip')
-  const locale = useLocale()
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const { form, submitted, handleChange, handleSubmit } = useContactForm()
+  const { form, submitted, errors, isFormValid, handleChange, handleBlur, handleSubmit } = useContactForm()
   const { resolvedTheme } = useTheme()
 
   if (submitted) {
@@ -66,9 +70,13 @@ export function ContactForm() {
           required
           value={form.fullName}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder={t('placeholderName')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+          className={inputCls(!!errors.fullName)}
         />
+        {errors.fullName && (
+          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.fullName)}</p>
+        )}
       </div>
 
       <div>
@@ -82,9 +90,13 @@ export function ContactForm() {
           required
           value={form.email}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder={t('placeholderEmail')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+          className={inputCls(!!errors.email)}
         />
+        {errors.email && (
+          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.email)}</p>
+        )}
       </div>
 
       <div>
@@ -102,7 +114,7 @@ export function ContactForm() {
             handleChange(e)
           }}
           placeholder={t('placeholderPhone')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy rtl:text-right"
+          className={cn(inputCls(false), 'rtl:text-right')}
         />
       </div>
 
@@ -117,9 +129,16 @@ export function ContactForm() {
           rows={5}
           value={form.message}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder={t('placeholderMessage')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]"
+          className={cn(
+            'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]',
+            errors.message ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600',
+          )}
         />
+        {errors.message && (
+          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.message)}</p>
+        )}
       </div>
 
       <Turnstile
@@ -131,7 +150,7 @@ export function ContactForm() {
 
       <button
         type="submit"
-        disabled={!turnstileToken}
+        disabled={!turnstileToken || !isFormValid}
         className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {t('submit')}

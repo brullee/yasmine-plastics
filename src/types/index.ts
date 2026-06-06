@@ -4,14 +4,20 @@ export type Product = {
   slug: string
   nameEn: string
   nameAr: string
-  descriptionEn: string
-  descriptionAr: string
   category: string
   options: {
     colors?: string[]
     sizes?: string[]
   }
+  compatibleLids?: string[]
   image: string
+  // Key attributes — fill in as real data becomes available
+  artCode?: string          // e.g. 'art-70-200' (art-neck-volume)
+  material?: string         // e.g. 'PP' | 'PS'
+  capacity?: string         // e.g. '250ml' | '750g'
+  piecesPerBox?: number
+  dimensions?: string       // e.g. 'φ70 × H85 mm' or '120×80×55 mm'
+  cbm?: string              // e.g. '0.048' (cubic metres per full carton)
 }
 
 export type Category = {
@@ -49,6 +55,9 @@ export type QuoteFormFields = {
   email: string
   phone: string
   product: string
+  color: string
+  size: string
+  lid: string
   delivery: string
   details: string
   honeypot: string
