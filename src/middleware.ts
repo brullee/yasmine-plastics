@@ -9,17 +9,26 @@ export default function middleware(req: NextRequest) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204 })
 
   const pathname = req.nextUrl.pathname
-  const hasLocalePrefix = routing.locales.some(
-    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
-  )
+  const saved = req.cookies.get('NEXT_LOCALE')?.value
+  const validLocales = routing.locales as readonly string[]
 
-  // When no locale is in the URL, honour the user's saved preference before
-  // falling back to the hardcoded defaultLocale ('ar').
-  if (!hasLocalePrefix) {
-    const saved = req.cookies.get('NEXT_LOCALE')?.value
-    if (saved && (routing.locales as readonly string[]).includes(saved)) {
+  if (saved && validLocales.includes(saved)) {
+    const urlLocale = routing.locales.find(
+      (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
+    )
+
+    if (!urlLocale) {
+      // No locale prefix — redirect to saved preference (existing behaviour)
       const url = req.nextUrl.clone()
       url.pathname = `/${saved}${pathname === '/' ? '' : pathname}`
+      return NextResponse.redirect(url)
+    }
+
+    if (urlLocale !== saved) {
+      // URL has a different locale than the saved preference (e.g. back button hit
+      // an old /en/ URL after the user switched to Arabic) — redirect to match preference
+      const url = req.nextUrl.clone()
+      url.pathname = `/${saved}${pathname.slice(`/${urlLocale}`.length) || '/'}`
       return NextResponse.redirect(url)
     }
   }

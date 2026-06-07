@@ -1,52 +1,92 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { cn, buildWhatsAppUrl } from '@/lib/utils'
+import { cn, buildWhatsAppUrl, localizedName } from '@/lib/utils'
+import type { Product, Locale } from '@/types'
 
 const CUSTOM = '__custom__'
 
 interface Props {
   colors?: string[]
   sizes?: string[]
-  lids?: string[]
+  lids?: Product[]
+  fitsContainers?: Product[]
+  selectedPartner?: string | null
+  onPartnerChange?: (slug: string | null) => void
   productName: string
   productSlug: string
   whatsappNumber: string
-  locale: string
+  locale: Locale
 }
 
-export function ProductActions({ colors, sizes, lids, productName, productSlug, whatsappNumber, locale }: Props) {
+export function ProductActions({
+  colors, sizes, lids, fitsContainers, selectedPartner, onPartnerChange,
+  productName, productSlug, whatsappNumber, locale,
+}: Props) {
   const t = useTranslations('product')
   const tOpts = useTranslations('product.options')
 
   const [selectedColor, setSelectedColor] = useState<string | null>(colors?.[0] ?? null)
   const [selectedSize, setSelectedSize] = useState<string | null>(sizes?.[0] ?? null)
-  const [selectedLid, setSelectedLid] = useState<string | null>(lids?.[0] ?? null)
 
   const colorOptions = colors ?? []
-  const hasOptions = colorOptions.length > 0 || (sizes?.length ?? 0) > 0 || (lids?.length ?? 0) > 0
+  const selectedLidName = lids?.find((l) => l.slug === selectedPartner)
+    ? localizedName(lids.find((l) => l.slug === selectedPartner)!, locale)
+    : null
 
-  // Recomputed on each render so it reflects the current selection
+  const hasOptions =
+    colorOptions.length > 0 ||
+    (sizes?.length ?? 0) > 0 ||
+    (lids?.length ?? 0) > 0 ||
+    (fitsContainers?.length ?? 0) > 0
+
   const chatLines = locale === 'ar' ? [
     `مرحباً، أنا مهتم بـ: ${productName} (${productSlug})`,
     ...(selectedColor ? [`اللون: ${selectedColor === CUSTOM ? 'مخصص' : selectedColor}`] : []),
     ...(selectedSize ? [`المقاس: ${selectedSize}`] : []),
-    ...(selectedLid ? [`الغطاء: ${selectedLid}`] : []),
+    ...(selectedLidName ? [`الغطاء: ${selectedLidName}`] : []),
   ] : [
     `Hi, I'm interested in: ${productName} (${productSlug})`,
     ...(selectedColor ? [`Colour: ${selectedColor === CUSTOM ? 'Custom' : selectedColor}`] : []),
     ...(selectedSize ? [`Size: ${selectedSize}`] : []),
-    ...(selectedLid ? [`Lid: ${selectedLid}`] : []),
+    ...(selectedLidName ? [`Lid: ${selectedLidName}`] : []),
   ]
   const chatUrl = buildWhatsAppUrl(whatsappNumber, chatLines.join('\n'))
 
+  function togglePartner(slug: string) {
+    onPartnerChange?.(selectedPartner === slug ? null : slug)
+  }
+
   return (
     <>
-      {/* Options panel */}
       {hasOptions && (
         <div className="rounded-xl bg-white dark:bg-gray-800 p-5 space-y-5 border border-gray-200 dark:border-gray-700">
+
+          {/* Compatible containers (shown on lid pages) */}
+          {fitsContainers && fitsContainers.length > 0 && (
+            <div>
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2.5">
+                {t('fitsContainers')}
+              </p>
+              <PartnerGrid products={fitsContainers} selectedSlug={selectedPartner ?? null} locale={locale} onSelect={togglePartner} />
+            </div>
+          )}
+
+          {/* Compatible lids (shown on container/bucket pages) */}
+          {lids && lids.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2.5">
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('lid')}</p>
+                {selectedLidName && <span className="text-sm text-gray-500 dark:text-gray-400">{selectedLidName}</span>}
+              </div>
+              <PartnerGrid products={lids} selectedSlug={selectedPartner ?? null} locale={locale} onSelect={togglePartner} />
+            </div>
+          )}
+
+          {/* Colors */}
           {colorOptions.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2.5">
@@ -85,9 +125,7 @@ export function ProductActions({ colors, sizes, lids, productName, productSlug, 
               {selectedColor === CUSTOM && (
                 <div className="mt-3 flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-4 py-3">
                   <svg className="mt-0.5 shrink-0 text-amber-500" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
                   <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNotice')}</p>
                 </div>
@@ -95,6 +133,7 @@ export function ProductActions({ colors, sizes, lids, productName, productSlug, 
             </div>
           )}
 
+          {/* Sizes */}
           {sizes && sizes.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2.5">
@@ -120,30 +159,6 @@ export function ProductActions({ colors, sizes, lids, productName, productSlug, 
             </div>
           )}
 
-          {lids && lids.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('lid')}</p>
-                {selectedLid && <span className="text-sm text-gray-500 dark:text-gray-400">{selectedLid}</span>}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {lids.map((lid) => (
-                  <button
-                    key={lid}
-                    onClick={() => setSelectedLid(lid)}
-                    className={cn(
-                      'px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      selectedLid === lid
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {lid}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -154,7 +169,7 @@ export function ProductActions({ colors, sizes, lids, productName, productSlug, 
             const p = new URLSearchParams({ product: productSlug })
             if (selectedColor) p.set('color', selectedColor)
             if (selectedSize) p.set('size', selectedSize)
-            if (selectedLid) p.set('lid', selectedLid)
+            if (selectedPartner && selectedLidName) p.set('lid', selectedPartner)
             return `/quote?${p.toString()}`
           })()}
           className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyDark transition-colors"
@@ -176,11 +191,51 @@ export function ProductActions({ colors, sizes, lids, productName, productSlug, 
   )
 }
 
+function PartnerGrid({ products, selectedSlug, locale, onSelect }: {
+  products: Product[]
+  selectedSlug: string | null
+  locale: Locale
+  onSelect: (slug: string) => void
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {products.map((p) => {
+        const name = localizedName(p, locale)
+        const isSelected = selectedSlug === p.slug
+        return (
+          <button
+            key={p.slug}
+            type="button"
+            onClick={() => onSelect(p.slug)}
+            className={cn(
+              'group flex items-center gap-3 p-2.5 rounded-lg border transition-colors text-start',
+              isSelected
+                ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
+                : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-brand-navy dark:hover:border-blue-400'
+            )}
+          >
+            <div className="relative w-12 h-12 rounded-md overflow-hidden bg-white flex-shrink-0">
+              <Image src={p.image} alt={name} fill sizes="48px" className="object-contain p-1" />
+            </div>
+            <span className={cn(
+              'text-xs font-medium leading-snug',
+              isSelected
+                ? 'text-brand-navy dark:text-sky-200'
+                : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-white'
+            )}>
+              {name}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 function SendIcon() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="22" y1="2" x2="11" y2="13" />
-      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+      <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
     </svg>
   )
 }

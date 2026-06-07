@@ -11,6 +11,7 @@ export type Product = {
   }
   compatibleLids?: string[]
   image: string
+  gallery?: string[]         // additional product images (shown in carousel after primary)
   // Key attributes — fill in as real data becomes available
   artCode?: string          // e.g. 'art-70-200' (art-neck-volume)
   material?: string         // e.g. 'PP' | 'PS'
@@ -18,6 +19,7 @@ export type Product = {
   piecesPerBox?: number
   dimensions?: string       // e.g. 'φ70 × H85 mm' or '120×80×55 mm'
   cbm?: string              // e.g. '0.048' (cubic metres per full carton)
+  pairingImages?: Record<string, string> // partnerSlug → combined product photo URL
 }
 
 export type Category = {
