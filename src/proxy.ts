@@ -1,11 +1,12 @@
 import createMiddleware from 'next-intl/middleware'
+// TODO: update to next-intl/proxy once next-intl officially supports Next.js 16
 import { routing } from './i18n/routing'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 const handleI18nRouting = createMiddleware(routing)
 
-export default function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204 })
 
   const pathname = req.nextUrl.pathname
@@ -37,5 +38,5 @@ export default function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/((?!admin|api|_next|_vercel|.*\\..*).*)'],
 }
