@@ -52,7 +52,7 @@ export function ProductActions({
     ...(selectedLidName ? [`الغطاء: ${selectedLidName}`] : []),
   ] : [
     `Hi, I'm interested in: ${productName} (${productSlug})`,
-    ...(selectedColor ? [`Colour: ${selectedColor === CUSTOM ? 'Custom' : selectedColor}`] : []),
+    ...(selectedColor ? [`Color: ${selectedColor === CUSTOM ? 'Custom' : selectedColor}`] : []),
     ...(selectedSize ? [`Size: ${selectedSize}`] : []),
     ...(selectedLidName ? [`Lid: ${selectedLidName}`] : []),
   ]

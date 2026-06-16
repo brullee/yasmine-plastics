@@ -1,6 +1,6 @@
 const NAVY = '#005496'
 const NAVY_DARK = '#003d6e'
-const BG = '#f5f7fa'
+const BG = '#f9fafb'
 
 function row(label: string, value: string | null | undefined, link?: string) {
   if (!value || value === '-') return ''
@@ -9,13 +9,13 @@ function row(label: string, value: string | null | undefined, link?: string) {
     : value
   return `
     <tr>
-      <td style="padding:10px 16px;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;width:130px;">${label}</td>
-      <td style="padding:10px 16px;font-size:14px;color:#111827;vertical-align:top;">${cell}</td>
+      <td style="padding:12px 16px;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;width:130px;">${label}</td>
+      <td style="padding:12px 16px;font-size:14px;color:#111827;vertical-align:top;line-height:1.5;">${cell}</td>
     </tr>`
 }
 
 function divider() {
-  return `<tr><td colspan="2" style="padding:0 16px;"><hr style="border:none;border-top:1px solid #e5e7eb;margin:4px 0;"></td></tr>`
+  return `<tr><td colspan="2" style="padding:0 16px;"><hr style="border:none;border-top:1px solid #d1d5db;margin:2px 0;"></td></tr>`
 }
 
 export function contactEmailHtml({ fullName, email, phone, message }: {
@@ -27,10 +27,10 @@ export function contactEmailHtml({ fullName, email, phone, message }: {
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#e5e7eb;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#e5e7eb;padding:32px 16px;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:32px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
 
         <!-- Header -->
         <tr><td style="background:${NAVY_DARK};padding:28px 32px;">
@@ -49,12 +49,12 @@ export function contactEmailHtml({ fullName, email, phone, message }: {
 
         <!-- Message -->
         <tr><td style="background:${BG};padding:24px 32px;">
-          <p style="margin:0 0 10px;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Message</p>
+          <p style="margin:0 0 10px;font-size:12px;color:${NAVY};text-transform:uppercase;letter-spacing:1px;font-weight:600;">Message</p>
           <p style="margin:0;font-size:14px;color:#111827;line-height:1.7;white-space:pre-wrap;">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
         </td></tr>
 
         <!-- Footer -->
-        <tr><td style="background:#f9fafb;padding:16px 32px;border-top:1px solid #e5e7eb;">
+        <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
           <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${fullName}.</p>
         </td></tr>
 
@@ -72,10 +72,10 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#e5e7eb;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#e5e7eb;padding:32px 16px;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:32px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
 
         <!-- Header -->
         <tr><td style="background:${NAVY_DARK};padding:28px 32px;">
@@ -100,7 +100,7 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
         </td></tr>
 
         <!-- Footer -->
-        <tr><td style="background:#f9fafb;padding:16px 32px;border-top:1px solid #e5e7eb;">
+        <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
           <p style="margin:0;font-size:12px;color:#9ca3af;">
             If the button doesn't work, copy and paste this link into your browser:<br>
             <a href="${resetURL}" style="color:${NAVY};word-break:break-all;">${resetURL}</a>
@@ -129,16 +129,17 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
   delivery?: string
   details?: string
 }) {
+  const displayColor = color === '__custom__' ? 'Custom' : color
   const hasProduct = productName || color || (size && size !== '-') || lidName
   const hasDetails = delivery || details
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#e5e7eb;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#e5e7eb;padding:32px 16px;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:32px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
 
         <!-- Header -->
         <tr><td style="background:${NAVY_DARK};padding:28px 32px;">
@@ -148,7 +149,7 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
 
         <!-- Contact details -->
         <tr><td style="background:#ffffff;padding:4px 0 8px;">
-          <p style="margin:8px 16px 4px;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Contact</p>
+          <p style="margin:8px 16px 4px;font-size:12px;color:${NAVY};text-transform:uppercase;letter-spacing:1px;font-weight:600;">Contact</p>
           <table width="100%" cellpadding="0" cellspacing="0">
             ${row('Name', `${firstName} ${lastName}`)}
             ${company ? row('Company', company) : ''}
@@ -161,10 +162,10 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
         ${hasProduct ? `
         <!-- Product details -->
         <tr><td style="background:${BG};padding:4px 0 8px;">
-          <p style="margin:8px 16px 4px;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Product</p>
+          <p style="margin:8px 16px 4px;font-size:12px;color:${NAVY};text-transform:uppercase;letter-spacing:1px;font-weight:600;">Product</p>
           <table width="100%" cellpadding="0" cellspacing="0" style="background:${BG};">
             ${productName && productSlug ? row('Product', `${productName} (${productSlug})`) : row('Product', productName)}
-            ${row('Colour', color)}
+            ${row('Color', displayColor)}
             ${size && size !== '-' ? row('Size', size) : ''}
             ${lidName && lidSlug ? row('Lid', `${lidName} (${lidSlug})`) : row('Lid', lidName)}
           </table>
@@ -173,18 +174,18 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
         ${hasDetails ? `
         <!-- Requirements -->
         <tr><td style="background:#ffffff;padding:4px 0 8px;">
-          <p style="margin:8px 16px 4px;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Requirements</p>
+          <p style="margin:8px 16px 4px;font-size:12px;color:${NAVY};text-transform:uppercase;letter-spacing:1px;font-weight:600;">Requirements</p>
           <table width="100%" cellpadding="0" cellspacing="0">
             ${row('Delivery', delivery)}
             ${details ? `<tr><td colspan="2" style="padding:10px 16px;">
-              <p style="margin:0 0 6px;font-size:13px;color:#6b7280;">Notes</p>
+              <p style="margin:0 0 6px;font-size:13px;color:${NAVY};font-weight:600;">Notes</p>
               <p style="margin:0;font-size:14px;color:#111827;line-height:1.7;white-space:pre-wrap;">${details.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
             </td></tr>` : ''}
           </table>
         </td></tr>` : ''}
 
         <!-- Footer -->
-        <tr><td style="background:#f9fafb;padding:16px 32px;border-top:1px solid #e5e7eb;">
+        <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
           <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${firstName}.</p>
         </td></tr>
 

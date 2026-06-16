@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     `Email: ${email}`,
     `Phone: ${phone}`,
     productName ? `\nProduct: ${productName} (${product})` : null,
-    color       ? `Colour: ${color}` : null,
+    color       ? `Color: ${color}` : null,
     size && size !== '-' ? `Size: ${size}` : null,
     lidName     ? `Lid: ${lidName} (${lid})` : null,
     delivery    ? `\nDelivery: ${delivery}` : null,

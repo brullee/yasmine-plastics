@@ -90,7 +90,7 @@
     "capacity": "Capacity",
     "piecesPerBox": "Pcs / Box",
     "dimensions": "Dimensions",
-    "availableColors": "Available Colours",
+    "availableColors": "Available Colors",
     "availableSizes": "Available Sizes",
     "compatibleLids": "Compatible Lids",
     "fitsContainers": "Fits these containers",
@@ -98,7 +98,7 @@
     "sendInquiry": "Send Inquiry",
     "chatNow": "Chat Now",
     "options": {
-      "color": "Colour",
+      "color": "Color",
       "size": "Size",
       "lid": "Lid",
       "custom": "Custom",
