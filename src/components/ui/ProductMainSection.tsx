@@ -4,18 +4,19 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ProductActions } from '@/components/ui/ProductActions'
-import { cn, localizedName } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
-function formatDimensions(dim: string | undefined): string | undefined {
-  if (!dim) return undefined
-  const wMatch = dim.match(/φ(\d+)/)
-  const hMatch = dim.match(/H(\d+)/)
-  if (wMatch && hMatch) return `W${wMatch[1]} × H${hMatch[1]} mm`
-  if (wMatch) return `W${wMatch[1]} mm`
-  const parts = dim.replace(/mm/gi, '').trim().split(/\s*[×x]\s*/).map(Number).filter(Boolean)
-  if (parts.length >= 2) return `W${parts[0]} × H${parts[parts.length - 1]} mm`
-  return dim
+function formatDimensions(product: Product): string | undefined {
+  if (product.shapeType === 'circular' && product.diameterTop && product.height) {
+    const phi = product.diameterBottom
+      ? `φ${product.diameterTop}/${product.diameterBottom}`
+      : `φ${product.diameterTop}`
+    return `${phi} × H${product.height} mm`
+  }
+  if (product.shapeType === 'rectangular' && product.width && product.length && product.height)
+    return `W${product.width} × L${product.length} × H${product.height} mm`
+  return undefined
 }
 
 interface Props {
@@ -33,29 +34,41 @@ export function ProductMainSection({
 }: Props) {
   const t = useTranslations('product')
 
-  const images = [product.image, ...(product.gallery ?? [])]
+  const ownImages = [product.image, ...(product.gallery ?? [])]
+  const pairingSlides = fitsContainers
+    .map((c) => ({ slug: c.slug, url: c.pairingImages?.[product.slug] ?? '' }))
+    .filter((e) => e.url && !ownImages.includes(e.url))
+  const images = [...ownImages, ...pairingSlides.map((e) => e.url)]
+
+  const firstPartnerSlug = compatibleLids[0]?.slug ?? fitsContainers[0]?.slug ?? null
+
+  const [selectedPartner, setSelectedPartner] = useState<string | null>(firstPartnerSlug)
   const [carouselIndex, setCarouselIndex] = useState(0)
-  const [selectedPartner, setSelectedPartner] = useState<string | null>(null)
 
-  // Partners can be containers (when viewing a lid) or lids (when viewing a container)
-  const allPartners = [...fitsContainers, ...compatibleLids]
-  const partnerProduct = selectedPartner ? allPartners.find((p) => p.slug === selectedPartner) ?? null : null
+  const displayImage = images[carouselIndex]
 
-  const displayImage = selectedPartner
-    ? (product.pairingImages?.[selectedPartner] ?? partnerProduct?.image ?? product.image)
-    : images[carouselIndex]
-
-  const displayAlt = partnerProduct
-    ? `${name} + ${localizedName(partnerProduct, locale)}`
-    : name
+  function handlePartnerChange(slug: string | null) {
+    setSelectedPartner(slug)
+    if (!slug) return
+    // Container page: pairing image is in our own gallery
+    const ownPairingUrl = product.pairingImages?.[slug]
+    if (ownPairingUrl) {
+      const idx = images.indexOf(ownPairingUrl)
+      if (idx !== -1) { setCarouselIndex(idx); return }
+    }
+    // Lid page: jump to the appended pairing slide
+    const slide = pairingSlides.find((e) => e.slug === slug)
+    if (slide) {
+      const idx = images.indexOf(slide.url)
+      if (idx !== -1) setCarouselIndex(idx)
+    }
+  }
 
   function prev() {
-    setSelectedPartner(null)
     setCarouselIndex((i) => (i - 1 + images.length) % images.length)
   }
 
   function next() {
-    setSelectedPartner(null)
     setCarouselIndex((i) => (i + 1) % images.length)
   }
 
@@ -69,14 +82,14 @@ export function ProductMainSection({
         <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100 dark:bg-gray-800 shadow-md">
           <Image
             src={displayImage}
-            alt={displayAlt}
+            alt={name}
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover transition-opacity duration-200"
             priority
           />
 
-          {showCarouselControls && !selectedPartner && (
+          {showCarouselControls && (
             <>
               <button
                 onClick={prev}
@@ -94,22 +107,10 @@ export function ProductMainSection({
               </button>
             </>
           )}
-
-          {/* Partner badge */}
-          {selectedPartner && partnerProduct && (
-            <div className="absolute bottom-3 start-3 end-3 flex justify-center">
-              <button
-                onClick={() => setSelectedPartner(null)}
-                className="text-xs bg-black/60 text-white px-3 py-1.5 rounded-full hover:bg-black/80 transition-colors backdrop-blur-sm"
-              >
-                {localizedName(partnerProduct, locale)} — {locale === 'ar' ? 'انقر للإزالة' : 'click to deselect'}
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* Dot indicators (own gallery only) */}
-        {showCarouselControls && !selectedPartner && (
+        {/* Dot indicators */}
+        {showCarouselControls && (
           <div className="flex justify-center gap-1.5">
             {images.map((_, i) => (
               <button
@@ -120,7 +121,7 @@ export function ProductMainSection({
                   'w-2 h-2 rounded-full transition-colors',
                   i === carouselIndex
                     ? 'bg-brand-navy dark:bg-sky-400'
-                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500',
                 )}
               />
             ))}
@@ -133,10 +134,10 @@ export function ProductMainSection({
             {images.map((src, i) => (
               <button
                 key={i}
-                onClick={() => { setSelectedPartner(null); setCarouselIndex(i) }}
+                onClick={() => setCarouselIndex(i)}
                 className={cn(
                   'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors',
-                  !selectedPartner && i === carouselIndex
+                  i === carouselIndex
                     ? 'border-brand-navy dark:border-sky-400'
                     : 'border-transparent hover:border-gray-300 dark:hover:border-gray-500'
                 )}
@@ -155,7 +156,7 @@ export function ProductMainSection({
         <div>
           {product.artCode && (
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 font-mono">
-              {product.artCode}
+              ART-{product.artCode}
             </p>
           )}
           <h1 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white leading-tight">
@@ -175,7 +176,7 @@ export function ProductMainSection({
           lids={compatibleLids}
           fitsContainers={fitsContainers}
           selectedPartner={selectedPartner}
-          onPartnerChange={(slug) => setSelectedPartner((prev) => (prev === slug ? null : slug))}
+          onPartnerChange={handlePartnerChange}
           productName={name}
           productSlug={product.slug}
           whatsappNumber={whatsappNumber}
@@ -192,14 +193,11 @@ export function ProductMainSection({
               { label: t('material'), value: product.material },
               { label: t('capacity'), value: product.capacity },
               { label: t('piecesPerBox'), value: product.piecesPerBox?.toString() },
-              { label: t('dimensions'), value: formatDimensions(product.dimensions) },
-              ...(product.options.sizes?.length
-                ? [{ label: t('availableSizes'), value: product.options.sizes.join(', ') }]
-                : []),
+              { label: t('dimensions'), value: formatDimensions(product) },
             ].map(({ label, value }) => (
               <div key={label} className="bg-white dark:bg-gray-800 px-4 py-3">
                 <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-0.5">{label}</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">{value ?? '—'}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{value || '—'}</p>
               </div>
             ))}
           </div>

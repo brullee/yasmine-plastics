@@ -5,9 +5,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { useTheme } from 'next-themes'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
-import { products } from '@/data/products'
-import { categories } from '@/data/categories'
-import type { Locale } from '@/types'
+import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName, buildWhatsAppUrl } from '@/lib/utils'
 import { company } from '@/data/company'
 
@@ -18,6 +16,8 @@ const inputCls = (hasError: boolean | undefined) =>
   cn(BASE_INPUT, hasError ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600')
 
 interface Props {
+  products: Product[]
+  categories: Category[]
   initialProduct?: string
   initialColor?: string
   initialSize?: string
@@ -25,6 +25,8 @@ interface Props {
 }
 
 export function QuoteForm({
+  products,
+  categories,
   initialProduct = '',
   initialColor = '',
   initialSize = '',
@@ -55,10 +57,12 @@ export function QuoteForm({
   const currentProduct = products.find(p => p.slug === form.product)
   const colorOptions = currentProduct?.options.colors ?? []
   const sizeOptions = currentProduct?.options.sizes ?? []
-  const lidNames = (currentProduct?.compatibleLids ?? [])
-    .map(slug => products.find(p => p.slug === slug))
-    .filter((p): p is NonNullable<typeof p> => p != null)
-    .map(p => localizedName(p, locale))
+  const lidOptions = (currentProduct?.compatibleLids ?? [])
+    .map(slug => {
+      const p = products.find(p => p.slug === slug)
+      return p ? { slug, name: localizedName(p, locale) } : null
+    })
+    .filter((l): l is { slug: string; name: string } => l !== null)
 
   if (submitted) {
     return (
@@ -249,7 +253,7 @@ export function QuoteForm({
       )}
 
       {/* Product-specific options — shown only when the selected product has them */}
-      {(colorOptions.length > 0 || sizeOptions.length > 0 || lidNames.length > 0) && (
+      {(colorOptions.length > 0 || sizeOptions.length > 0 || lidOptions.length > 0) && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
 
           {colorOptions.length > 0 && (
@@ -328,26 +332,30 @@ export function QuoteForm({
             </div>
           )}
 
-          {lidNames.length > 0 && (
+          {lidOptions.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('lid')}</p>
-                {form.lid && <span className="text-sm text-gray-500 dark:text-gray-400">{form.lid}</span>}
+                {form.lid && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {lidOptions.find(l => l.slug === form.lid)?.name}
+                  </span>
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
-                {lidNames.map((lid) => (
+                {lidOptions.map((l) => (
                   <button
-                    key={lid}
+                    key={l.slug}
                     type="button"
-                    onClick={() => setField('lid', lid)}
+                    onClick={() => setField('lid', l.slug)}
                     className={cn(
                       'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                      form.lid === lid
+                      form.lid === l.slug
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
                         : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
-                    {lid}
+                    {l.name}
                   </button>
                 ))}
               </div>

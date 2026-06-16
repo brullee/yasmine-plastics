@@ -3,8 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { ProductCard } from '@/components/ui/ProductCard'
 import { ProductMainSection } from '@/components/ui/ProductMainSection'
-import { getProductBySlug, getProductsByCategory, products } from '@/data/products'
-import { getCategoryBySlug } from '@/data/categories'
+import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
 import type { Locale } from '@/types'
@@ -16,7 +15,10 @@ interface Props {
 export default async function ProductDetailPage({ params }: Props) {
   const { locale: localeRaw, slug } = await params
   const locale = localeRaw as Locale
-  const product = getProductBySlug(slug)
+  const [product, allProducts] = await Promise.all([
+    getProductBySlug(slug),
+    getProducts(),
+  ])
 
   if (!product) notFound()
 
@@ -24,21 +26,21 @@ export default async function ProductDetailPage({ params }: Props) {
   const tNav = await getTranslations({ locale, namespace: 'nav' })
 
   const name = localizedName(product, locale)
-  const category = getCategoryBySlug(product.category)
+  const category = await getCategoryBySlug(product.category)
   const categoryName = category ? localizedName(category, locale) : product.category
 
   const compatibleLids = product.category !== 'cups' && product.compatibleLids
     ? product.compatibleLids
-        .map((s) => products.find((p) => p.slug === s) ?? null)
+        .map((s) => allProducts.find((p) => p.slug === s) ?? null)
         .filter((p): p is NonNullable<typeof p> => p !== null)
     : []
 
   const fitsContainers = (product.category === 'lids' || product.category === 'papercup-lids')
-    ? products.filter((p) => p.compatibleLids?.includes(product.slug))
+    ? allProducts.filter((p) => p.compatibleLids?.includes(product.slug))
     : []
 
-  const related = getProductsByCategory(product.category)
-    .filter((p) => p.slug !== product.slug)
+  const related = allProducts
+    .filter((p) => p.category === product.category && p.slug !== product.slug)
     .slice(0, 4)
 
   return (

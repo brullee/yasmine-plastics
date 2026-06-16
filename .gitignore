@@ -1,9 +1,6 @@
 node_modules
 .next
 tsconfig.tsbuildinfo
+.env*
 *.local
-.env
-.env.local
-.env.*.local
 Plan.md
-yasmine-logo-preview.png

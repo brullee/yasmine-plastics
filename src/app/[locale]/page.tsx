@@ -4,7 +4,6 @@ import { Link } from '@/i18n/navigation'
 import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MapEmbed } from '@/components/ui/MapEmbed'
-import { categories } from '@/data/categories'
 import { company } from '@/data/company'
 import type { Locale } from '@/types'
 

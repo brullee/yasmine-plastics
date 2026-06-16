@@ -5,12 +5,15 @@ import { withPayload } from '@payloadcms/next/withPayload'
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['monaco-editor', '@monaco-editor/react'],
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'picsum.photos',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
       },
     ],
   },

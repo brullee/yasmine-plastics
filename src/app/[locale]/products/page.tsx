@@ -2,8 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ProductsGrid } from '@/components/ui/ProductsGrid'
-import { products } from '@/data/products'
-import { categories } from '@/data/categories'
+import { getProducts, getCategories } from '@/lib/payload-data'
 import { localizedName } from '@/lib/utils'
 import type { Locale } from '@/types'
 
@@ -19,9 +18,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
   const t = await getTranslations({ locale, namespace: 'products' })
   const tNav = await getTranslations({ locale, namespace: 'nav' })
 
-  const populatedCategories = categories.filter((c) =>
-    products.some((p) => p.category === c.slug)
-  )
+  const [products, categories] = await Promise.all([getProducts(), getCategories()])
 
   // ── No category → category cards ─────────────────────────────────────────
   if (!activeCategory) {
@@ -43,7 +40,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
         <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {populatedCategories.map((cat) => (
+              {categories.map((cat) => (
                 <CategoryCard
                   key={cat.slug}
                   category={cat}

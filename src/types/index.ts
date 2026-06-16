@@ -4,6 +4,7 @@ export type Product = {
   slug: string
   nameEn: string
   nameAr: string
+  internalName?: string     // factory/internal name — admin-only, not shown on consumer UI
   category: string
   options: {
     colors?: string[]
@@ -17,8 +18,13 @@ export type Product = {
   material?: string         // e.g. 'PP' | 'PS'
   capacity?: string         // e.g. '250ml' | '750g'
   piecesPerBox?: number
-  dimensions?: string       // e.g. 'φ70 × H85 mm' or '120×80×55 mm'
-  cbm?: string              // e.g. '0.048' (cubic metres per full carton)
+  shapeType?: 'circular' | 'rectangular'
+  diameterTop?: number     // mm — circular; sole diameter when not tapered
+  tapered?: boolean
+  diameterBottom?: number  // mm — circular, tapered only
+  width?: number      // mm — rectangular only
+  length?: number     // mm — rectangular only
+  height?: number     // mm
   pairingImages?: Record<string, string> // partnerSlug → combined product photo URL
 }
 

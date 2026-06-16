@@ -33,9 +33,11 @@ export function ProductActions({
   const [selectedSize, setSelectedSize] = useState<string | null>(sizes?.[0] ?? null)
 
   const colorOptions = colors ?? []
-  const selectedLidName = lids?.find((l) => l.slug === selectedPartner)
-    ? localizedName(lids.find((l) => l.slug === selectedPartner)!, locale)
-    : null
+  const selectedPartnerProduct =
+    lids?.find((l) => l.slug === selectedPartner) ??
+    fitsContainers?.find((c) => c.slug === selectedPartner) ??
+    null
+  const selectedLidName = selectedPartnerProduct ? localizedName(selectedPartnerProduct, locale) : null
 
   const hasOptions =
     colorOptions.length > 0 ||
@@ -57,7 +59,7 @@ export function ProductActions({
   const chatUrl = buildWhatsAppUrl(whatsappNumber, chatLines.join('\n'))
 
   function togglePartner(slug: string) {
-    onPartnerChange?.(selectedPartner === slug ? null : slug)
+    onPartnerChange?.(slug)
   }
 
   return (

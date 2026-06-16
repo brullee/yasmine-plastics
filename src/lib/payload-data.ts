@@ -1,0 +1,102 @@
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import type { Product, Category } from '@/types'
+
+function mediaUrl(media: unknown): string {
+  if (!media) return ''
+  if (typeof media === 'string') return media
+  if (typeof media === 'object' && media !== null) {
+    const m = media as Record<string, unknown>
+    if (m.url && typeof m.url === 'string') {
+      // Strip origin for local files so Next.js doesn't block private IPs
+      if (m.url.includes('/api/media/file/')) {
+        try { return new URL(m.url).pathname } catch { return m.url }
+      }
+      return m.url
+    }
+    if (m.filename && typeof m.filename === 'string')
+      return `/api/media/file/${encodeURIComponent(m.filename as string)}`
+  }
+  return ''
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformProduct(doc: any): Product {
+  const category = typeof doc.category === 'object' ? (doc.category?.slug ?? '') : (doc.category ?? '')
+
+  const compatibleLids: string[] = []
+  const pairingImages: Record<string, string> = {}
+  for (const g of doc.gallery ?? []) {
+    const lidSlug = typeof g.pairedLid === 'object' ? g.pairedLid?.slug : null
+    if (lidSlug) {
+      compatibleLids.push(lidSlug)
+      const url = mediaUrl(g.image)
+      if (url) pairingImages[lidSlug] = url
+    }
+  }
+
+  return {
+    slug: doc.slug ?? '',
+    nameEn: doc.nameEn ?? '',
+    nameAr: doc.nameAr ?? '',
+    internalName: doc.internalName,
+    category,
+    options: {
+      colors: (doc.colors ?? []).map((c: { color: string }) => c.color).filter(Boolean),
+      sizes: (doc.sizes ?? []).map((s: { size: string }) => s.size).filter(Boolean),
+    },
+    compatibleLids: compatibleLids.length ? compatibleLids : undefined,
+    pairingImages: Object.keys(pairingImages).length ? pairingImages : undefined,
+    image: mediaUrl(doc.image),
+    gallery: (doc.gallery ?? []).map((g: { image: unknown }) => mediaUrl(g.image)).filter(Boolean),
+    artCode: doc.artCode,
+    material: doc.material,
+    capacity: doc.capacity,
+    piecesPerBox: doc.piecesPerBox,
+    shapeType: doc.shapeType,
+    diameterTop: doc.diameterTop,
+    tapered: doc.tapered,
+    diameterBottom: doc.diameterBottom,
+    width: doc.width,
+    length: doc.length,
+    height: doc.height,
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformCategory(doc: any): Category {
+  return {
+    slug: doc.slug ?? '',
+    nameEn: doc.nameEn ?? '',
+    nameAr: doc.nameAr ?? '',
+    image: mediaUrl(doc.image),
+  }
+}
+
+async function payload() {
+  return getPayload({ config })
+}
+
+export async function getProducts(): Promise<Product[]> {
+  const p = await payload()
+  const result = await p.find({ collection: 'products', limit: 1000, depth: 2 })
+  return result.docs.map(transformProduct).filter((p) => !!p.slug)
+}
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  const p = await payload()
+  const result = await p.find({ collection: 'products', where: { slug: { equals: slug } }, depth: 2, limit: 1 })
+  return result.docs[0] ? transformProduct(result.docs[0]) : null
+}
+
+export async function getCategories(): Promise<Category[]> {
+  const p = await payload()
+  const result = await p.find({ collection: 'categories', depth: 1, limit: 100 })
+  return result.docs.map(transformCategory)
+}
+
+export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
+  const p = await payload()
+  const result = await p.find({ collection: 'categories', where: { slug: { equals: slug } }, depth: 1, limit: 1 })
+  return result.docs[0] ? transformCategory(result.docs[0]) : undefined
+}

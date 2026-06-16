@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import { QuoteForm } from '@/components/ui/QuoteForm'
+import { getProducts, getCategories } from '@/lib/payload-data'
 import type { Locale } from '@/types'
 
 interface Props {
@@ -11,7 +12,11 @@ export default async function QuotePage({ params, searchParams }: Props) {
   const { locale: localeRaw } = await params
   const locale = localeRaw as Locale
   const { product, color, size, lid } = await searchParams
-  const t = await getTranslations({ locale, namespace: 'quote' })
+  const [t, products, categories] = await Promise.all([
+    getTranslations({ locale, namespace: 'quote' }),
+    getProducts(),
+    getCategories(),
+  ])
 
   const initialProduct = product ?? ''
   const initialColor = color ?? ''
@@ -36,6 +41,8 @@ export default async function QuotePage({ params, searchParams }: Props) {
             <p className="text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
           <QuoteForm
+            products={products}
+            categories={categories}
             initialProduct={initialProduct}
             initialColor={initialColor}
             initialSize={initialSize}
