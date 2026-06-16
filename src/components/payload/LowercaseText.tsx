@@ -1,6 +1,7 @@
 'use client'
 
 import { FieldDescription, FieldError, FieldLabel, TextInput, useField } from '@payloadcms/ui'
+import type { ChangeEvent } from 'react'
 import type { TextFieldClientComponent } from 'payload'
 
 export const LowercaseText: TextFieldClientComponent = ({ field, path, readOnly }) => {
@@ -17,10 +18,9 @@ export const LowercaseText: TextFieldClientComponent = ({ field, path, readOnly 
       <TextInput
         path={path}
         value={value ?? ''}
-        onChange={(e) => setValue(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
         readOnly={readOnly}
         showError={showError}
-        field={field}
       />
       <FieldError path={path} showError={showError} message={errorMessage ?? undefined} />
       {description && <FieldDescription path={path} description={description} />}
