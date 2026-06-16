@@ -6,8 +6,7 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import { useTheme } from 'next-themes'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import type { Locale, Product, Category } from '@/types'
-import { cn, localizedName, buildWhatsAppUrl } from '@/lib/utils'
-import { company } from '@/data/company'
+import { cn, localizedName } from '@/lib/utils'
 
 const CUSTOM = '__custom__'
 
@@ -35,13 +34,12 @@ export function QuoteForm({
   const t = useTranslations('quote.form')
   const tOpts = useTranslations('product.options')
   const tVal = useTranslations('validation')
-  const tWip = useTranslations('wip')
   const locale = useLocale() as Locale
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState(
     () => products.find(p => p.slug === initialProduct)?.category ?? ''
   )
-  const { form, submitted, errors, isFormValid, handleChange, handleBlur, handleSubmit, setField } = useQuoteForm(
+  const { form, submitted, submitting, submitError, errors, isFormValid, handleChange, handleBlur, handleSubmit, setField } = useQuoteForm(
     initialProduct,
     initialColor,
     initialSize,
@@ -75,22 +73,10 @@ export function QuoteForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5">
-      {/* WIP notice */}
-      <div className="rounded-xl bg-brand-sky dark:bg-brand-navyDark px-4 py-3">
-        <p className="text-sm text-brand-navy dark:text-gray-300">
-          {tWip('formNotice')}{' '}
-          <a
-            href={buildWhatsAppUrl(company.whatsapp)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline transition-colors"
-          >
-            {tWip('formWhatsAppCta')}
-          </a>
-        </p>
-      </div>
-
+    <form onSubmit={(e) => handleSubmit(e, turnstileToken ?? '', {
+        productName: currentProduct ? localizedName(currentProduct, locale) : '',
+        lidName: lidOptions.find((l) => l.slug === form.lid)?.name ?? '',
+      })} noValidate className="space-y-5">
       {/* Honeypot */}
       <input
         type="text"
@@ -401,12 +387,16 @@ export function QuoteForm({
         onExpire={() => setTurnstileToken(null)}
       />
 
+      {submitError && (
+        <p className="text-sm text-red-500 dark:text-red-400 text-center">{t('error')}</p>
+      )}
+
       <button
         type="submit"
-        disabled={!turnstileToken || !isFormValid}
+        disabled={!turnstileToken || !isFormValid || submitting}
         className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {t('submit')}
+        {submitting ? t('submitting') : t('submit')}
       </button>
     </form>
   )

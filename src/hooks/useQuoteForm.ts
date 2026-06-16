@@ -48,6 +48,8 @@ export function useQuoteForm(
     buildInitialForm(initialProduct, initialColor, initialSize, initialLid)
   )
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
   const [touched, setTouched] = useState<Touched>({})
 
   const errors: QuoteFormErrors = {}
@@ -89,13 +91,26 @@ export function useQuoteForm(
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent, token: string, extras?: Record<string, string>) {
     e.preventDefault()
     if (form.honeypot) return
     setTouched({ firstName: true, lastName: true, email: true, phone: true })
     if (!isFormValid) return
-    console.log('Quote form submission:', { ...form, honeypot: undefined })
-    setSubmitted(true)
+    setSubmitting(true)
+    setSubmitError(false)
+    try {
+      const res = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, ...extras, _token: token }),
+      })
+      if (!res.ok) throw new Error()
+      setSubmitted(true)
+    } catch {
+      setSubmitError(true)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function reset() {
@@ -104,5 +119,5 @@ export function useQuoteForm(
     setTouched({})
   }
 
-  return { form, submitted, errors, isFormValid, handleChange, handleBlur, handleSubmit, setField, reset }
+  return { form, submitted, submitting, submitError, errors, isFormValid, handleChange, handleBlur, handleSubmit, setField, reset }
 }

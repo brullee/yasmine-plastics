@@ -23,6 +23,8 @@ const EMPTY_FORM: ContactFormFields = {
 export function useContactForm() {
   const [form, setForm] = useState<ContactFormFields>(EMPTY_FORM)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
   const [touched, setTouched] = useState<Touched>({})
 
   const errors: ContactFormErrors = {}
@@ -47,13 +49,26 @@ export function useContactForm() {
     setTouched(prev => ({ ...prev, [e.target.name]: true }))
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent, token: string) {
     e.preventDefault()
     if (form.honeypot) return
     setTouched({ fullName: true, email: true, message: true })
     if (!isFormValid) return
-    console.log('Contact form submission:', { ...form, honeypot: undefined })
-    setSubmitted(true)
+    setSubmitting(true)
+    setSubmitError(false)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, _token: token }),
+      })
+      if (!res.ok) throw new Error()
+      setSubmitted(true)
+    } catch {
+      setSubmitError(true)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function reset() {
@@ -62,5 +77,5 @@ export function useContactForm() {
     setTouched({})
   }
 
-  return { form, submitted, errors, isFormValid, handleChange, handleBlur, handleSubmit, reset }
+  return { form, submitted, submitting, submitError, errors, isFormValid, handleChange, handleBlur, handleSubmit, reset }
 }
