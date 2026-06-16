@@ -3,9 +3,16 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { resendAdapter } from '@payloadcms/email-resend'
+import { forgotPasswordEmailHtml } from '@/lib/emailTemplates'
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+  email: resendAdapter({
+    defaultFromAddress: process.env.MAIL_FROM_NOREPLY ?? 'onboarding@resend.dev',
+    defaultFromName: 'Yasmine Plastics',
+    apiKey: process.env.RESEND_API_KEY ?? '',
+  }),
   admin: {
     user: 'users',
   },
@@ -19,15 +26,31 @@ export default buildConfig({
   collections: [
     {
       slug: 'users',
-      auth: true,
+      auth: {
+        forgotPassword: {
+          generateEmailHTML: (args) => {
+            const token = args?.token ?? ''
+            const user = args?.user
+            const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000'
+            const resetURL = `${serverURL}/admin/reset/${token}`
+            return forgotPasswordEmailHtml({ resetURL, userEmail: String((user as { email?: string }).email ?? '') })
+          },
+        },
+      },
       admin: { useAsTitle: 'email' },
       fields: [],
     },
     {
       slug: 'media',
-      upload: true,
+      upload: {
+        adminThumbnail: 'thumbnail',
+        mimeTypes: ['image/*'],
+      },
       access: { read: () => true },
-      admin: { useAsTitle: 'filename' },
+      admin: {
+        useAsTitle: 'filename',
+        description: 'Keep image files under 500 KB. Crop or compress before uploading, large files slow the site down for everyone.',
+      },
       fields: [
         { name: 'alt', label: 'Image Description', type: 'text', admin: { description: 'A short description of what\'s in the image. Used by screen readers and shown when the image fails to load. E.g. "White 250ml plastic cup".' } },
       ],
@@ -241,17 +264,16 @@ export default buildConfig({
                     },
                     {
                       type: 'row',
-                      admin: { condition: (data) => data.shapeType === 'rectangular' },
                       fields: [
-                        { name: 'width', type: 'number', label: 'Width (mm)' },
-                        { name: 'length', type: 'number', label: 'Length (mm)' },
+                        { name: 'width', type: 'number', label: 'Width (mm)', admin: { condition: (data) => data.shapeType === 'rectangular' } },
+                        { name: 'length', type: 'number', label: 'Length (mm)', admin: { condition: (data) => data.shapeType === 'rectangular' } },
                       ],
                     },
                     {
                       name: 'height',
                       type: 'number',
                       label: 'Height (mm)',
-                      admin: { condition: (data) => !!data.shapeType },
+                      admin: { condition: (data) => data.shapeType === 'circular' || data.shapeType === 'rectangular' },
                     },
                   ],
                 },

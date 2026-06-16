@@ -4,3 +4,4 @@ tsconfig.tsbuildinfo
 .env*
 *.local
 Plan.md
+scripts

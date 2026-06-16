@@ -9,10 +9,9 @@ import type { Product, Locale } from '@/types'
 
 function formatDimensions(product: Product): string | undefined {
   if (product.shapeType === 'circular' && product.diameterTop && product.height) {
-    const phi = product.diameterBottom
-      ? `φ${product.diameterTop}/${product.diameterBottom}`
-      : `φ${product.diameterTop}`
-    return `${phi} × H${product.height} mm`
+    return product.diameterBottom
+      ? `φ${product.diameterTop} × φ${product.diameterBottom} × H${product.height} mm`
+      : `φ${product.diameterTop} × H${product.height} mm`
   }
   if (product.shapeType === 'rectangular' && product.width && product.length && product.height)
     return `W${product.width} × L${product.length} × H${product.height} mm`

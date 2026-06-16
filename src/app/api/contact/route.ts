@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { transporter, MAIL_TO, MAIL_FROM, verifyTurnstile } from '@/lib/mailer'
+import { sendMail, MAIL_TO, verifyTurnstile } from '@/lib/mailer'
 import { contactEmailHtml } from '@/lib/emailTemplates'
 
 export async function POST(req: Request) {
@@ -13,8 +13,7 @@ export async function POST(req: Request) {
   if (!fullName?.trim() || !email?.trim() || !message?.trim())
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
 
-  await transporter.sendMail({
-    from: MAIL_FROM,
+  await sendMail({
     to: MAIL_TO,
     replyTo: email,
     subject: `Message from ${fullName}`,

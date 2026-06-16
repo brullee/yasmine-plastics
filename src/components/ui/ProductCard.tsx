@@ -10,9 +10,10 @@ interface Props {
   product: Product
   locale: Locale
   onQuickView?: (product: Product) => void
+  priority?: boolean
 }
 
-export function ProductCard({ product, locale, onQuickView }: Props) {
+export function ProductCard({ product, locale, onQuickView, priority = false }: Props) {
   const t = useTranslations('products')
   const name = localizedName(product, locale)
 
@@ -28,8 +29,9 @@ export function ProductCard({ product, locale, onQuickView }: Props) {
             src={product.image}
             alt={name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-contain"
+            priority={priority}
           />
         </div>
 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { transporter, MAIL_TO, MAIL_FROM, verifyTurnstile } from '@/lib/mailer'
+import { sendMail, MAIL_TO, verifyTurnstile } from '@/lib/mailer'
 import { quoteEmailHtml } from '@/lib/emailTemplates'
 
 export async function POST(req: Request) {
@@ -28,8 +28,7 @@ export async function POST(req: Request) {
     details     ? `\nDetails:\n${details}` : null,
   ].filter(Boolean).join('\n')
 
-  await transporter.sendMail({
-    from: MAIL_FROM,
+  await sendMail({
     to: MAIL_TO,
     replyTo: email,
     subject: `Quote Request from ${name}`,
