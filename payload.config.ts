@@ -68,6 +68,26 @@ export default buildConfig({
       ],
     },
     {
+      slug: 'colors',
+      admin: { useAsTitle: 'nameEn' },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'nameEn', label: 'Name (English)', type: 'text', required: true },
+            { name: 'nameAr', label: 'Name (Arabic)', type: 'text' },
+          ],
+        },
+      ],
+    },
+    {
+      slug: 'materials',
+      admin: { useAsTitle: 'name' },
+      fields: [
+        { name: 'name', label: 'Name', type: 'text', required: true },
+      ],
+    },
+    {
       slug: 'categories',
       admin: { useAsTitle: 'nameEn' },
       fields: [
@@ -227,11 +247,8 @@ export default buildConfig({
                   fields: [
                     {
                       name: 'material',
-                      type: 'select',
-                      options: [
-                        { label: 'PP (Polypropylene)', value: 'PP' },
-                        { label: 'PS (Polystyrene)', value: 'PS' },
-                      ],
+                      type: 'relationship',
+                      relationTo: 'materials',
                     },
                     {
                       type: 'row',
@@ -296,11 +313,10 @@ export default buildConfig({
               fields: [
                 {
                   name: 'colors',
-                  type: 'array',
+                  type: 'relationship',
+                  relationTo: 'colors',
+                  hasMany: true,
                   label: 'Colors',
-                  minRows: 1,
-                  validate: (value: unknown[] | null | undefined) => !value?.length ? 'At least one color is required' : true,
-                  fields: [{ name: 'color', type: 'text', required: true }],
                 },
                 {
                   name: 'sizes',

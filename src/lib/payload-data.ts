@@ -42,7 +42,13 @@ function transformProduct(doc: any): Product {
     internalName: doc.internalName,
     category,
     options: {
-      colors: (doc.colors ?? []).map((c: { color: string }) => c.color).filter(Boolean),
+      colors: (doc.colors ?? [])
+        .filter((c: unknown) => c && typeof c === 'object')
+        .map((c: unknown) => {
+          const color = c as Record<string, string>
+          return { en: color.nameEn ?? '', ar: color.nameAr || (color.nameEn ?? '') }
+        })
+        .filter((c: { en: string; ar: string }) => c.en),
       sizes: (doc.sizes ?? []).map((s: { size: string }) => s.size).filter(Boolean),
     },
     compatibleLids: compatibleLids.length ? compatibleLids : undefined,
@@ -50,7 +56,7 @@ function transformProduct(doc: any): Product {
     image: mediaUrl(doc.image),
     gallery: (doc.gallery ?? []).map((g: { image: unknown }) => mediaUrl(g.image)).filter(Boolean),
     artCode: doc.artCode,
-    material: doc.material,
+    material: typeof doc.material === 'object' && doc.material !== null ? (doc.material.name ?? undefined) : undefined,
     capacity: doc.capacity,
     piecesPerBox: doc.piecesPerBox,
     shapeType: doc.shapeType,

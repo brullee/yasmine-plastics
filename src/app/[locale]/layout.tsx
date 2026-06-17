@@ -11,6 +11,8 @@ import { Footer } from '@/components/layout/Footer'
 import { WhatsAppFAB } from '@/components/ui/WhatsAppFAB'
 import { BottomFade } from '@/components/BottomFade'
 import { FaviconSwitcher } from '@/components/FaviconSwitcher'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import '../globals.css'
 
 const inter = Inter({
@@ -85,6 +87,8 @@ export default async function LocaleLayout({ children, params }: Props) {
               <FaviconSwitcher />
             </div>
           </Providers>
+          <Analytics />
+          <SpeedInsights />
         </NextIntlClientProvider>
       </body>
     </html>
