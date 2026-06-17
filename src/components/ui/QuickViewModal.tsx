@@ -102,10 +102,10 @@ export function QuickViewModal({ product, locale, onClose }: Props) {
                 <div className="flex flex-wrap gap-1.5">
                   {product.options.colors.map((color) => (
                     <span
-                      key={color}
+                      key={color.en}
                       className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
                     >
-                      {color}
+                      {locale === 'ar' ? color.ar : color.en}
                     </span>
                   ))}
                 </div>
