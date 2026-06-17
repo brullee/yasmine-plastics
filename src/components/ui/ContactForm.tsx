@@ -1,19 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { useTheme } from 'next-themes'
 import { useContactForm } from '@/hooks/useContactForm'
-import { company } from '@/data/company'
-import { buildWhatsAppUrl } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+
+const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy'
+const inputCls = (hasError: boolean | undefined) =>
+  cn(BASE_INPUT, hasError ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600')
 
 export function ContactForm() {
   const t = useTranslations('contact.form')
-  const tWip = useTranslations('wip')
-  const locale = useLocale()
+  const tVal = useTranslations('validation')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const { form, submitted, handleChange, handleSubmit } = useContactForm()
+  const { form, submitted, submitting, submitError, errors, isFormValid, handleChange, handleBlur, handleSubmit } = useContactForm()
   const { resolvedTheme } = useTheme()
 
   if (submitted) {
@@ -27,22 +29,7 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5">
-      {/* WIP notice */}
-      <div className="rounded-xl bg-brand-sky dark:bg-brand-navyDark px-4 py-3">
-        <p className="text-sm text-brand-navy dark:text-gray-300">
-          {tWip('formNotice')}{' '}
-          <a
-            href={buildWhatsAppUrl(company.whatsapp)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline transition-colors"
-          >
-            {tWip('formWhatsAppCta')}
-          </a>
-        </p>
-      </div>
-
+    <form onSubmit={(e) => handleSubmit(e, turnstileToken ?? '')} noValidate>
       {/* Honeypot — hidden from real users, must stay empty */}
       <input
         type="text"
@@ -54,6 +41,7 @@ export function ContactForm() {
         aria-hidden="true"
         className="absolute opacity-0 h-0 w-0 pointer-events-none"
       />
+      <div className="space-y-5">
 
       <div>
         <label htmlFor="contact-fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -66,9 +54,13 @@ export function ContactForm() {
           required
           value={form.fullName}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder={t('placeholderName')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+          className={inputCls(!!errors.fullName)}
         />
+        {errors.fullName && (
+          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.fullName)}</p>
+        )}
       </div>
 
       <div>
@@ -82,9 +74,13 @@ export function ContactForm() {
           required
           value={form.email}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder={t('placeholderEmail')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+          className={inputCls(!!errors.email)}
         />
+        {errors.email && (
+          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.email)}</p>
+        )}
       </div>
 
       <div>
@@ -102,7 +98,7 @@ export function ContactForm() {
             handleChange(e)
           }}
           placeholder={t('placeholderPhone')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy rtl:text-right"
+          className={cn(inputCls(false), 'rtl:text-right')}
         />
       </div>
 
@@ -117,9 +113,16 @@ export function ContactForm() {
           rows={5}
           value={form.message}
           onChange={handleChange}
+          onBlur={handleBlur}
           placeholder={t('placeholderMessage')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]"
+          className={cn(
+            'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]',
+            errors.message ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600',
+          )}
         />
+        {errors.message && (
+          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.message)}</p>
+        )}
       </div>
 
       <Turnstile
@@ -129,13 +132,18 @@ export function ContactForm() {
         onExpire={() => setTurnstileToken(null)}
       />
 
+      {submitError && (
+        <p className="text-sm text-red-500 dark:text-red-400 text-center">{t('error')}</p>
+      )}
+
       <button
         type="submit"
-        disabled={!turnstileToken}
+        disabled={!turnstileToken || !isFormValid || submitting}
         className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {t('submit')}
+        {submitting ? t('submitting') : t('submit')}
       </button>
+      </div>
     </form>
   )
 }

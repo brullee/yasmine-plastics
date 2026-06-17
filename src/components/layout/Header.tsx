@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 import { useTranslations, useLocale } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { Link, useRouter, usePathname } from '@/i18n/navigation'
@@ -10,7 +12,7 @@ type NavKey = 'home' | 'about' | 'products' | 'contact'
 const NAV_LINKS: { key: NavKey; href: string; wip?: boolean }[] = [
   { key: 'home', href: '/' },
   { key: 'about', href: '/about' },
-  { key: 'products', href: '/products', wip: true },
+  { key: 'products', href: '/products' },
   { key: 'contact', href: '/contact' },
 ]
 
@@ -74,6 +76,20 @@ export function Header() {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
     router.replace(pathname, { locale: newLocale })
   }
+
+  // When back/forward navigation lands on a URL whose locale doesn't match the
+  // saved preference (e.g. back-button to an old /en/ URL after switching to Arabic),
+  // silently redirect to the correct locale. Runs on every pathname change so it
+  // catches client-side back/forward navigations that bypass the middleware.
+  useIsomorphicLayoutEffect(() => {
+    const saved = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/)?.[1]
+    if (saved && (saved === 'en' || saved === 'ar') && saved !== locale) {
+      document.documentElement.style.opacity = '0'
+      router.replace(`${pathname}${window.location.search}`, { locale: saved as 'en' | 'ar' })
+    } else {
+      document.documentElement.style.opacity = ''
+    }
+  }, [pathname, locale])
 
   // Avoid hydration mismatch — system theme is unknown during SSR
   useEffect(() => setThemeMounted(true), [])

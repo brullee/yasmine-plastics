@@ -10,14 +10,26 @@ export const categories: Category[] = [
   {
     slug: 'containers',
     nameEn: 'Containers',
-    nameAr: 'حاويات',
+    nameAr: 'علب',
     image: 'https://picsum.photos/seed/category-containers/600/400',
   },
   {
-    slug: 'specialty',
-    nameEn: 'Specialty',
-    nameAr: 'منتجات أخرى',
-    image: 'https://picsum.photos/seed/category-specialty/600/400',
+    slug: 'buckets',
+    nameEn: 'Buckets',
+    nameAr: 'سطول',
+    image: 'https://picsum.photos/seed/category-buckets/600/400',
+  },
+  {
+    slug: 'lids',
+    nameEn: 'Lids',
+    nameAr: 'أغطية',
+    image: 'https://picsum.photos/seed/category-lids/600/400',
+  },
+  {
+    slug: 'papercup-lids',
+    nameEn: 'Paper Cup Lids',
+    nameAr: 'أغطية الأكواب الورقية',
+    image: 'https://picsum.photos/seed/category-papercup-lids/600/400',
   },
 ]
 

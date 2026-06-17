@@ -10,7 +10,7 @@ type FooterNavKey = 'home' | 'about' | 'products' | 'contact' | 'quote'
 const NAV_LINKS: { key: FooterNavKey; href: string; wip?: boolean }[] = [
   { key: 'home', href: '/' },
   { key: 'about', href: '/about' },
-  { key: 'products', href: '/products', wip: true },
+  { key: 'products', href: '/products' },
   { key: 'contact', href: '/contact' },
   { key: 'quote', href: '/quote' },
 ]

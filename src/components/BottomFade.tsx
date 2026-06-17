@@ -49,7 +49,7 @@ export function BottomFade() {
 
   if (!mounted) return null
 
-  const color = resolvedTheme === 'dark' ? '13, 27, 42' : '220, 220, 220'
+  const color = resolvedTheme === 'dark' ? '13, 27, 42' : '255, 255, 255'
 
   return (
     <div

@@ -11,12 +11,6 @@ export function localizedName(
   return locale === 'ar' ? item.nameAr : item.nameEn
 }
 
-export function localizedDescription(
-  item: { descriptionEn: string; descriptionAr: string },
-  locale: Locale
-): string {
-  return locale === 'ar' ? item.descriptionAr : item.descriptionEn
-}
 
 export function buildWhatsAppUrl(phone: string, message?: string): string {
   const clean = phone.replace(/[^0-9]/g, '')
