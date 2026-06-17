@@ -247,23 +247,25 @@ export function QuoteForm({
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('color')}</p>
                 {form.color && form.color !== CUSTOM && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{form.color}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {locale === 'ar' ? (colorOptions.find(c => c.en === form.color)?.ar ?? form.color) : form.color}
+                  </span>
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {colorOptions.map((color) => (
                   <button
-                    key={color}
+                    key={color.en}
                     type="button"
-                    onClick={() => setField('color', color)}
+                    onClick={() => setField('color', color.en)}
                     className={cn(
                       'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                      form.color === color
+                      form.color === color.en
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
                         : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
-                    {color}
+                    {locale === 'ar' ? color.ar : color.en}
                   </button>
                 ))}
                 <button

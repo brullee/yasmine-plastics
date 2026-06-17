@@ -10,7 +10,7 @@ import type { Product, Locale } from '@/types'
 const CUSTOM = '__custom__'
 
 interface Props {
-  colors?: string[]
+  colors?: { en: string; ar: string }[]
   sizes?: string[]
   lids?: Product[]
   fitsContainers?: Product[]
@@ -29,7 +29,7 @@ export function ProductActions({
   const t = useTranslations('product')
   const tOpts = useTranslations('product.options')
 
-  const [selectedColor, setSelectedColor] = useState<string | null>(colors?.[0] ?? null)
+  const [selectedColor, setSelectedColor] = useState<string | null>(colors?.[0]?.en ?? null)
   const [selectedSize, setSelectedSize] = useState<string | null>(sizes?.[0] ?? null)
 
   const colorOptions = colors ?? []
@@ -47,7 +47,7 @@ export function ProductActions({
 
   const chatLines = locale === 'ar' ? [
     `مرحباً، أنا مهتم بـ: ${productName} (${productSlug})`,
-    ...(selectedColor ? [`اللون: ${selectedColor === CUSTOM ? 'مخصص' : selectedColor}`] : []),
+    ...(selectedColor ? [`اللون: ${selectedColor === CUSTOM ? 'مخصص' : (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)}`] : []),
     ...(selectedSize ? [`المقاس: ${selectedSize}`] : []),
     ...(selectedLidName ? [`الغطاء: ${selectedLidName}`] : []),
   ] : [
@@ -94,22 +94,26 @@ export function ProductActions({
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('color')}</p>
                 {selectedColor && selectedColor !== CUSTOM && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{selectedColor}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {locale === 'ar'
+                      ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)
+                      : selectedColor}
+                  </span>
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {colorOptions.map((color) => (
                   <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
+                    key={color.en}
+                    onClick={() => setSelectedColor(color.en)}
                     className={cn(
                       'px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      selectedColor === color
+                      selectedColor === color.en
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
                         : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
-                    {color}
+                    {locale === 'ar' ? color.ar : color.en}
                   </button>
                 ))}
                 <button

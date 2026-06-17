@@ -7,7 +7,7 @@ export type Product = {
   internalName?: string     // factory/internal name — admin-only, not shown on consumer UI
   category: string
   options: {
-    colors?: string[]
+    colors?: { en: string; ar: string }[]
     sizes?: string[]
   }
   compatibleLids?: string[]
@@ -15,7 +15,7 @@ export type Product = {
   gallery?: string[]         // additional product images (shown in carousel after primary)
   // Key attributes — fill in as real data becomes available
   artCode?: string          // e.g. 'art-70-200' (art-neck-volume)
-  material?: string         // e.g. 'PP' | 'PS'
+  material?: string
   capacity?: string         // e.g. '250ml' | '750g'
   piecesPerBox?: number
   shapeType?: 'circular' | 'rectangular'
