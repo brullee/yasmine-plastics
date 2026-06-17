@@ -2,7 +2,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml } from '@/lib/emailTemplates'
 
@@ -17,10 +17,22 @@ export default buildConfig({
     user: 'users',
   },
   plugins: [
-    vercelBlobStorage({
-      enabled: !!process.env.BLOB_READ_WRITE_TOKEN,
-      collections: { media: true },
-      token: process.env.BLOB_READ_WRITE_TOKEN ?? '',
+    s3Storage({
+      collections: {
+        media: {
+          generateFileURL: ({ filename }) =>
+            `${process.env.R2_PUBLIC_URL ?? ''}/${filename}`,
+        },
+      },
+      bucket: process.env.R2_BUCKET ?? '',
+      config: {
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID ?? '',
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? '',
+        },
+        region: 'auto',
+        endpoint: process.env.R2_ENDPOINT ?? '',
+      },
     }),
   ],
   collections: [
