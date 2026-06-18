@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef } from 'react'
 
@@ -34,11 +34,11 @@ export function ScrollReveal({ children, direction = 'up', delay = 0, className 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.intersectionRatio >= 0.15 && !inView.current) {
-          // Enough of the element is visible — animate in
+          // Enough of the element is visible - animate in
           inView.current = true
           play()
         } else if (entry.intersectionRatio === 0 && inView.current) {
-          // Fully off screen — silently reset so it re-animates next time
+          // Fully off screen - silently reset so it re-animates next time
           inView.current = false
           el.style.animation = 'none'
           el.style.opacity = '0'

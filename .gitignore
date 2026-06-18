@@ -4,4 +4,7 @@ tsconfig.tsbuildinfo
 .env*
 *.local
 Plan.md
-scripts
+scripts/images-*
+# Python
+__pycache__/
+*.pyc

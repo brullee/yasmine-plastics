@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
@@ -35,7 +35,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
           />
         </div>
 
-        {/* Name + actions — fixed height, no layout shift */}
+        {/* Name + actions - fixed height, no layout shift */}
         <div className="border-t border-gray-100 dark:border-slate-700 px-3 pt-2.5 pb-1 rounded-b-xl">
           <h3 className="font-medium text-gray-900 dark:text-white text-sm leading-snug">
             {name}

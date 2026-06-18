@@ -1,4 +1,4 @@
-import createMiddleware from 'next-intl/middleware'
+﻿import createMiddleware from 'next-intl/middleware'
 // TODO: update to next-intl/proxy once next-intl officially supports Next.js 16
 import { routing } from './i18n/routing'
 import type { NextRequest } from 'next/server'
@@ -19,7 +19,7 @@ export default function proxy(req: NextRequest) {
     )
 
     if (!urlLocale) {
-      // No locale prefix — redirect to saved preference (existing behaviour)
+      // No locale prefix - redirect to saved preference (existing behaviour)
       const url = req.nextUrl.clone()
       url.pathname = `/${saved}${pathname === '/' ? '' : pathname}`
       return NextResponse.redirect(url)
@@ -27,7 +27,7 @@ export default function proxy(req: NextRequest) {
 
     if (urlLocale !== saved) {
       // URL has a different locale than the saved preference (e.g. back button hit
-      // an old /en/ URL after the user switched to Arabic) — redirect to match preference
+      // an old /en/ URL after the user switched to Arabic) - redirect to match preference
       const url = req.nextUrl.clone()
       url.pathname = `/${saved}${pathname.slice(`/${urlLocale}`.length) || '/'}`
       return NextResponse.redirect(url)
