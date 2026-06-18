@@ -196,7 +196,7 @@ export function ProductMainSection({
             ].map(({ label, value }) => (
               <div key={label} className="bg-white dark:bg-gray-800 px-4 py-3">
                 <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-0.5">{label}</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">{value || '—'}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{value || '-'}</p>
               </div>
             ))}
           </div>

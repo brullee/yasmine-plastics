@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -30,7 +30,7 @@ export function ContactForm() {
 
   return (
     <form onSubmit={(e) => handleSubmit(e, turnstileToken ?? '')} noValidate>
-      {/* Honeypot — hidden from real users, must stay empty */}
+      {/* Honeypot - hidden from real users, must stay empty */}
       <input
         type="text"
         name="honeypot"

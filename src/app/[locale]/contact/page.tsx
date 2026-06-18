@@ -25,7 +25,7 @@ export default async function ContactPage({ params }: Props) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-        {/* Left: contact form — primary action comes first */}
+        {/* Left: contact form - primary action comes first */}
         <div>
           <ContactForm />
         </div>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
@@ -118,7 +118,7 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar — copyright + utility controls */}
+      {/* Bottom bar - copyright + utility controls */}
       <div id="footer-bottom-bar" className="border-t border-gray-100 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
           <p>{t('footer.copyright')}</p>

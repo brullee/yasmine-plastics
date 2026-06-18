@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useLayoutEffect } from 'react'
 
@@ -91,7 +91,7 @@ export function Header() {
     }
   }, [pathname, locale])
 
-  // Avoid hydration mismatch — system theme is unknown during SSR
+  // Avoid hydration mismatch - system theme is unknown during SSR
   useEffect(() => setThemeMounted(true), [])
 
   return (
@@ -129,7 +129,7 @@ export function Header() {
 
           {/* Right-side controls */}
           <div className="flex items-center gap-1">
-            {/* Theme toggle — rendered only after mount to avoid SSR/client mismatch */}
+            {/* Theme toggle - rendered only after mount to avoid SSR/client mismatch */}
             {themeMounted && (
               <button onClick={toggleTheme} aria-label="Toggle theme" className={subtleBtn}>
                 {resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}

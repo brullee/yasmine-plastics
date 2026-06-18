@@ -110,7 +110,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
       {/* Product grid */}
       <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-          {/* Can't find — top */}
+          {/* Can't find - top */}
           <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <p className="font-semibold text-brand-navy dark:text-white text-sm mb-0.5">
@@ -137,7 +137,7 @@ export default async function ProductsPage({ params, searchParams }: Props) {
             )
           }
 
-          {/* Can't find — bottom (only when list is long enough to scroll) */}
+          {/* Can't find - bottom (only when list is long enough to scroll) */}
           {filtered.length > 6 && (
             <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>

@@ -1,5 +1,9 @@
 import path from 'path'
+import { after } from 'next/server'
 import { buildConfig } from 'payload'
+import { normalizeMediaAfterUpload } from '@/lib/image-normalize'
+
+const pendingNormalize = new Set<string>()
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
@@ -15,6 +19,9 @@ export default buildConfig({
   }),
   admin: {
     user: 'users',
+    components: {
+      providers: ['@/components/payload/ClientImageCompressor#ClientImageCompressorProvider'],
+    },
   },
   plugins: [
     s3Storage({
@@ -63,8 +70,47 @@ export default buildConfig({
         useAsTitle: 'filename',
         description: 'Keep image files under 500 KB. Crop or compress before uploading, large files slow the site down for everyone.',
       },
+      hooks: {
+        afterChange: [
+          async ({ doc, operation, req }) => {
+            if (!doc.normalizeImage || !doc.filename) return
+            // The file reaches R2 after the create hooks complete.
+            // Flag on create, then process on the update that immediately follows.
+            if (operation === 'create') {
+              pendingNormalize.add(String(doc.id))
+              return
+            }
+            if (operation === 'update' && pendingNormalize.has(String(doc.id))) {
+              pendingNormalize.delete(String(doc.id))
+              const { filename, id } = doc
+              const { payload } = req
+              // Defer so this runs after the upload request completes.
+              // Avoids re-entrant payload.update conflict and unblocks the 201 response.
+              after(async () => {
+                try {
+                  await normalizeMediaAfterUpload(filename, id, payload)
+                } catch (err) {
+                  console.error('[image-normalize] Failed:', err)
+                }
+              })
+            }
+          },
+        ],
+      },
       fields: [
+        {
+          name: 'normalizingIndicator',
+          type: 'ui',
+          admin: { components: { Field: '@/components/payload/NormalizingIndicator#NormalizingIndicator' } },
+        },
         { name: 'alt', label: 'Image Description', type: 'text', admin: { description: 'A short description of what\'s in the image. Used by screen readers and shown when the image fails to load. E.g. "White 250ml plastic cup".' } },
+        {
+          name: 'normalizeImage',
+          type: 'checkbox',
+          label: 'Normalize image',
+          defaultValue: true,
+          admin: { description: 'Removes background, scales subject to 65% of canvas, and centres on a white 1400×1400 background. Runs after upload. Allow 30-60 seconds then refresh.' },
+        },
       ],
     },
     {
