@@ -47,7 +47,7 @@ const MODAL_IDLE_MS = 5 * 60 * 1000
 function maybeFlagWarmup() {
   const last = Number(localStorage.getItem('lastNormalizeUpload') ?? '0')
   if (Date.now() - last > MODAL_IDLE_MS) {
-    localStorage.setItem('modalWarmingUp', 'true')
+    localStorage.setItem('modalWarmingUp', String(Date.now()))
   }
   localStorage.setItem('lastNormalizeUpload', String(Date.now()))
 }

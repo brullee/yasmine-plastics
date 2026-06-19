@@ -143,8 +143,11 @@ export default buildConfig({
             { label: 'Gentle', value: 'gentle' },
           ],
           admin: {
+            disableListColumn: true,
             description: 'Use Gentle for white or transparent products to avoid clipping edges.',
-            condition: (data) => !!data.normalizeImage,
+            components: {
+              Field: '@/components/payload/ProcessingModeField#ProcessingModeField',
+            },
           },
         },
       ],
@@ -384,7 +387,7 @@ export default buildConfig({
                       name: 'tapered',
                       type: 'checkbox',
                       label: 'Tapered (different top & bottom diameter)',
-                      defaultValue: true,
+                      defaultValue: false,
                       admin: { condition: (data) => data.shapeType === 'circular' },
                     },
                     {

@@ -9,6 +9,14 @@ const handleI18nRouting = createMiddleware(routing)
 export default function proxy(req: NextRequest) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204 })
 
+  const host = req.headers.get('host') ?? ''
+  if (host === 'admin.yasmineplastics.com') {
+    const url = req.nextUrl.clone()
+    const path = req.nextUrl.pathname
+    url.pathname = path === '/' ? '/admin' : `/admin${path}`
+    return NextResponse.rewrite(url)
+  }
+
   const pathname = req.nextUrl.pathname
   const saved = req.cookies.get('NEXT_LOCALE')?.value
   const validLocales = routing.locales as readonly string[]
