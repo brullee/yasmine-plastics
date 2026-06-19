@@ -152,6 +152,7 @@ export default buildConfig({
     {
       slug: 'colors',
       admin: { useAsTitle: 'nameEn' },
+      access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
       fields: [
         {
           type: 'row',
@@ -165,6 +166,7 @@ export default buildConfig({
     {
       slug: 'materials',
       admin: { useAsTitle: 'name' },
+      access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
       fields: [
         { name: 'name', label: 'Name', type: 'text', required: true },
       ],
