@@ -2,16 +2,22 @@ import path from 'path'
 import { after } from 'next/server'
 import { buildConfig } from 'payload'
 import { normalizeMediaAfterUpload } from '@/lib/image-normalize'
-
-const pendingNormalize = new Set<string>()
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml } from '@/lib/emailTemplates'
 
+const pendingNormalize = new Set<string>()
+
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+  i18n: {
+    translations: {
+      en: { general: { noLabel: '–' } },
+      ar: { general: { noLabel: '–' } },
+    },
+  },
   email: resendAdapter({
     defaultFromAddress: process.env.MAIL_FROM_NOREPLY ?? 'onboarding@resend.dev',
     defaultFromName: 'Yasmine Plastics',
@@ -20,7 +26,9 @@ export default buildConfig({
   admin: {
     user: 'users',
     components: {
-      providers: ['@/components/payload/ClientImageCompressor#ClientImageCompressorProvider'],
+      providers: [
+        '@/components/payload/ClientImageCompressor#ClientImageCompressorProvider',
+      ],
     },
   },
   plugins: [
@@ -68,32 +76,44 @@ export default buildConfig({
       access: { read: () => true },
       admin: {
         useAsTitle: 'filename',
-        description: 'Keep image files under 500 KB. Crop or compress before uploading, large files slow the site down for everyone.',
+        description: 'Images are compressed automatically on upload.',
       },
       hooks: {
         afterChange: [
-          async ({ doc, operation, req }) => {
+          async ({ doc, operation, previousDoc, req }) => {
             if (!doc.normalizeImage || !doc.filename) return
-            // The file reaches R2 after the create hooks complete.
-            // Flag on create, then process on the update that immediately follows.
+            const docIdStr = String(doc.id)
+
             if (operation === 'create') {
-              pendingNormalize.add(String(doc.id))
+              // File reaches R2 after create hooks complete; flag here and
+              // process on the auto-update Payload fires right after.
+              pendingNormalize.add(docIdStr)
               return
             }
-            if (operation === 'update' && pendingNormalize.has(String(doc.id))) {
-              pendingNormalize.delete(String(doc.id))
-              const { filename, id } = doc
-              const { payload } = req
-              // Defer so this runs after the upload request completes.
-              // Avoids re-entrant payload.update conflict and unblocks the 201 response.
-              after(async () => {
-                try {
-                  await normalizeMediaAfterUpload(filename, id, payload)
-                } catch (err) {
-                  console.error('[image-normalize] Failed:', err)
-                }
-              })
-            }
+
+            if (operation !== 'update') return
+
+            const isPostCreateUpdate = pendingNormalize.has(docIdStr)
+            // File replaced on an existing record (not our own normalizer's rename,
+            // which sets width/height to 1400 in the same payload.update call).
+            const isFileReplacement =
+              !isPostCreateUpdate &&
+              !!previousDoc?.filename &&
+              doc.filename !== previousDoc.filename &&
+              !(doc.width === 1400 && doc.height === 1400)
+
+            if (!isPostCreateUpdate && !isFileReplacement) return
+            if (isPostCreateUpdate) pendingNormalize.delete(docIdStr)
+
+            const { filename, id, processingMode } = doc
+            const { payload } = req
+            after(async () => {
+              try {
+                await normalizeMediaAfterUpload(filename, id, payload, processingMode ?? 'standard')
+              } catch (err) {
+                console.error('[image-normalize] Failed:', err)
+              }
+            })
           },
         ],
       },
@@ -101,15 +121,31 @@ export default buildConfig({
         {
           name: 'normalizingIndicator',
           type: 'ui',
-          admin: { components: { Field: '@/components/payload/NormalizingIndicator#NormalizingIndicator' } },
+          admin: { disableListColumn: true, components: { Field: '@/components/payload/NormalizingIndicator#NormalizingIndicator' } },
         },
-        { name: 'alt', label: 'Image Description', type: 'text', admin: { description: 'A short description of what\'s in the image. Used by screen readers and shown when the image fails to load. E.g. "White 250ml plastic cup".' } },
+        { name: 'filesize', type: 'number', admin: { readOnly: true, components: { Cell: '@/components/payload/FileSizeCell#FileSizeCell' } } },
+        { name: 'url', type: 'text', admin: { readOnly: true, components: { Cell: '@/components/payload/UrlCell#UrlCell' } } },
+        { name: 'alt', label: 'Image Description', type: 'text', admin: { description: 'Describe the image briefly. E.g. "White 250ml plastic cup".' } },
         {
           name: 'normalizeImage',
           type: 'checkbox',
-          label: 'Normalize image',
+          label: 'Normalized',
           defaultValue: true,
-          admin: { description: 'Removes background, scales subject to 65% of canvas, and centres on a white 1400×1400 background. Runs after upload. Allow 30-60 seconds then refresh.' },
+          admin: { description: 'Removes background and centres on a white 1400x1400 canvas. Runs after upload, allow up to 30 seconds.' },
+        },
+        {
+          name: 'processingMode',
+          type: 'radio',
+          label: 'Processing Mode',
+          defaultValue: 'standard',
+          options: [
+            { label: 'Standard', value: 'standard' },
+            { label: 'Gentle', value: 'gentle' },
+          ],
+          admin: {
+            description: 'Use Gentle for white or transparent products to avoid clipping edges.',
+            condition: (data) => !!data.normalizeImage,
+          },
         },
       ],
     },
@@ -171,7 +207,7 @@ export default buildConfig({
         {
           name: 'supportsCompatibleLids',
           type: 'checkbox',
-          label: 'Gallery images for products in this category can be paired with a lid',
+          label: 'Support Lid Pairing',
           defaultValue: false,
         },
       ],
@@ -277,6 +313,16 @@ export default buildConfig({
                           { 'category.slug': { equals: 'papercup-lids' } },
                           { 'category.slug': { equals: 'papercup-lid' } },
                         ],
+                      },
+                    },
+                    {
+                      name: 'showInLidGallery',
+                      type: 'checkbox',
+                      label: 'Show on lid page',
+                      defaultValue: true,
+                      admin: {
+                        description: 'Include this image in the pairing gallery shown on the lid\'s product page.',
+                        condition: (data, siblingData) => !!data.hasCompatibleLids && !!(siblingData as Record<string, unknown>)?.pairedLid,
                       },
                     },
                   ],

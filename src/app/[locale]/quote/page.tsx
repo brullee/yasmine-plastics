@@ -1,56 +1,41 @@
-import { getTranslations } from 'next-intl/server'
+export const revalidate = 3600
+
+import { Suspense } from 'react'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { QuoteForm } from '@/components/ui/QuoteForm'
 import { getProducts, getCategories } from '@/lib/payload-data'
 import type { Locale } from '@/types'
 
 interface Props {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ product?: string; color?: string; size?: string; lid?: string }>
 }
 
-export default async function QuotePage({ params, searchParams }: Props) {
+export default async function QuotePage({ params }: Props) {
   const { locale: localeRaw } = await params
   const locale = localeRaw as Locale
-  const { product, color, size, lid } = await searchParams
+  setRequestLocale(locale)
+
   const [t, products, categories] = await Promise.all([
     getTranslations({ locale, namespace: 'quote' }),
     getProducts(),
     getCategories(),
   ])
 
-  const initialProduct = product ?? ''
-  const initialColor = color ?? ''
-  const initialSize = size ?? ''
-  const initialLid = lid ?? ''
-
-  const steps = [
-    t('step1'),
-    t('step2'),
-    t('step3'),
-  ]
+  const steps = [t('step1'), t('step2'), t('step3')]
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16 items-start">
-        {/* Form - takes 2/3 width */}
         <div className="lg:col-span-2">
           <div className="mb-10">
-            <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">
-              {t('title')}
-            </h1>
+            <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">{t('title')}</h1>
             <p className="text-gray-500 dark:text-gray-400">{t('subtitle')}</p>
           </div>
-          <QuoteForm
-            products={products}
-            categories={categories}
-            initialProduct={initialProduct}
-            initialColor={initialColor}
-            initialSize={initialSize}
-            initialLid={initialLid}
-          />
+          <Suspense>
+            <QuoteForm products={products} categories={categories} />
+          </Suspense>
         </div>
 
-        {/* Sidebar - what happens next */}
         <div className="lg:sticky lg:top-24">
           <div className="bg-brand-sky dark:bg-brand-navyDark rounded-2xl p-6">
             <h2 className="text-base font-bold text-brand-navy dark:text-white mb-5 uppercase tracking-wide">
@@ -62,9 +47,7 @@ export default async function QuotePage({ params, searchParams }: Props) {
                   <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-navy text-white dark:bg-white dark:text-brand-navy text-sm font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 pt-0.5 leading-relaxed">
-                    {step}
-                  </p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 pt-0.5 leading-relaxed">{step}</p>
                 </li>
               ))}
             </ol>

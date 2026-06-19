@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { ProductCard } from '@/components/ui/ProductCard'
 import { ProductMainSection } from '@/components/ui/ProductMainSection'
@@ -8,6 +8,16 @@ import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
 import type { Locale } from '@/types'
 
+export const revalidate = 3600
+
+export async function generateStaticParams() {
+  if (process.env.NODE_ENV === 'development') return []
+  const products = await getProducts()
+  return (['en', 'ar'] as const).flatMap((locale) =>
+    products.map((p) => ({ locale, slug: p.slug }))
+  )
+}
+
 interface Props {
   params: Promise<{ locale: string; slug: string }>
 }
@@ -15,6 +25,7 @@ interface Props {
 export default async function ProductDetailPage({ params }: Props) {
   const { locale: localeRaw, slug } = await params
   const locale = localeRaw as Locale
+  setRequestLocale(locale)
   const [product, allProducts] = await Promise.all([
     getProductBySlug(slug),
     getProducts(),

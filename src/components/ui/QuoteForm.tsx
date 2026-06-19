@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { useTheme } from 'next-themes'
@@ -17,20 +18,18 @@ const inputCls = (hasError: boolean | undefined) =>
 interface Props {
   products: Product[]
   categories: Category[]
-  initialProduct?: string
-  initialColor?: string
-  initialSize?: string
-  initialLid?: string
 }
 
 export function QuoteForm({
   products,
   categories,
-  initialProduct = '',
-  initialColor = '',
-  initialSize = '',
-  initialLid = '',
 }: Props) {
+  const searchParams = useSearchParams()
+  const initialProduct = searchParams.get('product') ?? ''
+  const initialColor   = searchParams.get('color')   ?? ''
+  const initialSize    = searchParams.get('size')     ?? ''
+  const initialLid     = searchParams.get('lid')      ?? ''
+
   const t = useTranslations('quote.form')
   const tOpts = useTranslations('product.options')
   const tVal = useTranslations('validation')
@@ -242,6 +241,36 @@ export function QuoteForm({
       {(colorOptions.length > 0 || sizeOptions.length > 0 || lidOptions.length > 0) && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
 
+          {lidOptions.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('lid')}</p>
+                {form.lid && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {lidOptions.find(l => l.slug === form.lid)?.name}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {lidOptions.map((l) => (
+                  <button
+                    key={l.slug}
+                    type="button"
+                    onClick={() => setField('lid', l.slug)}
+                    className={cn(
+                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
+                      form.lid === l.slug
+                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
+                    )}
+                  >
+                    {l.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {colorOptions.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -314,36 +343,6 @@ export function QuoteForm({
                     )}
                   >
                     {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {lidOptions.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('lid')}</p>
-                {form.lid && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {lidOptions.find(l => l.slug === form.lid)?.name}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {lidOptions.map((l) => (
-                  <button
-                    key={l.slug}
-                    type="button"
-                    onClick={() => setField('lid', l.slug)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                      form.lid === l.slug
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {l.name}
                   </button>
                 ))}
               </div>

@@ -6,12 +6,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'media.yasmineplastics.com',
-      },
-    ],
+    unoptimized: true,
   },
 }
 

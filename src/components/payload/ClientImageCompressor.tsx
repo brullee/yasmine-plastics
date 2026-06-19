@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 
 const MAX_DIMENSION  = 3000
-const WEBP_QUALITY   = 0.85
+const WEBP_QUALITY   = 1.0
 const SIZE_THRESHOLD = 200 * 1024 // skip files already under 200 KB
 
 async function compressToWebP(file: File): Promise<File> {
@@ -54,37 +54,55 @@ function maybeFlagWarmup() {
 
 const compressing = new WeakSet<HTMLInputElement>()
 
-async function interceptChange(e: Event) {
-  const input = e.target as HTMLInputElement
-  if (compressing.has(input))       return
-  if (!input.files?.[0])            return
-  const file = input.files[0]
-  if (!file.type.startsWith('image/')) return
-  if (file.size <= SIZE_THRESHOLD)     return
-
-  e.stopImmediatePropagation()
-  maybeFlagWarmup()
-
+async function dispatchCompressed(input: HTMLInputElement, file: File) {
   const result = await compressToWebP(file)
-
   const dt = new DataTransfer()
   dt.items.add(result)
   input.files = dt.files
-
   compressing.add(input)
   input.dispatchEvent(new Event('change', { bubbles: true }))
   compressing.delete(input)
 }
 
+async function interceptChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (compressing.has(input)) return
+  const file = input.files?.[0]
+  if (!file || !file.type.startsWith('image/') || file.size <= SIZE_THRESHOLD) return
+
+  e.stopImmediatePropagation()
+  maybeFlagWarmup()
+  await dispatchCompressed(input, file)
+}
+
+async function interceptDrop(e: DragEvent) {
+  const file = e.dataTransfer?.files?.[0]
+  if (!file || !file.type.startsWith('image/') || file.size <= SIZE_THRESHOLD) return
+
+  const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>('input[type="file"]')
+  if (!input) return
+
+  e.stopImmediatePropagation()
+  e.preventDefault()
+  maybeFlagWarmup()
+  await dispatchCompressed(input, file)
+}
+
 export function ClientImageCompressorProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const attached = new WeakSet<HTMLInputElement>()
+    const attachedInputs    = new WeakSet<HTMLInputElement>()
+    const attachedDropzones = new WeakSet<HTMLElement>()
 
     function attach() {
       document.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach(input => {
-        if (attached.has(input)) return
+        if (attachedInputs.has(input)) return
         input.addEventListener('change', interceptChange, { capture: true })
-        attached.add(input)
+        attachedInputs.add(input)
+      })
+      document.querySelectorAll<HTMLElement>('.dropzone').forEach(div => {
+        if (attachedDropzones.has(div)) return
+        div.addEventListener('drop', interceptDrop, { capture: true })
+        attachedDropzones.add(div)
       })
     }
 
