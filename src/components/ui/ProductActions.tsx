@@ -172,10 +172,17 @@ export function ProductActions({
       <div className="flex flex-col sm:flex-row gap-3 pt-1">
         <Link
           href={(() => {
-            const p = new URLSearchParams({ product: productSlug })
+            const p = new URLSearchParams()
+            if (fitsContainers?.length && selectedPartner) {
+              // On a lid page: send inquiry as if the container is the product + this lid is the accessory
+              p.set('product', selectedPartner)
+              p.set('lid', productSlug)
+            } else {
+              p.set('product', productSlug)
+              if (selectedPartner) p.set('lid', selectedPartner)
+            }
             if (selectedColor) p.set('color', selectedColor)
             if (selectedSize) p.set('size', selectedSize)
-            if (selectedPartner && selectedLidName) p.set('lid', selectedPartner)
             return `/quote?${p.toString()}`
           })()}
           className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyDark transition-colors"

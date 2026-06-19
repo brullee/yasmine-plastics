@@ -34,9 +34,11 @@ export function ProductMainSection({
   const t = useTranslations('product')
 
   const ownImages = [product.image, ...(product.gallery ?? [])]
-  const pairingSlides = fitsContainers
-    .map((c) => ({ slug: c.slug, url: c.pairingImages?.[product.slug] ?? '' }))
-    .filter((e) => e.url && !ownImages.includes(e.url))
+  const pairingSlides = fitsContainers.flatMap((c) =>
+    (c.pairingImages?.[product.slug] ?? [])
+      .filter((url) => !ownImages.includes(url))
+      .map((url) => ({ slug: c.slug, url }))
+  )
   const images = [...ownImages, ...pairingSlides.map((e) => e.url)]
 
   const firstPartnerSlug = compatibleLids[0]?.slug ?? fitsContainers[0]?.slug ?? null
@@ -50,7 +52,7 @@ export function ProductMainSection({
     setSelectedPartner(slug)
     if (!slug) return
     // Container page: pairing image is in our own gallery
-    const ownPairingUrl = product.pairingImages?.[slug]
+    const ownPairingUrl = product.pairingImages?.[slug]?.[0]
     if (ownPairingUrl) {
       const idx = images.indexOf(ownPairingUrl)
       if (idx !== -1) { setCarouselIndex(idx); return }
@@ -78,12 +80,12 @@ export function ProductMainSection({
 
       {/* ── Left: Image carousel ── */}
       <div className="space-y-3">
-        <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100 dark:bg-gray-800 shadow-md">
+        <div className="relative rounded-2xl overflow-hidden aspect-square bg-gray-100 dark:bg-gray-800 shadow-md">
           <Image
             src={displayImage}
             alt={name}
             fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover transition-opacity duration-200"
             priority
           />

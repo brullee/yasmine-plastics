@@ -1,6 +1,14 @@
-import { getPayload } from 'payload'
+import { getPayload as _getPayload } from 'payload'
+import type { BasePayload } from 'payload'
 import config from '@payload-config'
 import type { Product, Category } from '@/types'
+
+const g = global as typeof globalThis & { __payload?: BasePayload }
+
+async function getPayload(): Promise<BasePayload> {
+  if (!g.__payload) g.__payload = await _getPayload({ config })
+  return g.__payload
+}
 
 function mediaUrl(media: unknown): string {
   if (!media) return ''
@@ -25,13 +33,15 @@ function transformProduct(doc: any): Product {
   const category = typeof doc.category === 'object' ? (doc.category?.slug ?? '') : (doc.category ?? '')
 
   const compatibleLids: string[] = []
-  const pairingImages: Record<string, string> = {}
+  const pairingImages: Record<string, string[]> = {}
   for (const g of doc.gallery ?? []) {
     const lidSlug = typeof g.pairedLid === 'object' ? g.pairedLid?.slug : null
-    if (lidSlug) {
-      compatibleLids.push(lidSlug)
-      const url = mediaUrl(g.image)
-      if (url) pairingImages[lidSlug] = url
+    if (!lidSlug) continue
+    if (!compatibleLids.includes(lidSlug)) compatibleLids.push(lidSlug)
+    const url = mediaUrl(g.image)
+    if (url && g.showInLidGallery !== false) {
+      if (!pairingImages[lidSlug]) pairingImages[lidSlug] = []
+      pairingImages[lidSlug].push(url)
     }
   }
 
@@ -79,30 +89,26 @@ function transformCategory(doc: any): Category {
   }
 }
 
-async function payload() {
-  return getPayload({ config })
-}
-
 export async function getProducts(): Promise<Product[]> {
-  const p = await payload()
+  const p = await getPayload()
   const result = await p.find({ collection: 'products', limit: 1000, depth: 2 })
   return result.docs.map(transformProduct).filter((p) => !!p.slug)
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const p = await payload()
+  const p = await getPayload()
   const result = await p.find({ collection: 'products', where: { slug: { equals: slug } }, depth: 2, limit: 1 })
   return result.docs[0] ? transformProduct(result.docs[0]) : null
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const p = await payload()
+  const p = await getPayload()
   const result = await p.find({ collection: 'categories', depth: 1, limit: 100 })
   return result.docs.map(transformCategory)
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
-  const p = await payload()
+  const p = await getPayload()
   const result = await p.find({ collection: 'categories', where: { slug: { equals: slug } }, depth: 1, limit: 1 })
   return result.docs[0] ? transformCategory(result.docs[0]) : undefined
 }

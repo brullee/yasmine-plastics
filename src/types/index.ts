@@ -25,7 +25,7 @@ export type Product = {
   width?: number      // mm - rectangular only
   length?: number     // mm - rectangular only
   height?: number     // mm
-  pairingImages?: Record<string, string> // partnerSlug → combined product photo URL
+  pairingImages?: Record<string, string[]> // partnerSlug → combined product photo URLs
 }
 
 export type Category = {

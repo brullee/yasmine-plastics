@@ -1,5 +1,5 @@
 import sharp from 'sharp'
-import { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import type { BasePayload } from 'payload'
 
 const TARGET_SIZE  = 1400
@@ -40,29 +40,35 @@ async function removeBackground(imageUrl: string): Promise<Buffer | null> {
   }
 }
 
-async function normalizeBuffer(input: Buffer): Promise<Buffer> {
-  const subjectMax = Math.round(TARGET_SIZE * FILL_PERCENT)
+async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL_PERCENT): Promise<Buffer> {
+  const subjectMax = Math.round(TARGET_SIZE * fillPercent)
 
   const meta = await sharp(input).metadata()
   const hasAlpha = (meta.channels ?? 3) === 4
 
-  // For BG-removed RGBA images: flatten transparent → white so trim works
-  // (BiRefNet stores original colour in masked pixels; comparing raw RGBA would fail)
-  const forTrimming = hasAlpha
-    ? await sharp(input).flatten({ background: { r: 255, g: 255, b: 255 } }).toBuffer()
-    : input
+  let toProcess: Buffer
+  if (gentle && hasAlpha) {
+    // Trim transparent pixels left by BG removal — preserves light product edges
+    // without clipping them the way white-colour threshold trimming would.
+    toProcess = await sharp(input).trim({ threshold: 10 }).toBuffer()
+  } else {
+    // Flatten transparent → white so trim can compare colours uniformly.
+    // (BiRefNet stores original colour in masked pixels; raw RGBA comparison fails.)
+    const forTrimming = hasAlpha
+      ? await sharp(input).flatten({ background: { r: 255, g: 255, b: 255 } }).toBuffer()
+      : input
+    toProcess = await sharp(forTrimming)
+      .trim({ background: { r: 255, g: 255, b: 255 }, threshold: 35 })
+      .toBuffer()
+  }
 
-  const trimmed = await sharp(forTrimming)
-    .trim({ background: { r: 255, g: 255, b: 255 }, threshold: 35 })
-    .toBuffer()
-
-  const { width = 1, height = 1 } = await sharp(trimmed).metadata()
+  const { width = 1, height = 1 } = await sharp(toProcess).metadata()
 
   const scale = Math.min(subjectMax / width, subjectMax / height)
   const newW  = Math.round(width  * scale)
   const newH  = Math.round(height * scale)
 
-  const resized = await sharp(trimmed).resize(newW, newH).toBuffer()
+  const resized = await sharp(toProcess).resize(newW, newH).toBuffer()
 
   return sharp({
     create: {
@@ -85,65 +91,45 @@ export async function normalizeMediaAfterUpload(
   filename: string,
   docId: number | string,
   payload: BasePayload,
+  processingMode: 'standard' | 'gentle' = 'standard',
 ) {
-  const log = (msg: string) => console.log(`[image-normalize] ${msg}`)
-  log(`START ${filename}`)
+  const gentle = processingMode === 'gentle'
+  console.log(`[image-normalize] START ${filename} [${processingMode}]`)
 
   const s3     = s3Client()
   const bucket = process.env.R2_BUCKET ?? ''
 
-  log('Downloading from R2...')
   const res = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: filename }))
   const chunks: Buffer[] = []
   for await (const chunk of res.Body as AsyncIterable<Uint8Array>) {
     chunks.push(Buffer.from(chunk))
   }
   let imageBuffer: Buffer = Buffer.concat(chunks)
-  log(`Downloaded ${(imageBuffer.length / 1024).toFixed(0)} KB`)
 
   const imageUrl = `${process.env.R2_PUBLIC_URL ?? ''}/${filename}`
-  const modalUrl = process.env.MODAL_BG_REMOVE_URL
-  log(`MODAL_BG_REMOVE_URL = ${modalUrl ?? '(not set)'}`)
-
   const t0 = Date.now()
   const bgRemoved = await removeBackground(imageUrl)
   if (bgRemoved) {
-    log(`BG removed in ${Date.now() - t0}ms (${(bgRemoved.length / 1024).toFixed(0)} KB)`)
+    console.log(`[image-normalize] BG removed in ${Date.now() - t0}ms (${(bgRemoved.length / 1024).toFixed(0)} KB)`)
     imageBuffer = bgRemoved
-  } else {
-    log('BG removal skipped or failed, normalizing original')
   }
 
-  log('Detecting alpha channel...')
-  const meta = await sharp(imageBuffer).metadata()
-  log(`Input: ${meta.width}x${meta.height} channels=${meta.channels} format=${meta.format}`)
-
-  log('Flattening / trimming...')
   const t1 = Date.now()
-  const normalized = await normalizeBuffer(imageBuffer)
+  const normalized = await normalizeBuffer(imageBuffer, gentle)
   const normMeta = await sharp(normalized).metadata()
-  log(`Normalized in ${Date.now() - t1}ms → ${normMeta.width}x${normMeta.height} (${(normalized.length / 1024).toFixed(0)} KB)`)
+  console.log(`[image-normalize] Done in ${Date.now() - t1}ms → ${normMeta.width}x${normMeta.height} (${(normalized.length / 1024).toFixed(0)} KB)`)
 
-  // Rename to .jpg so the URL changes, forcing browsers to fetch the new file instead of serving a cached copy
-  const normalizedFilename = filename.replace(/\.[^.]+$/, '.jpg')
-
-  log('Uploading to R2...')
   await s3.send(new PutObjectCommand({
     Bucket:      bucket,
-    Key:         normalizedFilename,
+    Key:         filename,
     Body:        normalized,
     ContentType: 'image/jpeg',
   }))
 
-  if (normalizedFilename !== filename) {
-    await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: filename }))
-  }
-  log('Uploaded')
-
   await payload.update({
     collection: 'media',
     id:         docId,
-    data:       { filename: normalizedFilename, width: normMeta.width, height: normMeta.height, filesize: normalized.length, mimeType: 'image/jpeg' },
+    data:       { width: normMeta.width, height: normMeta.height, filesize: normalized.length },
   })
-  log('DONE')
+  console.log(`[image-normalize] DONE ${filename}`)
 }

@@ -1,16 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useDocumentInfo } from '@payloadcms/ui'
+import { useDocumentInfo, useField } from '@payloadcms/ui'
 
 export function NormalizingIndicator() {
-  const { id, initialData } = useDocumentInfo()
-  const data = initialData as Record<string, unknown> | undefined
+  const { id } = useDocumentInfo()
+  const { value: normalizeImage } = useField<boolean>({ path: 'normalizeImage' })
+  const { value: width } = useField<number>({ path: 'width' })
+  const { value: height } = useField<number>({ path: 'height' })
 
   const isPending =
-    data?.normalizeImage === true &&
-    typeof data?.mimeType === 'string' &&
-    data.mimeType !== 'image/jpeg'
+    normalizeImage === true &&
+    (width !== 1400 || height !== 1400)
 
   const [done, setDone] = useState(false)
   const [warmingUp, setWarmingUp] = useState(false)
@@ -33,7 +34,7 @@ export function NormalizingIndicator() {
         const res = await fetch(`/api/media/${id}?depth=0`)
         if (!res.ok) return
         const doc = await res.json()
-        if (doc.mimeType === 'image/jpeg') {
+        if (doc.width === 1400 && doc.height === 1400) {
           clearInterval(interval)
           setDone(true)
           setTimeout(() => window.location.reload(), 600)
@@ -74,7 +75,7 @@ export function NormalizingIndicator() {
       {done
         ? 'Normalization complete. Reloading...'
         : warmingUp
-          ? 'Background removal is warming up. Processing may take ~20 seconds. You can leave this page.'
+          ? 'Background removal is warming up. Processing may take approx. 20 seconds. You can leave this page.'
           : 'Processing image in background. You can leave this page.'}
       <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }`}</style>
     </div>
