@@ -19,8 +19,8 @@ export default buildConfig({
     },
   },
   email: resendAdapter({
-    defaultFromAddress: process.env.MAIL_FROM_NOREPLY ?? 'onboarding@resend.dev',
-    defaultFromName: 'Yasmine Plastics',
+    defaultFromName:    'Yasmine Co.',
+    defaultFromAddress: 'noreply@yasmineplastics.com',
     apiKey: process.env.RESEND_API_KEY ?? '',
   }),
   admin: {
@@ -28,6 +28,9 @@ export default buildConfig({
     components: {
       providers: [
         '@/components/payload/ClientImageCompressor#ClientImageCompressorProvider',
+      ],
+      beforeLogin: [
+        '@/components/payload/LoginRateWarning#LoginRateWarning',
       ],
     },
   },
@@ -54,6 +57,7 @@ export default buildConfig({
     {
       slug: 'users',
       auth: {
+        maxLoginAttempts: 0,
         forgotPassword: {
           generateEmailHTML: (args) => {
             const token = args?.token ?? ''
@@ -71,7 +75,7 @@ export default buildConfig({
       slug: 'media',
       upload: {
         adminThumbnail: 'thumbnail',
-        mimeTypes: ['image/*'],
+        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
       },
       access: { read: () => true },
       admin: {
@@ -143,8 +147,11 @@ export default buildConfig({
             { label: 'Gentle', value: 'gentle' },
           ],
           admin: {
+            disableListColumn: true,
             description: 'Use Gentle for white or transparent products to avoid clipping edges.',
-            condition: (data) => !!data.normalizeImage,
+            components: {
+              Field: '@/components/payload/ProcessingModeField#ProcessingModeField',
+            },
           },
         },
       ],
@@ -169,6 +176,14 @@ export default buildConfig({
       access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
       fields: [
         { name: 'name', label: 'Name', type: 'text', required: true },
+      ],
+    },
+    {
+      slug: 'sizes',
+      admin: { useAsTitle: 'label' },
+      access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      fields: [
+        { name: 'label', label: 'Size', type: 'text', required: true },
       ],
     },
     {
@@ -207,6 +222,13 @@ export default buildConfig({
         },
         { name: 'image', type: 'upload', relationTo: 'media' },
         {
+          name: 'defaultMaterial',
+          label: 'Default Material',
+          type: 'relationship',
+          relationTo: 'materials',
+          admin: { description: 'Auto-selected when this category is picked on a new product.' },
+        },
+        {
           name: 'supportsCompatibleLids',
           type: 'checkbox',
           label: 'Support Lid Pairing',
@@ -244,6 +266,15 @@ export default buildConfig({
           admin: {
             components: {
               Field: '@/components/payload/CategoryLidSync#CategoryLidSync',
+            },
+          },
+        },
+        {
+          name: 'categoryMaterialSync',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@/components/payload/CategoryMaterialSync#CategoryMaterialSync',
             },
           },
         },
@@ -362,6 +393,7 @@ export default buildConfig({
                       name: 'shapeType',
                       type: 'select',
                       label: 'Shape',
+                      defaultValue: 'circular',
                       options: [
                         { label: 'Circular (φ)', value: 'circular' },
                         { label: 'Rectangular', value: 'rectangular' },
@@ -383,6 +415,7 @@ export default buildConfig({
                       name: 'tapered',
                       type: 'checkbox',
                       label: 'Tapered (different top & bottom diameter)',
+                      defaultValue: false,
                       admin: { condition: (data) => data.shapeType === 'circular' },
                     },
                     {
@@ -414,11 +447,15 @@ export default buildConfig({
                 },
                 {
                   name: 'sizes',
-                  type: 'array',
+                  type: 'relationship',
+                  relationTo: 'sizes',
+                  hasMany: true,
                   label: 'Sizes',
-                  minRows: 1,
-                  validate: (value: unknown[] | null | undefined) => !value?.length ? 'At least one size is required' : true,
-                  fields: [{ name: 'size', type: 'text', required: true }],
+                  admin: {
+                    components: {
+                      Field: '@/components/payload/SizesField#SizesField',
+                    },
+                  },
                 },
               ],
             },

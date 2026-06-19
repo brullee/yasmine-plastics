@@ -3,6 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useDocumentInfo, useField } from '@payloadcms/ui'
 
+// Patch at module load time — useEffect is too late for hydration warnings
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  const orig = console.error.bind(console)
+  console.error = (...args: unknown[]) => {
+    if (typeof args[0] === 'string' && (args[0].includes('hydrat') || args[0].includes('Hydrat'))) return
+    orig(...args)
+  }
+}
+
 export function NormalizingIndicator() {
   const { id } = useDocumentInfo()
   const { value: normalizeImage } = useField<boolean>({ path: 'normalizeImage' })
@@ -18,21 +27,12 @@ export function NormalizingIndicator() {
   const [warmingUp, setWarmingUp] = useState(false)
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') return
-    const orig = console.error.bind(console)
-    console.error = (...args: unknown[]) => {
-      if (typeof args[0] === 'string' && (args[0].includes('hydrat') || args[0].includes('Hydrat'))) return
-      orig(...args)
-    }
-    return () => { console.error = orig }
-  }, [])
-
-  useEffect(() => {
     if (!isPending) return
-    if (localStorage.getItem('modalWarmingUp') === 'true') {
+    const flagTime = Number(localStorage.getItem('modalWarmingUp') ?? '0')
+    if (flagTime && Date.now() - flagTime < 60_000) {
       setWarmingUp(true)
-      localStorage.removeItem('modalWarmingUp')
     }
+    localStorage.removeItem('modalWarmingUp')
   }, [isPending])
 
   useEffect(() => {

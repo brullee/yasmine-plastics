@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server'
 import { sendMail, MAIL_TO, verifyTurnstile } from '@/lib/mailer'
 import { quoteEmailHtml } from '@/lib/emailTemplates'
+import { formRateLimit, getIP } from '@/lib/ratelimit'
 
 export async function POST(req: Request) {
+  const { success } = await formRateLimit.limit(getIP(req))
+  if (!success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   const { firstName, lastName, company, email, phone, product, productName, color, size, lid, lidName, delivery, details, honeypot, _token } = await req.json()
 
   if (honeypot) return NextResponse.json({ ok: true })
@@ -12,6 +15,15 @@ export async function POST(req: Request) {
 
   if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !phone?.trim())
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
+
+  if (
+    firstName.length > 50 || lastName.length > 50 || email.length > 254 ||
+    phone.length > 30 || (company && company.length > 100) || (details && details.length > 5000)
+  )
+    return NextResponse.json({ error: 'Input too long' }, { status: 400 })
 
   const name = `${firstName} ${lastName}`.trim()
 

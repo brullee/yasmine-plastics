@@ -43,6 +43,9 @@ async function removeBackground(imageUrl: string): Promise<Buffer | null> {
 async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL_PERCENT): Promise<Buffer> {
   const subjectMax = Math.round(TARGET_SIZE * fillPercent)
 
+  // Auto-rotate based on EXIF orientation, then strip the tag
+  input = await sharp(input).rotate().toBuffer()
+
   const meta = await sharp(input).metadata()
   const hasAlpha = (meta.channels ?? 3) === 4
 
