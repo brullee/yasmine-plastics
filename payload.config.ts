@@ -362,6 +362,7 @@ export default buildConfig({
                       name: 'shapeType',
                       type: 'select',
                       label: 'Shape',
+                      defaultValue: 'circular',
                       options: [
                         { label: 'Circular (φ)', value: 'circular' },
                         { label: 'Rectangular', value: 'rectangular' },
@@ -383,6 +384,7 @@ export default buildConfig({
                       name: 'tapered',
                       type: 'checkbox',
                       label: 'Tapered (different top & bottom diameter)',
+                      defaultValue: true,
                       admin: { condition: (data) => data.shapeType === 'circular' },
                     },
                     {
@@ -418,6 +420,7 @@ export default buildConfig({
                   label: 'Sizes',
                   minRows: 1,
                   validate: (value: unknown[] | null | undefined) => !value?.length ? 'At least one size is required' : true,
+                  defaultValue: [{ size: '' }],
                   fields: [{ name: 'size', type: 'text', required: true }],
                 },
               ],
