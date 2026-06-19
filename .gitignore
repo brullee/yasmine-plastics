@@ -1,11 +1,18 @@
+# Dependencies
 node_modules
+
+# Next.js
 .next
 next-env.d.ts
 tsconfig.tsbuildinfo
+
+# Environment
 .env*
-*.local
-Plan.md
-scripts/images-*
+
 # Python
 __pycache__/
 *.pyc
+
+# Local dev
+scripts/images-*
+Plan.md

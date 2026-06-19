@@ -1,5 +1,5 @@
 """
-modal_bg_remove.py — BiRefNet-massive background removal as a Modal web endpoint.
+modal_bg_remove.py — BRIA RMBG 2.0 background removal as a Modal web endpoint.
 
 Deploy:
     PYTHONUTF8=1 python -m modal deploy scripts/modal_bg_remove.py
@@ -22,15 +22,19 @@ class BgRemoveRequest(BaseModel):
 
 
 def download_model():
-    from rembg import new_session
-    print("Pre-downloading birefnet-massive into image...")
-    new_session("birefnet-massive")
+    from transformers import AutoModelForImageSegmentation
+    print("Pre-downloading Aero-Ex/RMBG-2.0 into image...")
+    AutoModelForImageSegmentation.from_pretrained("Aero-Ex/RMBG-2.0", trust_remote_code=True)
     print("Done.")
 
 
 container_image = (
     modal.Image.from_registry("nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04", add_python="3.11")
-    .pip_install("rembg[gpu]", "onnxruntime-gpu", "Pillow", "numpy", "requests", "fastapi[standard]", "pydantic")
+    .pip_install(
+        "torch", "torchvision",
+        "transformers==4.45.2", "timm", "kornia",
+        "Pillow", "numpy", "requests", "fastapi[standard]", "pydantic",
+    )
     .run_function(download_model)
 )
 
@@ -39,24 +43,30 @@ container_image = (
 class BackgroundRemover:
     @modal.enter()
     def load_model(self):
-        from rembg import new_session
-        print("Loading birefnet-massive...")
-        self.session = new_session("birefnet-massive")
+        import torch
+        from transformers import AutoModelForImageSegmentation
+        print("Loading Aero-Ex/RMBG-2.0...")
+        self.model = AutoModelForImageSegmentation.from_pretrained(
+            "Aero-Ex/RMBG-2.0", trust_remote_code=True
+        )
+        torch.set_float32_matmul_precision("high")
+        self.model.eval().to("cuda")
         print("Ready.")
 
     @modal.asgi_app()
     def api(self):
         from fastapi import FastAPI, HTTPException
         from fastapi.responses import Response
-        from rembg import remove
 
         fastapi_app = FastAPI()
-        session = self.session
+        model = self.model
 
         @fastapi_app.post("/")
         async def remove_bg(body: BgRemoveRequest):
+            import torch
             import requests as http
             from PIL import Image, ImageFilter
+            from torchvision import transforms
 
             secret = os.environ.get("MODAL_API_SECRET")
             if secret and body.api_key != secret:
@@ -64,10 +74,23 @@ class BackgroundRemover:
 
             r = http.get(body.image_url, timeout=30)
             r.raise_for_status()
-            img = Image.open(io.BytesIO(r.content))
+            img = Image.open(io.BytesIO(r.content)).convert("RGB")
 
-            result = remove(img, session=session)
-            data = np.array(result.convert("RGBA"))
+            transform = transforms.Compose([
+                transforms.Resize((1024, 1024)),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+            ])
+            tensor = transform(img).unsqueeze(0).to("cuda")
+
+            with torch.no_grad():
+                preds = model(tensor)[-1].sigmoid().cpu()
+
+            mask = transforms.ToPILImage()(preds[0].squeeze()).resize(img.size, Image.LANCZOS)
+
+            result = img.convert("RGBA")
+            data = np.array(result)
+            data[:, :, 3] = np.array(mask)
             data[:, :, 3] = np.where(data[:, :, 3] < 30, 0, data[:, :, 3])
             alpha = Image.fromarray(data[:, :, 3]).filter(ImageFilter.MinFilter(3))
             data[:, :, 3] = np.array(alpha)

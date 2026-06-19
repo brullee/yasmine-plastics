@@ -10,11 +10,22 @@ export function NormalizingIndicator() {
   const { value: height } = useField<number>({ path: 'height' })
 
   const isPending =
+    !!id &&
     normalizeImage === true &&
     (width !== 1400 || height !== 1400)
 
   const [done, setDone] = useState(false)
   const [warmingUp, setWarmingUp] = useState(false)
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return
+    const orig = console.error.bind(console)
+    console.error = (...args: unknown[]) => {
+      if (typeof args[0] === 'string' && (args[0].includes('hydrat') || args[0].includes('Hydrat'))) return
+      orig(...args)
+    }
+    return () => { console.error = orig }
+  }, [])
 
   useEffect(() => {
     if (!isPending) return
