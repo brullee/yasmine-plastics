@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 
-export const MAIL_TO = process.env.CONTACT_EMAIL ?? ''
-export const MAIL_FROM = process.env.MAIL_FROM_FORMS ?? 'Yasmine Plastics <onboarding@resend.dev>'
+export const MAIL_TO   = process.env.CONTACT_EMAIL ?? ''
+export const MAIL_FROM = 'Yasmine Co. <forms@yasmineplastics.com>'
 
 export async function sendMail({ to, replyTo, subject, html, text }: {
   to: string

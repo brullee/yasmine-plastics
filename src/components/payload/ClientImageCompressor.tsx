@@ -2,11 +2,13 @@
 
 import { useEffect } from 'react'
 
-const MAX_DIMENSION  = 3000
-const WEBP_QUALITY   = 1.0
-const SIZE_THRESHOLD = 200 * 1024 // skip files already under 200 KB
+const MAX_DIMENSION      = 3000
+const WEBP_QUALITY       = 1.0
+const CONVERTIBLE_TYPES = new Set(['image/jpeg', 'image/png'])
 
 async function compressToWebP(file: File): Promise<File> {
+  if (!CONVERTIBLE_TYPES.has(file.type)) return file
+
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file)
     const img  = new Image()
@@ -30,11 +32,11 @@ async function compressToWebP(file: File): Promise<File> {
       ctx.drawImage(img, 0, 0, width, height)
 
       canvas.toBlob(blob => {
-        if (!blob || blob.size >= file.size) { resolve(file); return }
+        if (!blob || blob.type !== 'image/webp') { resolve(file); return }
         const name = file.name.replace(/\.[^.]+$/, '.webp')
-        const compressed = new File([blob], name, { type: 'image/webp' })
-        console.log(`[upload] ${file.name} ${(file.size / 1024).toFixed(0)}KB → ${name} ${(compressed.size / 1024).toFixed(0)}KB`)
-        resolve(compressed)
+        const converted = new File([blob], name, { type: 'image/webp' })
+        console.log(`[upload] ${file.name} ${(file.size / 1024).toFixed(0)}KB -> ${name} ${(converted.size / 1024).toFixed(0)}KB`)
+        resolve(converted)
       }, 'image/webp', WEBP_QUALITY)
     }
 
@@ -68,7 +70,7 @@ async function interceptChange(e: Event) {
   const input = e.target as HTMLInputElement
   if (compressing.has(input)) return
   const file = input.files?.[0]
-  if (!file || !file.type.startsWith('image/') || file.size <= SIZE_THRESHOLD) return
+  if (!file || !file.type.startsWith('image/')) return
 
   e.stopImmediatePropagation()
   maybeFlagWarmup()
@@ -77,7 +79,7 @@ async function interceptChange(e: Event) {
 
 async function interceptDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0]
-  if (!file || !file.type.startsWith('image/') || file.size <= SIZE_THRESHOLD) return
+  if (!file || !file.type.startsWith('image/')) return
 
   const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>('input[type="file"]')
   if (!input) return

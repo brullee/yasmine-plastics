@@ -3,11 +3,22 @@
 import { routing } from './i18n/routing'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { loginRateLimit } from './lib/ratelimit'
 
 const handleI18nRouting = createMiddleware(routing)
 
-export default function proxy(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204 })
+
+  const authPaths = ['/api/users/login', '/api/users/forgot-password']
+  if (authPaths.includes(req.nextUrl.pathname)) {
+    if (req.method === 'POST') {
+      const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? req.headers.get('x-real-ip') ?? 'unknown'
+      const { success } = await loginRateLimit.limit(ip)
+      if (!success) return NextResponse.json({ errors: [{ message: 'Too many attempts. Try again later.' }] }, { status: 429 })
+    }
+    return NextResponse.next()
+  }
 
   const host = req.headers.get('host') ?? ''
   if (host === 'admin.yasmineplastics.com') {
@@ -46,5 +57,9 @@ export default function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!admin|api|_next|_vercel|.*\\..*).*)'],
+  matcher: [
+    '/((?!admin|api|_next|_vercel|.*\\..*).*)',
+    '/api/users/login',
+    '/api/users/forgot-password',
+  ],
 }

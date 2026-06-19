@@ -59,7 +59,10 @@ function transformProduct(doc: any): Product {
           return { en: color.nameEn ?? '', ar: color.nameAr || (color.nameEn ?? '') }
         })
         .filter((c: { en: string; ar: string }) => c.en),
-      sizes: (doc.sizes ?? []).map((s: { size: string }) => s.size).filter(Boolean),
+      sizes: (doc.sizes ?? [])
+        .filter((s: unknown) => s && typeof s === 'object')
+        .map((s: unknown) => (s as { label: string }).label)
+        .filter(Boolean),
     },
     compatibleLids: compatibleLids.length ? compatibleLids : undefined,
     pairingImages: Object.keys(pairingImages).length ? pairingImages : undefined,
