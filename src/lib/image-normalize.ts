@@ -2,8 +2,9 @@ import sharp from 'sharp'
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import type { BasePayload } from 'payload'
 
-const TARGET_SIZE  = 1400
-const FILL_PERCENT = 0.65
+const TARGET_SIZE     = 1400
+const FILL_STANDARD   = 0.65
+const FILL_SPACIOUS   = 0.55
 
 function s3Client() {
   return new S3Client({
@@ -40,7 +41,7 @@ async function removeBackground(imageUrl: string): Promise<Buffer | null> {
   }
 }
 
-async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL_PERCENT): Promise<Buffer> {
+async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL_STANDARD): Promise<Buffer> {
   const subjectMax = Math.round(TARGET_SIZE * fillPercent)
 
   // Auto-rotate based on EXIF orientation, then strip the tag
@@ -50,17 +51,14 @@ async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL
   const hasAlpha = (meta.channels ?? 3) === 4
 
   let toProcess: Buffer
-  if (gentle && hasAlpha) {
-    // Trim transparent pixels left by BG removal — preserves light product edges
-    // without clipping them the way white-colour threshold trimming would.
-    toProcess = await sharp(input).trim({ threshold: 10 }).toBuffer()
+  if (hasAlpha) {
+    // BG removal produced an alpha channel — always trim on transparency.
+    // Standard = tighter crop (threshold 20), Gentle = looser (threshold 10).
+    // Color-based trimming after flattening to white clips colored product edges.
+    toProcess = await sharp(input).trim({ threshold: gentle ? 10 : 20 }).toBuffer()
   } else {
-    // Flatten transparent → white so trim can compare colours uniformly.
-    // (BiRefNet stores original colour in masked pixels; raw RGBA comparison fails.)
-    const forTrimming = hasAlpha
-      ? await sharp(input).flatten({ background: { r: 255, g: 255, b: 255 } }).toBuffer()
-      : input
-    toProcess = await sharp(forTrimming)
+    // No alpha (BG removal skipped) — trim white border by colour.
+    toProcess = await sharp(input)
       .trim({ background: { r: 255, g: 255, b: 255 }, threshold: 35 })
       .toBuffer()
   }
@@ -118,7 +116,7 @@ export async function normalizeMediaAfterUpload(
   }
 
   const t1 = Date.now()
-  const normalized = await normalizeBuffer(imageBuffer, gentle)
+  const normalized = await normalizeBuffer(imageBuffer, gentle, gentle ? FILL_SPACIOUS : FILL_STANDARD)
   const normMeta = await sharp(normalized).metadata()
   console.log(`[image-normalize] Done in ${Date.now() - t1}ms → ${normMeta.width}x${normMeta.height} (${(normalized.length / 1024).toFixed(0)} KB)`)
 
@@ -134,5 +132,16 @@ export async function normalizeMediaAfterUpload(
     id:         docId,
     data:       { width: normMeta.width, height: normMeta.height, filesize: normalized.length },
   })
+
+  const zoneId  = process.env.CLOUDFLARE_ZONE_ID
+  const cfToken = process.env.CLOUDFLARE_API_TOKEN
+  if (zoneId && cfToken) {
+    await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${cfToken}`, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ files: [imageUrl] }),
+    }).catch(err => console.error('[image-normalize] Cache purge failed:', err))
+  }
+
   console.log(`[image-normalize] DONE ${filename}`)
 }

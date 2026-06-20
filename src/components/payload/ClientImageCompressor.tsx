@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 const MAX_DIMENSION      = 3000
 const WEBP_QUALITY       = 1.0
+const MAX_FILE_SIZE      = 10 * 1024 * 1024 // 10MB after compression
 const CONVERTIBLE_TYPES = new Set(['image/jpeg', 'image/png'])
 
 async function compressToWebP(file: File): Promise<File> {
@@ -58,6 +59,13 @@ const compressing = new WeakSet<HTMLInputElement>()
 
 async function dispatchCompressed(input: HTMLInputElement, file: File) {
   const result = await compressToWebP(file)
+
+  if (result.size > MAX_FILE_SIZE) {
+    alert(`Image is too large after compression (${(result.size / 1024 / 1024).toFixed(1)}MB). Maximum is 10MB.`)
+    input.value = ''
+    return
+  }
+
   const dt = new DataTransfer()
   dt.items.add(result)
   input.files = dt.files

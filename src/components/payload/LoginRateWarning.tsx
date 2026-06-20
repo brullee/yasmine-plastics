@@ -9,7 +9,10 @@ export async function LoginRateWarning() {
     headerStore.get('x-real-ip') ??
     'unknown'
 
-  const { remaining, reset } = await loginRateLimit.getRemaining(ip)
-
-  return <LoginRateWarningClient initialRemaining={remaining} initialReset={reset} />
+  try {
+    const { remaining, reset } = await loginRateLimit.getRemaining(ip)
+    return <LoginRateWarningClient initialRemaining={remaining} initialReset={reset} />
+  } catch {
+    return null
+  }
 }

@@ -37,6 +37,7 @@ export default buildConfig({
   },
   plugins: [
     s3Storage({
+      clientUploads: true,
       collections: {
         media: {
           generateFileURL: ({ filename }) =>
@@ -141,15 +142,15 @@ export default buildConfig({
         {
           name: 'processingMode',
           type: 'radio',
-          label: 'Processing Mode',
+          label: 'Canvas Fill',
           defaultValue: 'standard',
           options: [
-            { label: 'Standard', value: 'standard' },
-            { label: 'Gentle', value: 'gentle' },
+            { label: 'Standard (65%)', value: 'standard' },
+            { label: 'Spacious (55%)', value: 'gentle' },
           ],
           admin: {
             disableListColumn: true,
-            description: 'Use Gentle for white or transparent products to avoid clipping edges.',
+            description: 'How much of the 1400x1400 canvas the product fills. Spacious adds more breathing room around smaller products.',
             components: {
               Field: '@/components/payload/ProcessingModeField#ProcessingModeField',
             },

@@ -67,8 +67,8 @@ export function NormalizingIndicator() {
 
   return (
     <div style={{
-      padding: '10px 14px',
-      marginBottom: '1.5rem',
+      padding: '8px 12px',
+      marginBottom: '1rem',
       background: 'var(--theme-elevation-100)',
       border: '1px solid var(--theme-elevation-200)',
       borderRadius: '4px',
