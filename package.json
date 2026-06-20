@@ -1,6 +1,6 @@
 {
   "name": "yasmine-plastics",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "scripts": {
     "dev": "npx rimraf .next && next dev",
