@@ -23,9 +23,20 @@ export default async function proxy(req: NextRequest) {
   const host = req.headers.get('host') ?? ''
   if (host === 'admin.yasmineplastics.com') {
     const url = req.nextUrl.clone()
-    const path = req.nextUrl.pathname
-    url.pathname = path === '/' ? '/admin' : `/admin${path}`
-    return NextResponse.rewrite(url)
+    const path = req.nextUrl.pathname.replace(/^\/(ar|en)(\/|$)/, '/') || '/'
+    // Product page → look up by slug and redirect to admin edit page
+    const productMatch = path.match(/^\/products\/([^/]+)\/?$/)
+    if (productMatch) {
+      url.pathname = '/api/admin-redirect'
+      url.search   = `?collection=products&slug=${productMatch[1]}`
+      return NextResponse.redirect(url)
+    }
+
+    // Known Payload admin paths redirect to www/admin/...
+    const isAdminPath = /^\/(login|logout|forgot-password|reset|account|create-first-user|collections|globals)(\/|$)|^\/$/.test(path)
+    url.host     = 'www.yasmineplastics.com'
+    url.pathname = isAdminPath ? (path === '/' ? '/admin' : `/admin${path}`) : '/admin'
+    return NextResponse.redirect(url)
   }
 
   const pathname = req.nextUrl.pathname
