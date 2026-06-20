@@ -25,6 +25,7 @@ export default buildConfig({
   }),
   admin: {
     user: 'users',
+    theme: 'dark',
     components: {
       providers: [
         '@/components/payload/ClientImageCompressor#ClientImageCompressorProvider',
