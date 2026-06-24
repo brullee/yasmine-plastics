@@ -38,7 +38,12 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {categories.map((cat) => (
-                <CategoryCard key={cat.slug} category={cat} locale={locale} className="h-64" />
+                <CategoryCard
+                  key={cat.slug}
+                  category={cat}
+                  locale={locale}
+                  productCount={products.filter((p) => p.category === cat.slug).length}
+                />
               ))}
             </div>
 
@@ -95,7 +100,7 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
           </div>
 
           {filtered.length > 0
-            ? <ProductsGrid products={filtered} locale={locale} />
+            ? <ProductsGrid products={filtered} allProducts={products} locale={locale} />
             : <div className="text-center py-20 text-gray-400 dark:text-gray-500">{t('notFound')}</div>
           }
 

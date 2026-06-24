@@ -1,99 +1,246 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
 import { company } from '@/data/company'
 import { buildWhatsAppUrl, localizedName } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
+const EASE_OPEN  = 'cubic-bezier(.55,0,.1,1)'
+const EASE_CLOSE = 'cubic-bezier(.2,.75,.5,1)'
+
+type Phase = 'placed' | 'flying' | 'expanding' | 'open' | 'closing'
+
+function calcLayout(rect: DOMRect) {
+  const vw = window.innerWidth, vh = window.innerHeight
+  const imgSize = Math.min(380, vw * 0.44, vh * 0.6)
+  // Panel is taller than the image to accommodate many options
+  const boxH    = Math.min(Math.max(imgSize + 80, 560), vh * 0.90)
+  const panelW  = Math.min(imgSize + 460, vw * 0.92, 900)
+  const imgTop  = (vh - imgSize) / 2
+  const boxTop  = (vh - boxH) / 2
+  return {
+    placed: { top: rect.top,  left: rect.left,           width: rect.width,  height: rect.height  },
+    image:  { top: imgTop,    left: (vw - imgSize) / 2,  width: imgSize,     height: imgSize      },
+    panel:  { top: boxTop,    left: (vw - panelW)  / 2,  width: panelW,      height: boxH         },
+    imgSize,
+    boxH,
+  }
+}
+
 interface Props {
   product: Product
   locale: Locale
+  originRect: DOMRect
   onClose: () => void
+  allProducts?: Product[]
 }
 
-export function QuickViewModal({ product, locale, onClose }: Props) {
-  const t = useTranslations('product')
+export function QuickViewModal({ product, locale, originRect, onClose, allProducts }: Props) {
+  const t         = useTranslations('product')
   const tProducts = useTranslations('products')
-  const closeRef = useRef<HTMLButtonElement>(null)
 
+  const [phase, setPhase] = useState<Phase>('placed')
+  const [layout]          = useState(() => calcLayout(originRect))
+  const [imgIndex, setImgIndex] = useState(0)
+
+  const images  = [product.image, ...(product.gallery ?? [])]
+  const hasMany = images.length > 1
+
+  const prevImg = () => setImgIndex(i => (i - 1 + images.length) % images.length)
+  const nextImg = () => setImgIndex(i => (i + 1) % images.length)
+
+  // Scroll lock + keyboard
   useEffect(() => {
-    closeRef.current?.focus()
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape')     handleClose()
+      if (e.key === 'ArrowLeft')  prevImg()
+      if (e.key === 'ArrowRight') nextImg()
     }
-    window.addEventListener('keydown', handler)
+    window.addEventListener('keydown', onKey)
+    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey) }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    return () => {
-      document.body.style.overflow = prev
-      window.removeEventListener('keydown', handler)
+  // Phase sequencing — mirrors Nectar timing
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase('flying'),    75)
+    const t2 = setTimeout(() => setPhase('expanding'), 75 + 760)
+    const t3 = setTimeout(() => setPhase('open'),      75 + 760 + 560)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleClose() {
+    setPhase('closing')
+    setTimeout(onClose, 320)
+  }
+
+  const resolvedLids = allProducts && product.category !== 'cups'
+    ? (product.compatibleLids ?? [])
+        .map(s => allProducts.find(p => p.slug === s) ?? null)
+        .filter((p): p is Product => p !== null)
+    : []
+
+  const fitsContainers = allProducts && (product.category === 'lids' || product.category === 'papercup-lids')
+    ? allProducts.filter(p => p.compatibleLids?.includes(product.slug))
+    : []
+
+  const name        = localizedName(product, locale)
+  const whatsappUrl = buildWhatsAppUrl(company.whatsapp,
+    locale === 'ar'
+      ? `مرحباً، أنا مهتم بـ: ${name} (${product.slug})`
+      : `Hi, I'm interested in: ${name} (${product.slug})`
+  )
+
+  const l = layout
+  const boxStyle = ((): React.CSSProperties => {
+    const base: React.CSSProperties = {
+      position: 'fixed', zIndex: 61,
+      borderRadius: 16, overflow: 'hidden',
+      boxShadow: '0 32px 64px -12px rgba(0,0,0,0.4)',
     }
-  }, [onClose])
+    switch (phase) {
+      case 'placed':
+        return { ...base, top: l.placed.top, left: l.placed.left, width: l.placed.width, height: l.placed.height, boxShadow: 'none', transition: 'none' }
+      case 'flying':
+        return { ...base, top: l.image.top, left: l.image.left, width: l.image.width, height: l.image.height,
+          transition: `top 750ms ${EASE_OPEN}, left 750ms ${EASE_OPEN}, width 750ms ${EASE_OPEN}, height 750ms ${EASE_OPEN}` }
+      case 'expanding':
+        return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height,
+          transition: `top 550ms ${EASE_OPEN}, left 550ms ${EASE_OPEN}, width 550ms ${EASE_OPEN}, height 550ms ${EASE_OPEN}` }
+      case 'open':
+        return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height, transition: 'none' }
+      case 'closing':
+        return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height,
+          transform: 'scale(0.85)', opacity: 0,
+          transition: `transform 300ms ${EASE_CLOSE}, opacity 300ms ${EASE_CLOSE}` }
+    }
+  })()
 
-  const name = localizedName(product, locale)
+  const backdropOpacity = phase === 'placed' || phase === 'closing' ? 0 : 0.6
+  const contentVisible  = phase === 'open'
 
-  const whatsappText = locale === 'ar'
-    ? `مرحباً، أنا مهتم بـ: ${name} (${product.slug})`
-    : `Hi, I'm interested in: ${name} (${product.slug})`
-  const whatsappUrl = buildWhatsAppUrl(company.whatsapp, whatsappText)
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-label={name}
-    >
+  return createPortal(
+    <>
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+        className="fixed inset-0 z-50"
+        style={{
+          background: 'rgba(0,0,0,0.6)',
+          opacity: backdropOpacity,
+          transition: phase === 'closing' ? `opacity 300ms ${EASE_CLOSE}` : 'opacity 300ms ease',
+          pointerEvents: phase === 'placed' ? 'none' : 'auto',
+        }}
+        onClick={handleClose}
         aria-hidden="true"
       />
 
-      {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      {/* Animated box */}
+      <div style={boxStyle} role="dialog" aria-modal="true" aria-label={name}>
+        <div className="flex h-full bg-white dark:bg-slate-900">
 
-        {/* Close */}
-        <button
-          ref={closeRef}
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute top-3 end-3 z-10 p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
-        >
-          <XIcon />
-        </button>
-
-        <div className="flex flex-col md:flex-row overflow-y-auto">
-          {/* Image */}
-          <div className="relative w-full md:w-5/12 shrink-0 aspect-square bg-gray-50 dark:bg-gray-800">
+          {/* Image side — no separate background so there's no visible dividing line */}
+          <div
+            className="relative shrink-0 overflow-hidden bg-gray-50 dark:bg-slate-800"
+            style={{ width: l.imgSize, minWidth: l.imgSize }}
+          >
             <Image
-              src={product.image}
-              alt={name}
+              key={imgIndex}
+              src={images[imgIndex]}
+              alt={`${name} ${imgIndex + 1}`}
               fill
-              sizes="(max-width: 768px) 100vw, 350px"
-              className="object-cover"
+              sizes="400px"
+              className="object-contain p-5"
+              priority
             />
+
+            {hasMany && (
+              <>
+                <button onClick={prevImg} aria-label="Previous image"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  <ChevronIcon direction="left" />
+                </button>
+                <button onClick={nextImg} aria-label="Next image"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  <ChevronIcon direction="right" />
+                </button>
+
+                <div className="absolute bottom-3 inset-x-0 flex justify-center gap-1.5">
+                  {images.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setImgIndex(i)}
+                      aria-label={`Image ${i + 1}`}
+                      className={cn(
+                        'w-2 h-2 rounded-full transition-colors',
+                        i === imgIndex
+                          ? 'bg-brand-navy dark:bg-white'
+                          : 'bg-black/25 dark:bg-white/40'
+                      )}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Info */}
-          <div className="flex flex-col gap-4 p-6 md:overflow-y-auto">
+          {/* Explicit 1px divider — intentional, not an artifact */}
+          <div className="w-px shrink-0 bg-gray-100 dark:bg-slate-800" />
+
+          {/* Content side */}
+          <div
+            className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto"
+            style={{
+              opacity:    contentVisible ? 1 : 0,
+              transition: contentVisible ? 'opacity 0.28s ease' : 'none',
+            }}
+          >
+            {/* Close */}
+            <button
+              onClick={handleClose}
+              aria-label="Close"
+              className="absolute top-3 end-3 z-10 p-2 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-300"
+            >
+              <XIcon />
+            </button>
+
             {/* Category pill */}
-            <span className="self-start text-xs font-semibold text-brand-blue bg-brand-sky dark:bg-sky-900/40 dark:text-sky-300 px-2.5 py-1 rounded-full uppercase tracking-wide">
+            <span className="self-start text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/40 px-2.5 py-1 rounded-full uppercase tracking-wide">
               {product.category}
             </span>
 
             {/* Name */}
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-snug">
+            <h2 className="text-xl font-bold text-brand-navy dark:text-white leading-snug">
               {name}
             </h2>
 
-            {/* Color chips */}
+            {/* Specs — material, capacity, piecesPerBox */}
+            {(product.material || product.capacity || product.piecesPerBox) && (
+              <div className="flex flex-wrap gap-2">
+                {product.material && (
+                  <span className="text-xs font-semibold px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                    {product.material}
+                  </span>
+                )}
+                {product.capacity && (
+                  <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">
+                    {product.capacity}
+                  </span>
+                )}
+                {product.piecesPerBox && (
+                  <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">
+                    {product.piecesPerBox} pcs/box
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Colors */}
             {product.options.colors && product.options.colors.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
@@ -101,10 +248,7 @@ export function QuickViewModal({ product, locale, onClose }: Props) {
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {product.options.colors.map((color) => (
-                    <span
-                      key={color.en}
-                      className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
-                    >
+                    <span key={color.en} className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
                       {locale === 'ar' ? color.ar : color.en}
                     </span>
                   ))}
@@ -112,7 +256,7 @@ export function QuickViewModal({ product, locale, onClose }: Props) {
               </div>
             )}
 
-            {/* Size chips */}
+            {/* Sizes */}
             {product.options.sizes && product.options.sizes.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
@@ -120,12 +264,51 @@ export function QuickViewModal({ product, locale, onClose }: Props) {
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {product.options.sizes.map((size) => (
-                    <span
-                      key={size}
-                      className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
-                    >
-                      {size}
+                    <span key={size} dir="ltr" className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
+                      {size}{product.options.sizeUnit ?? ''}
                     </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Compatible lids */}
+            {resolvedLids.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                  {t('compatibleLids')}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {resolvedLids.map((lid) => (
+                    <Link
+                      key={lid.slug}
+                      href={`/products/${lid.slug}`}
+                      onClick={handleClose}
+                      className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-brand-navy dark:text-sky-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      {localizedName(lid, locale)}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fits these containers */}
+            {fitsContainers.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                  {t('fitsContainers')}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {fitsContainers.map((container) => (
+                    <Link
+                      key={container.slug}
+                      href={`/products/${container.slug}`}
+                      onClick={handleClose}
+                      className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-brand-navy dark:text-sky-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      {localizedName(container, locale)}
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -135,7 +318,7 @@ export function QuickViewModal({ product, locale, onClose }: Props) {
             <div className="flex flex-col gap-2 mt-auto pt-2">
               <Link
                 href={`/products/${product.slug}`}
-                onClick={onClose}
+                onClick={handleClose}
                 className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyDark transition-colors"
               >
                 {tProducts('viewDetails')} {locale === 'ar' ? '←' : '→'}
@@ -144,7 +327,7 @@ export function QuickViewModal({ product, locale, onClose }: Props) {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300"
+                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-slate-700 text-sm font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-brand-navy dark:text-gray-300"
               >
                 <WhatsAppIcon />
                 {t('chatNow')}
@@ -153,15 +336,23 @@ export function QuickViewModal({ product, locale, onClose }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </>,
+    document.body
+  )
+}
+
+function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points={direction === 'left' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
+    </svg>
   )
 }
 
 function XIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
+      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   )
 }

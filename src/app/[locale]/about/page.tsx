@@ -37,7 +37,7 @@ export default async function AboutPage({
               <h2 className={`text-2xl md:text-3xl font-bold mb-4 ${title}`}>
                 {t(`${key}.title`)}
               </h2>
-              <p className={`leading-relaxed text-base md:text-lg max-w-2xl ${body}`}>
+              <p className={`leading-relaxed text-base md:text-lg ${body}`}>
                 {t(`${key}.body`)}
               </p>
             </section>

@@ -7,7 +7,27 @@
 @keyframes reveal-up    { from { opacity: 0; transform: translateY( 20px); } to { opacity: 1; transform: none; } }
 
 
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
+  /* Card hover shadow — dark mode uses a ring + strong drop instead of light shadow */
+  :root {
+    --card-shadow-idle:   0 1px 4px rgba(0,0,0,.06);
+    --card-shadow-hover:  0 50px 95px -15px rgba(0,0,0,.22);
+  }
+  .dark {
+    --card-shadow-idle:   none;
+    --card-shadow-hover:  0 0 0 1px rgba(255,255,255,.07), 0 25px 60px rgba(0,0,0,.65);
+  }
+
   html {
     scroll-behavior: smooth;
     overflow-x: clip;

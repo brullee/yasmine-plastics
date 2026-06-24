@@ -7,11 +7,17 @@ import type { Product, Locale } from '@/types'
 
 interface Props {
   products: Product[]
+  allProducts?: Product[]
   locale: Locale
 }
 
-export function ProductsGrid({ products, locale }: Props) {
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
+interface QVState {
+  product: Product
+  originRect: DOMRect
+}
+
+export function ProductsGrid({ products, allProducts, locale }: Props) {
+  const [qv, setQv] = useState<QVState | null>(null)
 
   return (
     <>
@@ -21,17 +27,19 @@ export function ProductsGrid({ products, locale }: Props) {
             key={product.slug}
             product={product}
             locale={locale}
-            onQuickView={setQuickViewProduct}
+            onQuickView={(p, rect) => setQv({ product: p, originRect: rect })}
             priority={i < 4}
           />
         ))}
       </div>
 
-      {quickViewProduct && (
+      {qv && (
         <QuickViewModal
-          product={quickViewProduct}
+          product={qv.product}
+          originRect={qv.originRect}
           locale={locale}
-          onClose={() => setQuickViewProduct(null)}
+          allProducts={allProducts}
+          onClose={() => setQv(null)}
         />
       )}
     </>

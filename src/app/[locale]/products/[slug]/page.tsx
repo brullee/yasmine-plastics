@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
-import { ProductCard } from '@/components/ui/ProductCard'
+import { ProductsGrid } from '@/components/ui/ProductsGrid'
 import { ProductMainSection } from '@/components/ui/ProductMainSection'
 import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
@@ -90,11 +90,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <h2 className="text-2xl font-bold text-brand-navy dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
               {t('relatedItems')}
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {related.map((p) => (
-                <ProductCard key={p.slug} product={p} locale={locale} />
-              ))}
-            </div>
+            <ProductsGrid products={related} allProducts={allProducts} locale={locale} />
           </section>
         )}
 

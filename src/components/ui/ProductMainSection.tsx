@@ -97,6 +97,7 @@ export function ProductMainSection({
   }
 
   function onStripMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!window.matchMedia('(hover: hover)').matches) return
     const el = thumbStripRef.current
     if (!el) return
     const rect = el.getBoundingClientRect()

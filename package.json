@@ -1,9 +1,9 @@
 {
   "name": "yasmine-plastics",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "scripts": {
-    "dev": "npx rimraf .next && next dev",
+    "dev": "rm -rf .next && next dev",
     "build": "next build",
     "start": "next start",
     "deploy": "next build && git push"
