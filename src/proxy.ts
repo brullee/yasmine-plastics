@@ -31,7 +31,7 @@ export default async function proxy(req: NextRequest) {
       url.search   = `?collection=products&slug=${productMatch[1]}`
       return NextResponse.redirect(url)
     }
-    return NextResponse.next()
+    return NextResponse.redirect(new URL('/admin', 'https://www.yasmineplastics.com'))
   }
 
   const pathname = req.nextUrl.pathname
