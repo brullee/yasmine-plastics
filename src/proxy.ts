@@ -10,6 +10,8 @@ const handleI18nRouting = createMiddleware(routing)
 export default async function proxy(req: NextRequest) {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204 })
 
+  const host = req.headers.get('host') ?? ''
+
   const authPaths = ['/api/users/login', '/api/users/forgot-password']
   if (authPaths.includes(req.nextUrl.pathname)) {
     if (req.method === 'POST') {
@@ -20,23 +22,16 @@ export default async function proxy(req: NextRequest) {
     return NextResponse.next()
   }
 
-  const host = req.headers.get('host') ?? ''
   if (host === 'admin.yasmineplastics.com') {
-    const url = req.nextUrl.clone()
     const path = req.nextUrl.pathname.replace(/^\/(ar|en)(\/|$)/, '/') || '/'
-    // Product page → look up by slug and redirect to admin edit page
     const productMatch = path.match(/^\/products\/([^/]+)\/?$/)
     if (productMatch) {
+      const url = req.nextUrl.clone()
       url.pathname = '/api/admin-redirect'
       url.search   = `?collection=products&slug=${productMatch[1]}`
       return NextResponse.redirect(url)
     }
-
-    // Known Payload admin paths redirect to www/admin/...
-    const isAdminPath = /^\/(login|logout|forgot-password|reset|account|create-first-user|collections|globals)(\/|$)|^\/$/.test(path)
-    url.host     = 'www.yasmineplastics.com'
-    url.pathname = isAdminPath ? (path === '/' ? '/admin' : `/admin${path}`) : '/admin'
-    return NextResponse.redirect(url)
+    return NextResponse.next()
   }
 
   const pathname = req.nextUrl.pathname
