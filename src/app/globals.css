@@ -15,6 +15,7 @@
 
   html:lang(ar) {
     font-size: 1.05em;
+    font-weight: 300;
   }
 
   body {

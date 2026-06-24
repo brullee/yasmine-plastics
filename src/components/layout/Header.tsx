@@ -137,7 +137,7 @@ export function Header() {
             )}
 
             {/* Language toggle */}
-            <button onClick={toggleLocale} aria-label="Switch language" className={cn(subtleBtn, 'text-xs font-semibold tracking-wide')}>
+            <button onClick={toggleLocale} aria-label="Switch language" className={cn(subtleBtn, 'text-xs font-medium tracking-wide')}>
               {locale === 'ar' ? 'EN' : 'AR'}
             </button>
 

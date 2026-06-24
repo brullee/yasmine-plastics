@@ -174,6 +174,7 @@ export function ProductMainSection({
         <ProductActions
           colors={product.options.colors}
           sizes={product.options.sizes}
+          sizeUnit={product.options.sizeUnit}
           lids={compatibleLids}
           fitsContainers={fitsContainers}
           selectedPartner={selectedPartner}
