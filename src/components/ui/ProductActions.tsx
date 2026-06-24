@@ -12,6 +12,7 @@ const CUSTOM = '__custom__'
 interface Props {
   colors?: { en: string; ar: string }[]
   sizes?: string[]
+  sizeUnit?: string
   lids?: Product[]
   fitsContainers?: Product[]
   selectedPartner?: string | null
@@ -23,7 +24,7 @@ interface Props {
 }
 
 export function ProductActions({
-  colors, sizes, lids, fitsContainers, selectedPartner, onPartnerChange,
+  colors, sizes, sizeUnit, lids, fitsContainers, selectedPartner, onPartnerChange,
   productName, productSlug, whatsappNumber, locale,
 }: Props) {
   const t = useTranslations('product')
@@ -107,7 +108,7 @@ export function ProductActions({
                     key={color.en}
                     onClick={() => setSelectedColor(color.en)}
                     className={cn(
-                      'px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                       selectedColor === color.en
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
                         : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
@@ -119,7 +120,7 @@ export function ProductActions({
                 <button
                   onClick={() => setSelectedColor(CUSTOM)}
                   className={cn(
-                    'px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                    'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                     selectedColor === CUSTOM
                       ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
                       : 'bg-gray-50 border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-transparent dark:border-gray-500 dark:text-gray-400 dark:hover:border-gray-300 dark:hover:text-gray-200'
@@ -144,7 +145,7 @@ export function ProductActions({
             <div>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('size')}</p>
-                {selectedSize && <span className="text-sm text-gray-500 dark:text-gray-400">{selectedSize}</span>}
+                {selectedSize && <span className="text-sm text-gray-500 dark:text-gray-400" dir="ltr">{selectedSize}{sizeUnit ?? ''}</span>}
               </div>
               <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => (
@@ -152,13 +153,13 @@ export function ProductActions({
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     className={cn(
-                      'px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                       selectedSize === size
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
                         : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
-                    {size}
+                    <span dir="ltr">{size}{sizeUnit ?? ''}</span>
                   </button>
                 ))}
               </div>
@@ -194,7 +195,7 @@ export function ProductActions({
           href={chatUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-300 dark:border-gray-700"
+          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white dark:bg-gray-800 text-brand-navy dark:text-white font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-300 dark:border-gray-700"
         >
           <WhatsAppIcon />
           {t('chatNow')}

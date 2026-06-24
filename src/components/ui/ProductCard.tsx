@@ -1,65 +1,155 @@
-﻿'use client'
+'use client'
 
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { cn, localizedName } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
-import { localizedName } from '@/lib/utils'
+
+const EASE = 'cubic-bezier(.2,.75,.5,1)'
+const DUR  = '700ms'
 
 interface Props {
   product: Product
   locale: Locale
-  onQuickView?: (product: Product) => void
+  onQuickView?: (product: Product, originRect: DOMRect) => void
   priority?: boolean
 }
 
 export function ProductCard({ product, locale, onQuickView, priority = false }: Props) {
-  const t = useTranslations('products')
+  const t    = useTranslations('products')
   const name = localizedName(product, locale)
 
+  const cardRef    = useRef<HTMLDivElement>(null)
+  const imgRef     = useRef<HTMLDivElement>(null)
+  const hoveredRef = useRef(false)
+  const [hovered, setHovered] = useState(false)
+  const [bgScale, setBgScale] = useState({ x: 1, y: 1 })
+
+  const onEnter = () => {
+    if (hoveredRef.current) return
+    hoveredRef.current = true
+    setHovered(true)
+    const el = cardRef.current
+    if (el) setBgScale({ x: (el.offsetWidth + 40) / el.offsetWidth, y: (el.offsetHeight + 40) / el.offsetHeight })
+  }
+  const onLeave = () => {
+    hoveredRef.current = false
+    setHovered(false)
+    setBgScale({ x: 1, y: 1 })
+  }
+  // Re-triggers card hover after a QuickView modal closes with cursor already over the card
+  const onMove = () => { if (!hoveredRef.current) onEnter() }
+
+  const colorCount = product.options.colors?.length ?? 0
+  const sizeCount  = product.options.sizes?.length ?? 0
+
   return (
-    <div className="group relative z-0 hover:z-10">
-      <Link
-        href={`/products/${product.slug}`}
-        className="block bg-white dark:bg-slate-800 rounded-xl shadow-sm group-hover:shadow-xl border border-gray-200 dark:border-slate-700 group-hover:scale-[1.06] transition-all duration-300 ease-in-out"
+    <div
+      ref={cardRef}
+      className="relative"
+      style={{ zIndex: hovered ? 10 : 0 }}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onMouseMove={onMove}
+    >
+      {/* ── Nectar background-color-expand ───────────────────────────────── */}
+      <div
+        className="absolute inset-0 rounded-xl bg-white dark:bg-slate-800 pointer-events-none"
+        style={{
+          transform:  `scale(${bgScale.x}, ${bgScale.y})`,
+          boxShadow:  hovered ? 'var(--card-shadow-hover)' : 'var(--card-shadow-idle)',
+          transition: `transform ${DUR} ${EASE}, box-shadow ${DUR} ${EASE}`,
+        }}
+      />
+
+      {/* ── Inner content — scales with the card expand ─────────────────── */}
+      <div
+        style={{
+          transform:  hovered ? 'scale(1.07)' : 'scale(1)',
+          transition: `transform ${DUR} ${EASE}`,
+        }}
       >
-        {/* Image */}
-        <div className="relative aspect-square bg-white dark:bg-slate-700 rounded-t-xl overflow-hidden p-2">
-          <Image
-            src={product.image}
-            alt={name}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain"
-            priority={priority}
-          />
+        {/* Image section */}
+        <div className="relative">
+          {/* Link covers the image — click navigates to product page */}
+          <Link href={`/products/${product.slug}`} className="block">
+            <div
+              ref={imgRef}
+              className="relative aspect-square overflow-hidden bg-white dark:bg-slate-800 rounded-xl isolate"
+            >
+              <Image
+                src={product.image}
+                alt={name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-contain p-2 rounded-xl"
+                priority={priority}
+              />
+            </div>
+          </Link>
+
+          {/* Quick View pill — OUTSIDE the Link so clicking it never navigates */}
+          {onQuickView && (
+            <button
+              type="button"
+              className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap"
+              style={{
+                opacity:       hovered ? 1 : 0,
+                pointerEvents: hovered ? 'auto' : 'none',
+                transition:    hovered ? `opacity ${DUR} ${EASE}` : 'opacity 80ms ease',
+              }}
+              onClick={() => {
+                const rect = imgRef.current?.getBoundingClientRect()
+                if (rect) onQuickView(product, rect)
+              }}
+            >
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-[#0d1b2a] border border-gray-200 dark:border-transparent text-brand-navy dark:text-white text-xs font-semibold rounded-full shadow transition-colors">
+                <EyeIcon />
+                {t('quickView')}
+              </span>
+            </button>
+          )}
         </div>
 
-        {/* Name + actions - fixed height, no layout shift */}
-        <div className="border-t border-gray-100 dark:border-slate-700 px-3 pt-2.5 pb-1 rounded-b-xl">
-          <h3 className="font-medium text-gray-900 dark:text-white text-sm leading-snug">
-            {name}
-          </h3>
-
-          {/* Always in flow (no height change), just fades in */}
-          <div className="flex items-center justify-center gap-4 pt-2 pb-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-75">
-            {onQuickView && (
-              <button
-                type="button"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(product) }}
-                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-brand-navy dark:hover:text-white transition-colors"
-              >
-                <span className="text-brand-navy dark:text-brand-sky"><EyeIcon /></span>
-                {t('quickView')}
-              </button>
+        {/* Meta area */}
+        <div className="px-3 pt-2.5 pb-3">
+          <Link
+            href={`/products/${product.slug}`}
+            className={cn(
+              'block text-sm font-medium leading-snug transition-colors duration-300',
+              hovered ? 'text-brand-navy dark:text-sky-300' : 'text-gray-900 dark:text-white'
             )}
-            <span className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              <span className="text-emerald-500"><ViewIcon /></span>
-              {t('viewDetails')}
-            </span>
+          >
+            {name}
+          </Link>
+
+          {/* Specs row — secondary info always visible */}
+          <div className="flex items-center flex-wrap gap-1.5 mt-1.5 min-h-[18px]">
+            {product.material && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                {product.material}
+              </span>
+            )}
+            {product.capacity && (
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                {product.capacity}
+              </span>
+            )}
+            {colorCount > 0 && !product.material && !product.capacity && (
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                {colorCount} {colorCount === 1 ? 'color' : 'colors'}
+              </span>
+            )}
+            {sizeCount > 0 && !product.material && !product.capacity && colorCount === 0 && (
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                {sizeCount} {sizeCount === 1 ? 'size' : 'sizes'}
+              </span>
+            )}
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   )
 }
@@ -67,18 +157,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
 function EyeIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  )
-}
-
-function ViewIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-      <polyline points="15 3 21 3 21 9" />
-      <line x1="10" y1="14" x2="21" y2="3" />
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
     </svg>
   )
 }

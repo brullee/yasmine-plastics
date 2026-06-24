@@ -9,6 +9,7 @@ export type Product = {
   options: {
     colors?: { en: string; ar: string }[]
     sizes?: string[]
+    sizeUnit?: string
   }
   compatibleLids?: string[]
   image: string

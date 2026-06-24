@@ -63,6 +63,7 @@ function transformProduct(doc: any): Product {
         .filter((s: unknown) => s && typeof s === 'object')
         .map((s: unknown) => (s as { label: string }).label)
         .filter(Boolean),
+      sizeUnit: doc.sizeUnit ?? undefined,
     },
     compatibleLids: compatibleLids.length ? compatibleLids : undefined,
     pairingImages: Object.keys(pairingImages).length ? pairingImages : undefined,

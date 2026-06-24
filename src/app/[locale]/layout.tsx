@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Metadata } from 'next'
-import { Inter, Tajawal } from 'next/font/google'
+import { Inter, Readex_Pro } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -21,10 +21,10 @@ const inter = Inter({
   display: 'swap',
 })
 
-const notoSansArabic = Tajawal({
+const notoSansArabic = Readex_Pro({
   subsets: ['arabic'],
   variable: '--font-arabic',
-  weight: ['400', '500', '700'],
+  weight: ['300', '400', '500', '700'],
   display: 'swap',
 })
 

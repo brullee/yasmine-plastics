@@ -5,8 +5,16 @@ import { useEffect, useState } from 'react'
 
 type Option = { label: string; value: string; __isNew__?: boolean; [key: string]: unknown }
 
+const UNITS = [
+  { label: 'ml', value: 'ml' },
+  { label: 'L', value: 'L' },
+  { label: 'g', value: 'g' },
+  { label: 'oz', value: 'oz' },
+]
+
 export function SizesField() {
   const { value, setValue } = useField<number[]>({ path: 'sizes' })
+  const { value: unit, setValue: setUnit } = useField<string>({ path: 'sizeUnit' })
   const [options, setOptions]     = useState<Option[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
@@ -22,6 +30,9 @@ export function SizesField() {
   const selected = (value ?? [])
     .map(id => options.find(o => o.value === String(id)))
     .filter(Boolean) as Option[]
+
+  const hasSizes = (value ?? []).length > 0
+  const missingUnit = hasSizes && !unit
 
   function handleChange(next: Option | Option[]) {
     void (async () => {
@@ -57,16 +68,37 @@ export function SizesField() {
   return (
     <div className="field-type relationship">
       <label className="field-label">Sizes</label>
-      <ReactSelect
-        isMulti
-        isCreatable
-        isLoading={isLoading}
-        options={options}
-        value={selected}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onChange={handleChange as any}
-        placeholder="Select or type to add..."
-      />
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <div style={{ flex: 1 }}>
+          <ReactSelect
+            isMulti
+            isCreatable
+            isLoading={isLoading}
+            options={options}
+            value={selected}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onChange={handleChange as any}
+            placeholder="Select or type to add..."
+          />
+        </div>
+        <div style={{ width: '160px', flexShrink: 0 }}>
+          <ReactSelect
+            isClearable
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            options={UNITS as any}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            value={(UNITS.find(u => u.value === unit) ?? null) as any}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onChange={(opt: any) => setUnit(opt?.value ?? null)}
+            placeholder="Unit"
+          />
+        </div>
+      </div>
+      {missingUnit && (
+        <p style={{ color: 'var(--theme-error-500, #f87171)', fontSize: '12px', marginTop: '6px' }}>
+          Unit of measurement is required when sizes are set
+        </p>
+      )}
     </div>
   )
 }

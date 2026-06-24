@@ -459,6 +459,26 @@ export default buildConfig({
                     },
                   },
                 },
+                {
+                  name: 'sizeUnit',
+                  type: 'select',
+                  label: 'Size Unit',
+                  options: [
+                    { label: 'ml', value: 'ml' },
+                    { label: 'L', value: 'L' },
+                    { label: 'g', value: 'g' },
+                    { label: 'oz', value: 'oz' },
+                  ],
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  validate: (value: any, { siblingData }: { siblingData: any }) => {
+                    const sizes = siblingData?.sizes
+                    if (Array.isArray(sizes) && sizes.length > 0 && !value) {
+                      return 'Unit of measurement is required when sizes are set'
+                    }
+                    return true
+                  },
+                  admin: { hidden: true },
+                },
               ],
             },
           ],
