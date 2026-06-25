@@ -55,7 +55,7 @@ export function Footer() {
   function toggleLocale() {
     const newLocale = locale === 'en' ? 'ar' : 'en'
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
-    router.replace(pathname, { locale: newLocale })
+    router.replace(`${pathname}${window.location.search}`, { locale: newLocale })
   }
 
   function toggleTheme() {

@@ -74,7 +74,7 @@ export function Header() {
   const toggleLocale = () => {
     const newLocale = locale === 'ar' ? 'en' : 'ar'
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
-    router.replace(pathname, { locale: newLocale })
+    router.replace(`${pathname}${window.location.search}`, { locale: newLocale })
   }
 
   // When back/forward navigation lands on a URL whose locale doesn't match the
