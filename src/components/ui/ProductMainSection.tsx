@@ -45,6 +45,8 @@ export function ProductMainSection({
   const firstPartnerSlug = compatibleLids[0]?.slug ?? fitsContainers[0]?.slug ?? null
 
   const [selectedPartner, setSelectedPartner] = useState<string | null>(firstPartnerSlug)
+  const [selectedColor, setSelectedColor] = useState<string | null>(product.options.colors?.[0]?.en ?? null)
+  const [selectedSize, setSelectedSize] = useState<string | null>(product.options.sizes?.[0] ?? null)
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
@@ -223,9 +225,31 @@ export function ProductMainSection({
     touchStartX.current = null
   }
 
+  // ── Color / size → carousel jump ────────────────────────────────────────
+  function handleColorChange(color: string | null) {
+    setSelectedColor(color)
+    setHoveredThumb(null)
+    if (!color) return
+    const url = product.options.colorImageMap?.[color]
+    if (!url) return
+    const idx = images.indexOf(url)
+    if (idx !== -1) setCarouselIndex(idx)
+  }
+
+  function handleSizeChange(size: string | null) {
+    setSelectedSize(size)
+    setHoveredThumb(null)
+    if (!size) return
+    const url = product.options.sizeImageMap?.[size]
+    if (!url) return
+    const idx = images.indexOf(url)
+    if (idx !== -1) setCarouselIndex(idx)
+  }
+
   // ── Partner change ───────────────────────────────────────────────────────
   function handlePartnerChange(slug: string | null) {
     setSelectedPartner(slug)
+    setHoveredThumb(null)
     if (!slug) return
     const ownPairingUrl = product.pairingImages?.[slug]?.[0]
     if (ownPairingUrl) {
@@ -272,12 +296,12 @@ export function ProductMainSection({
               {images.map((src, i) => (
                 <button
                   key={i}
-                  onClick={() => { setCarouselIndex(i); setHoveredThumb(i) }}
+                  onClick={() => setCarouselIndex(i)}
                   onMouseEnter={() => {
                     clearHoverTimer()
                     hoverTimerRef.current = setTimeout(() => setHoveredThumb(i), 80)
                   }}
-                  onMouseLeave={clearHoverTimer}
+                  onMouseLeave={() => { clearHoverTimer(); setHoveredThumb(null) }}
                   className={cn(
                     'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors',
                     i === (hoveredThumb ?? carouselIndex)
@@ -387,6 +411,10 @@ export function ProductMainSection({
           fitsContainers={fitsContainers}
           selectedPartner={selectedPartner}
           onPartnerChange={handlePartnerChange}
+          selectedColor={selectedColor}
+          onColorChange={handleColorChange}
+          selectedSize={selectedSize}
+          onSizeChange={handleSizeChange}
           productName={name}
           productSlug={product.slug}
           whatsappNumber={whatsappNumber}

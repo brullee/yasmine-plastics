@@ -17,6 +17,10 @@ interface Props {
   fitsContainers?: Product[]
   selectedPartner?: string | null
   onPartnerChange?: (slug: string | null) => void
+  selectedColor?: string | null
+  onColorChange?: (color: string | null) => void
+  selectedSize?: string | null
+  onSizeChange?: (size: string | null) => void
   productName: string
   productSlug: string
   whatsappNumber: string
@@ -25,13 +29,20 @@ interface Props {
 
 export function ProductActions({
   colors, sizes, sizeUnit, lids, fitsContainers, selectedPartner, onPartnerChange,
+  selectedColor: controlledColor, onColorChange,
+  selectedSize: controlledSize, onSizeChange,
   productName, productSlug, whatsappNumber, locale,
 }: Props) {
   const t = useTranslations('product')
   const tOpts = useTranslations('product.options')
 
-  const [selectedColor, setSelectedColor] = useState<string | null>(colors?.[0]?.en ?? null)
-  const [selectedSize, setSelectedSize] = useState<string | null>(sizes?.[0] ?? null)
+  const [internalColor, setInternalColor] = useState<string | null>(colors?.[0]?.en ?? null)
+  const [internalSize, setInternalSize] = useState<string | null>(sizes?.[0] ?? null)
+
+  const selectedColor = onColorChange !== undefined ? (controlledColor ?? null) : internalColor
+  const setSelectedColor = onColorChange ?? setInternalColor
+  const selectedSize = onSizeChange !== undefined ? (controlledSize ?? null) : internalSize
+  const setSelectedSize = onSizeChange ?? setInternalSize
 
   const colorOptions = colors ?? []
   const selectedPartnerProduct =

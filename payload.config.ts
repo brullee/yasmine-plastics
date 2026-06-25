@@ -323,48 +323,6 @@ export default buildConfig({
               ],
             },
             {
-              label: 'Media',
-              fields: [
-                { name: 'image', type: 'upload', relationTo: 'media', required: true, label: 'Main Image' },
-                {
-                  name: 'gallery',
-                  type: 'array',
-                  label: 'Additional Images',
-                  fields: [
-                    { name: 'image', type: 'upload', relationTo: 'media', required: true },
-                    {
-                      name: 'pairedLid',
-                      type: 'relationship',
-                      relationTo: 'products',
-                      label: 'Paired with',
-                      admin: {
-                        description: 'Tag this as the pairing shot for a specific compatible lid',
-                        condition: (data) => !!data.hasCompatibleLids,
-                      },
-                      filterOptions: {
-                        or: [
-                          { 'category.slug': { equals: 'lids' } },
-                          { 'category.slug': { equals: 'lid' } },
-                          { 'category.slug': { equals: 'papercup-lids' } },
-                          { 'category.slug': { equals: 'papercup-lid' } },
-                        ],
-                      },
-                    },
-                    {
-                      name: 'showInLidGallery',
-                      type: 'checkbox',
-                      label: 'Show on lid page',
-                      defaultValue: true,
-                      admin: {
-                        description: 'Include this image in the pairing gallery shown on the lid\'s product page.',
-                        condition: (data, siblingData) => !!data.hasCompatibleLids && !!(siblingData as Record<string, unknown>)?.pairedLid,
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-            {
               label: 'Specifications',
               fields: [
                 {
@@ -478,6 +436,105 @@ export default buildConfig({
                     return true
                   },
                   admin: { hidden: true },
+                },
+              ],
+            },
+            {
+              label: 'Media',
+              fields: [
+                { name: 'image', type: 'upload', relationTo: 'media', required: true, label: 'Main Image' },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'mainImageLinkedColors',
+                      type: 'relationship',
+                      relationTo: 'colors',
+                      label: 'Color shown',
+                      admin: {
+                        components: {
+                          Field: '@/components/payload/MainImageColorsField#MainImageColorsField',
+                        },
+                      },
+                    },
+                    {
+                      name: 'mainImageLinkedSizes',
+                      type: 'relationship',
+                      relationTo: 'sizes',
+                      label: 'Size shown',
+                      admin: {
+                        components: {
+                          Field: '@/components/payload/MainImageSizesField#MainImageSizesField',
+                        },
+                      },
+                    },
+                  ],
+                },
+                {
+                  name: 'gallery',
+                  type: 'array',
+                  label: 'Gallery',
+                  admin: {
+                    components: {
+                      RowLabel: '@/components/payload/GalleryRowLabel#GalleryRowLabel',
+                    },
+                  },
+                  fields: [
+                    { name: 'image', type: 'upload', relationTo: 'media', required: true },
+                    {
+                      name: 'pairedLid',
+                      type: 'relationship',
+                      relationTo: 'products',
+                      label: 'Paired with lid',
+                      admin: {
+                        condition: (data) => !!data.hasCompatibleLids,
+                      },
+                      filterOptions: {
+                        or: [
+                          { 'category.slug': { equals: 'lids' } },
+                          { 'category.slug': { equals: 'lid' } },
+                          { 'category.slug': { equals: 'papercup-lids' } },
+                          { 'category.slug': { equals: 'papercup-lid' } },
+                        ],
+                      },
+                    },
+                    {
+                      name: 'showInLidGallery',
+                      type: 'checkbox',
+                      label: 'Show on lid page',
+                      defaultValue: true,
+                      admin: {
+                        condition: (data, siblingData) => !!data.hasCompatibleLids && !!(siblingData as Record<string, unknown>)?.pairedLid,
+                      },
+                    },
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'linkedColors',
+                          type: 'relationship',
+                          relationTo: 'colors',
+                          label: 'Color shown',
+                          admin: {
+                            components: {
+                              Field: '@/components/payload/LinkedColorsField#LinkedColorsField',
+                            },
+                          },
+                        },
+                        {
+                          name: 'linkedSizes',
+                          type: 'relationship',
+                          relationTo: 'sizes',
+                          label: 'Size shown',
+                          admin: {
+                            components: {
+                              Field: '@/components/payload/LinkedSizesField#LinkedSizesField',
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  ],
                 },
               ],
             },

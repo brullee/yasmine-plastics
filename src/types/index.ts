@@ -10,6 +10,8 @@ export type Product = {
     colors?: { en: string; ar: string }[]
     sizes?: string[]
     sizeUnit?: string
+    colorImageMap?: Record<string, string>  // color.nameEn → first gallery image URL tagged with that color
+    sizeImageMap?: Record<string, string>   // size.label → first gallery image URL tagged with that size
   }
   compatibleLids?: string[]
   image: string
