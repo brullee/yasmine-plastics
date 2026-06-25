@@ -42,8 +42,8 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
           {productCount !== undefined && (
             <span className="text-white/90 text-base font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 transition-opacity duration-[450ms] [transition-timing-function:cubic-bezier(.15,.75,.5,1)]">
               {locale === 'ar'
-                ? productCount === 1 ? 'منتج واحد' : productCount === 2 ? 'منتجان' : `${productCount} منتجات`
-                : productCount === 1 ? 'product' : productCount === 2 ? 'products' : `${productCount} products`}
+                ? productCount === 1 ? 'منتج واحد' : productCount === 2 ? 'منتجان' : productCount <= 10 ? `${productCount} منتجات` : productCount < 100 ? `${productCount} منتجاً` : `${productCount} منتج`
+                : productCount === 1 ? '1 product' : `${productCount} products`}
             </span>
           )}
         </div>
