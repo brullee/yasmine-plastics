@@ -1,5 +1,29 @@
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
+import { pageAlternates, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'meta' })
+  const title = t('aboutTitle')
+  const description = t('aboutDescription')
+  return {
+    title,
+    description,
+    alternates: pageAlternates(locale, '/about'),
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/${locale}/about`,
+      type: 'website',
+    },
+  }
+}
 
 type SectionKey = 'story' | 'mission' | 'vision' | 'values'
 
