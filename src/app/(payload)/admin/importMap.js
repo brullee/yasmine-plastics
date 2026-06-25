@@ -6,6 +6,11 @@ import { LowercaseText as LowercaseText_0889b483c4555e77039b3dc2be1fe0b6 } from 
 import { CategoryLidSync as CategoryLidSync_753a7c062c5a663ddd14176a32acc322 } from '@/components/payload/CategoryLidSync'
 import { CategoryMaterialSync as CategoryMaterialSync_a192553eba787fcd9bfc5dcb8c33cfde } from '@/components/payload/CategoryMaterialSync'
 import { SizesField as SizesField_f579635e15412ccef7f851e5391a7387 } from '@/components/payload/SizesField'
+import { MainImageColorsField as MainImageColorsField_f91c1b3aa56fc0d6e2a0618e45246a2a } from '@/components/payload/MainImageColorsField'
+import { MainImageSizesField as MainImageSizesField_7396b7980bd1e13a35b31cd8563c7064 } from '@/components/payload/MainImageSizesField'
+import { LinkedColorsField as LinkedColorsField_66513f97b79f4d8806426582331bb724 } from '@/components/payload/LinkedColorsField'
+import { LinkedSizesField as LinkedSizesField_0932e0e990cfa7afd3aa69b143fa6c0e } from '@/components/payload/LinkedSizesField'
+import { GalleryRowLabel as GalleryRowLabel_79a601cc84dc5db4aee135ae0777f03c } from '@/components/payload/GalleryRowLabel'
 import { LoginRateWarning as LoginRateWarning_fd60fe0c9ec61648f571d4e782b32f1d } from '@/components/payload/LoginRateWarning'
 import { ClientImageCompressorProvider as ClientImageCompressorProvider_f27d5cb7fa8597af0f6621c0fd3100d8 } from '@/components/payload/ClientImageCompressor'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -21,6 +26,11 @@ export const importMap = {
   "@/components/payload/CategoryLidSync#CategoryLidSync": CategoryLidSync_753a7c062c5a663ddd14176a32acc322,
   "@/components/payload/CategoryMaterialSync#CategoryMaterialSync": CategoryMaterialSync_a192553eba787fcd9bfc5dcb8c33cfde,
   "@/components/payload/SizesField#SizesField": SizesField_f579635e15412ccef7f851e5391a7387,
+  "@/components/payload/MainImageColorsField#MainImageColorsField": MainImageColorsField_f91c1b3aa56fc0d6e2a0618e45246a2a,
+  "@/components/payload/MainImageSizesField#MainImageSizesField": MainImageSizesField_7396b7980bd1e13a35b31cd8563c7064,
+  "@/components/payload/LinkedColorsField#LinkedColorsField": LinkedColorsField_66513f97b79f4d8806426582331bb724,
+  "@/components/payload/LinkedSizesField#LinkedSizesField": LinkedSizesField_0932e0e990cfa7afd3aa69b143fa6c0e,
+  "@/components/payload/GalleryRowLabel#GalleryRowLabel": GalleryRowLabel_79a601cc84dc5db4aee135ae0777f03c,
   "@/components/payload/LoginRateWarning#LoginRateWarning": LoginRateWarning_fd60fe0c9ec61648f571d4e782b32f1d,
   "@/components/payload/ClientImageCompressor#ClientImageCompressorProvider": ClientImageCompressorProvider_f27d5cb7fa8597af0f6621c0fd3100d8,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,

@@ -59,7 +59,7 @@ function MoonIcon() {
   )
 }
 
-const subtleBtn = 'p-2 rounded-md text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors'
+const subtleBtn = 'p-2 rounded-md text-gray-400 hover:text-brand-navy dark:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors'
 
 export function Header() {
   const t = useTranslations('nav')
@@ -74,7 +74,7 @@ export function Header() {
   const toggleLocale = () => {
     const newLocale = locale === 'ar' ? 'en' : 'ar'
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
-    router.replace(pathname, { locale: newLocale })
+    router.replace(`${pathname}${window.location.search}`, { locale: newLocale })
   }
 
   // When back/forward navigation lands on a URL whose locale doesn't match the

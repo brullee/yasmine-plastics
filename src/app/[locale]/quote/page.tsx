@@ -1,13 +1,33 @@
 export const revalidate = 3600
 
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { QuoteForm } from '@/components/ui/QuoteForm'
 import { getProducts, getCategories } from '@/lib/payload-data'
+import { pageAlternates, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 interface Props {
   params: Promise<{ locale: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'meta' })
+  const title = t('quoteTitle')
+  const description = t('quoteDescription')
+  return {
+    title,
+    description,
+    alternates: pageAlternates(locale, '/quote'),
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/${locale}/quote`,
+      type: 'website',
+    },
+  }
 }
 
 export default async function QuotePage({ params }: Props) {

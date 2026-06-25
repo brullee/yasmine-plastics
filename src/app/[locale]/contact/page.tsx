@@ -1,10 +1,30 @@
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { company } from '@/data/company'
 import { ContactForm } from '@/components/ui/ContactForm'
+import { pageAlternates, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 interface Props {
   params: Promise<{ locale: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'meta' })
+  const title = t('contactTitle')
+  const description = t('contactDescription')
+  return {
+    title,
+    description,
+    alternates: pageAlternates(locale, '/contact'),
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/${locale}/contact`,
+      type: 'website',
+    },
+  }
 }
 
 export default async function ContactPage({ params }: Props) {
@@ -15,8 +35,29 @@ export default async function ContactPage({ params }: Props) {
   const address = locale === 'ar' ? company.addressAr : company.addressEn
   const hours = locale === 'ar' ? company.hoursAr : company.hoursEn
 
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Yasmine Plastics',
+    url: BASE_URL,
+    telephone: company.phone,
+    email: company.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: company.addressEn,
+      addressLocality: 'Amman',
+      addressCountry: 'JO',
+    },
+    openingHours: 'Sa-Th 08:00-17:00',
+    hasMap: company.mapShareUrl,
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <div className="mb-12">
         <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">
           {t('title')}

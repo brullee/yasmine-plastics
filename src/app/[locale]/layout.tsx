@@ -41,14 +41,18 @@ export async function generateMetadata({
 
   if (locale === 'ar') {
     return {
+      metadataBase: new URL('https://www.yasmineplastics.com'),
       title: { default: 'ياسمين للبلاستيك', template: '%s | ياسمين للبلاستيك' },
       description: 'منتجات بلاستيكية وقوالب، مصنّعة وفق المواصفات منذ عام 1989. نخدم الأردن والعالم العربي.',
+      openGraph: { siteName: 'ياسمين للبلاستيك', locale: 'ar_JO', type: 'website' },
     }
   }
 
   return {
+    metadataBase: new URL('https://www.yasmineplastics.com'),
     title: { default: 'Yasmine Plastics', template: '%s | Yasmine Plastics' },
     description: 'Plastic products and molds, manufactured to spec since 1989. Serving Jordan and the Arab world.',
+    openGraph: { siteName: 'Yasmine Plastics', locale: 'en_US', type: 'website' },
   }
 }
 

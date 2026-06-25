@@ -21,7 +21,7 @@
       "item2Title": "35+ Years of Experience",
       "item2Text": "Trusted by hundreds of businesses across Jordan and the wider Arab world since 1989.",
       "item3Title": "Wide Product Range",
-      "item3Text": "Over 300 products spanning packaging, food service, industrial, and more."
+      "item3Text": "Over 300 products spanning food service, industrial, consumer goods, and more."
     },
     "categories": {
       "title": "Our Product Categories",
@@ -29,7 +29,7 @@
     },
     "trustedBy": {
       "title": "Trusted By",
-      "context": "Supplying packaging solutions across Jordan and the Arab world since 1989"
+      "context": "Supplying plastic products across Jordan and the Arab world since 1989"
     },
     "cta": {
       "headline": "Ready to Place an Order?",
@@ -51,7 +51,7 @@
     },
     "mission": {
       "title": "Our Mission",
-      "body": "To deliver high-quality, durable, and customisable plastic packaging solutions that meet the real-world needs of our clients,on time, at the right price, with the flexibility to adapt. We measure success by our clients' satisfaction and the long-term relationships we build together."
+      "body": "To deliver high-quality, durable, and customisable plastic products that meet the real-world needs of our clients, on time, at the right price, with the flexibility to adapt. We measure success by our clients' satisfaction and the long-term relationships we build together."
     },
     "vision": {
       "title": "Our Vision",
@@ -192,5 +192,17 @@
     "backToProducts": "Back to Products",
     "learnMore": "Learn More",
     "contactUs": "Contact Us"
+  },
+  "meta": {
+    "homeTitle": "Yasmine Plastics | Custom Plastic Manufacturing Since 1989",
+    "homeDescription": "Custom plastic cups, containers, lids, and made-to-order products manufactured in Jordan. Backed by over 35 years of plastics industry experience. Serving businesses across the Arab world. Request a bulk order quote.",
+    "productsTitle": "Plastic Products Catalogue",
+    "productsDescription": "Browse our range of plastic cups, containers, lids, and other products. Custom colours, dimensions, and specifications available. Prices quoted on request.",
+    "contactTitle": "Contact Us",
+    "contactDescription": "Contact Yasmine Plastics in Amman, Jordan. Call, email, or send a message. Our team responds within 24 hours.",
+    "quoteTitle": "Request a Quote",
+    "quoteDescription": "Request a custom price quote for plastic products. Specify your product, quantity, colours, and delivery location. We reply within 24 hours.",
+    "aboutTitle": "About Yasmine Plastics",
+    "aboutDescription": "Founded in Amman in 2008, built on plastics industry experience going back to 1989. We design and manufacture custom molds, shapes, and products to your exact specifications."
   }
 }

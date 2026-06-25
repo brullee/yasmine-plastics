@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
@@ -6,6 +7,7 @@ import { ProductMainSection } from '@/components/ui/ProductMainSection'
 import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
+import { pageAlternates, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export const revalidate = 3600
@@ -20,6 +22,35 @@ export async function generateStaticParams() {
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, slug } = await params
+  const product = await getProductBySlug(slug)
+  if (!product) return {}
+
+  const name = locale === 'ar' ? product.nameAr : product.nameEn
+  const category = await getCategoryBySlug(product.category)
+  const categoryName = category
+    ? (locale === 'ar' ? category.nameAr : category.nameEn)
+    : product.category
+
+  const description = locale === 'ar'
+    ? `${name}. ${categoryName} من ياسمين للبلاستيك.${product.material ? ` مصنوع من ${product.material}.` : ''} اطلب عرض سعر للطلبات الصناعية والجملة.`
+    : `${name}. ${categoryName} by Yasmine Plastics.${product.material ? ` Made from ${product.material}.` : ''} Request a wholesale or bulk order quote.`
+
+  return {
+    title: name,
+    description,
+    alternates: pageAlternates(locale, `/products/${slug}`),
+    openGraph: {
+      title: `${name} | Yasmine Plastics`,
+      description,
+      url: `${BASE_URL}/${locale}/products/${slug}`,
+      type: 'website',
+      images: product.image ? [{ url: product.image, width: 1400, height: 1400, alt: name }] : undefined,
+    },
+  }
 }
 
 export default async function ProductDetailPage({ params }: Props) {
@@ -54,8 +85,30 @@ export default async function ProductDetailPage({ params }: Props) {
     .filter((p) => p.category === product.category && p.slug !== product.slug)
     .slice(0, 4)
 
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name,
+    image: product.image || undefined,
+    description: locale === 'ar'
+      ? `${name}. ${categoryName} من ياسمين للبلاستيك`
+      : `${name}. ${categoryName} by Yasmine Plastics`,
+    brand: { '@type': 'Brand', name: 'Yasmine Plastics' },
+    ...(product.material ? { material: product.material } : {}),
+    offers: {
+      '@type': 'Offer',
+      availability: 'https://schema.org/PreOrder',
+      priceCurrency: 'JOD',
+      seller: { '@type': 'Organization', name: 'Yasmine Plastics' },
+    },
+  }
+
   return (
     <div className="bg-gray-50 dark:bg-brand-navyDeep min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Breadcrumb */}

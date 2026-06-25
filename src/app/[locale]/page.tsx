@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getTranslations, getLocale } from 'next-intl/server'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
@@ -5,7 +6,30 @@ import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MapEmbed } from '@/components/ui/MapEmbed'
 import { company } from '@/data/company'
+import { pageAlternates, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'meta' })
+  const title = t('homeTitle')
+  const description = t('homeDescription')
+  return {
+    title: { absolute: title },
+    description,
+    alternates: pageAlternates(locale, ''),
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/${locale}`,
+      type: 'website',
+    },
+  }
+}
 
 function ManufacturingIcon() {
   return (
@@ -49,8 +73,30 @@ export default async function HomePage({
   const t = await getTranslations({ locale, namespace: 'home' })
   const tNav = await getTranslations({ locale, namespace: 'nav' })
 
+  const orgSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Yasmine Plastics',
+    url: BASE_URL,
+    logo: `${BASE_URL}/YasmineLogo.svg`,
+    telephone: company.phone,
+    email: company.email,
+    foundingDate: '2008',
+    description: 'Manufacturer of plastic cups, containers, lids, and custom plastic products in Jordan.',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: company.addressEn,
+      addressLocality: 'Amman',
+      addressCountry: 'JO',
+    },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+      />
       {/* Hero */}
       <section className="bg-gradient-to-br from-brand-navy to-brand-navyDark text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">

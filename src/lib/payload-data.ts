@@ -45,6 +45,26 @@ function transformProduct(doc: any): Product {
     }
   }
 
+  const colorImageMap: Record<string, string> = {}
+  const sizeImageMap: Record<string, string> = {}
+
+  function addToMap(color: unknown, size: unknown, url: string) {
+    const nameEn = typeof color === 'object' && color !== null ? (color as Record<string, string>).nameEn : null
+    if (nameEn && !colorImageMap[nameEn]) colorImageMap[nameEn] = url
+    const label = typeof size === 'object' && size !== null ? (size as Record<string, string>).label : null
+    if (label && !sizeImageMap[label]) sizeImageMap[label] = url
+  }
+
+  // Main image associations (index 0 in the carousel)
+  const mainUrl = mediaUrl(doc.image)
+  if (mainUrl) addToMap(doc.mainImageLinkedColors, doc.mainImageLinkedSizes, mainUrl)
+
+  // Gallery image associations
+  for (const g of doc.gallery ?? []) {
+    const url = mediaUrl(g.image)
+    if (url) addToMap(g.linkedColors, g.linkedSizes, url)
+  }
+
   return {
     slug: doc.slug ?? '',
     nameEn: doc.nameEn ?? '',
@@ -64,6 +84,8 @@ function transformProduct(doc: any): Product {
         .map((s: unknown) => (s as { label: string }).label)
         .filter(Boolean),
       sizeUnit: doc.sizeUnit ?? undefined,
+      colorImageMap: Object.keys(colorImageMap).length ? colorImageMap : undefined,
+      sizeImageMap: Object.keys(sizeImageMap).length ? sizeImageMap : undefined,
     },
     compatibleLids: compatibleLids.length ? compatibleLids : undefined,
     pairingImages: Object.keys(pairingImages).length ? pairingImages : undefined,

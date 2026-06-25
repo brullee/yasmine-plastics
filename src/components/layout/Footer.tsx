@@ -55,7 +55,7 @@ export function Footer() {
   function toggleLocale() {
     const newLocale = locale === 'en' ? 'ar' : 'en'
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
-    router.replace(pathname, { locale: newLocale })
+    router.replace(`${pathname}${window.location.search}`, { locale: newLocale })
   }
 
   function toggleTheme() {
@@ -74,17 +74,17 @@ export function Footer() {
               <div className="flex items-start gap-1">
                 <span className="text-gray-500 dark:text-gray-400 shrink-0">{t('contact.info.phone')}: </span>
                 <div className="flex flex-col gap-1">
-                  <a href={`tel:${company.phone}`} dir="ltr" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone}</a>
-                  <a href={`tel:${company.phone2}`} dir="ltr" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{company.phone2}</a>
+                  <a href={`tel:${company.phone}`} dir="ltr" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{company.phone}</a>
+                  <a href={`tel:${company.phone2}`} dir="ltr" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{company.phone2}</a>
                 </div>
               </div>
               <p>
                 <span className="text-gray-500 dark:text-gray-400">{t('contact.info.email')}: </span>
-                <a href={`mailto:${company.email}`} dir="ltr" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{company.email}</a>
+                <a href={`mailto:${company.email}`} dir="ltr" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{company.email}</a>
               </p>
               <div className="max-w-[22rem]">
                 <span className="text-gray-500 dark:text-gray-400">{t('contact.info.address')}: </span>
-                <a href={company.mapShareUrl} target="_blank" rel="noopener noreferrer" className="dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{address}</a>
+                <a href={company.mapShareUrl} target="_blank" rel="noopener noreferrer" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{address}</a>
               </div>
             </div>
           </div>
@@ -102,7 +102,7 @@ export function Footer() {
                   className={`inline-flex items-center gap-1.5 text-sm transition-colors w-fit ${
                     wip
                       ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white'
                   }`}
                 >
                   {t(`nav.${key}`)}
@@ -128,7 +128,7 @@ export function Footer() {
             <button
               onClick={toggleTheme}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors"
             >
               {isDark ? <SunIcon /> : <MoonIcon />}
               <span className="text-xs font-arabic font-medium">{isDark ? t('footer.light') : t('footer.dark')}</span>
@@ -140,7 +140,7 @@ export function Footer() {
             <button
               onClick={toggleLocale}
               aria-label={locale === 'en' ? 'Switch to Arabic' : 'Switch to English'}
-              className="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors text-xs font-medium font-arabic"
+              className="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors text-xs font-medium font-arabic"
             >
               {locale === 'en' ? 'العربية' : 'English'}
             </button>
