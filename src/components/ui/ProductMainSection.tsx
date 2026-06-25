@@ -400,7 +400,7 @@ export function ProductMainSection({
         {/* Category pill */}
         <div className="inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5">
           <span className="text-gray-500 dark:text-gray-400 text-sm">{t('category')}:</span>
-          <span className="text-gray-900 dark:text-white font-semibold text-sm">{categoryName}</span>
+          <span className="text-brand-navy dark:text-white font-semibold text-sm">{categoryName}</span>
         </div>
 
         <ProductActions
@@ -435,7 +435,7 @@ export function ProductMainSection({
             ].map(({ label, value }) => (
               <div key={label} className="bg-white dark:bg-gray-800 px-4 py-3">
                 <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-0.5">{label}</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">{value || '-'}</p>
+                <p className="text-sm font-semibold text-brand-navy dark:text-white">{value || '-'}</p>
               </div>
             ))}
           </div>

@@ -119,7 +119,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
             href={`/products/${product.slug}`}
             className={cn(
               'block text-sm font-medium leading-snug transition-colors duration-300',
-              hovered ? 'text-brand-navy dark:text-sky-300' : 'text-gray-900 dark:text-white'
+              hovered ? 'text-brand-navy dark:text-sky-300' : 'text-brand-navy dark:text-white'
             )}
           >
             {name}
