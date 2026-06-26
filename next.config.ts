@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       { source: '/admin/en/:path*', destination: '/admin/:path*', permanent: false },
       { source: '/admin/ar', destination: '/admin', permanent: false },
       { source: '/admin/ar/:path*', destination: '/admin/:path*', permanent: false },
+      { source: '/admin/products/:slug', destination: '/api/admin-redirect?collection=products&slug=:slug', permanent: false },
     ]
   },
 }
