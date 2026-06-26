@@ -53,7 +53,7 @@ export function ProductActions({
 
   const hasOptions =
     colorOptions.length > 0 ||
-    (sizes?.length ?? 0) > 0 ||
+    (sizes?.length ?? 0) > 1 ||
     (lids?.length ?? 0) > 0 ||
     (fitsContainers?.length ?? 0) > 0
 
@@ -152,7 +152,7 @@ export function ProductActions({
           )}
 
           {/* Sizes */}
-          {sizes && sizes.length > 0 && (
+          {sizes && sizes.length > 1 && (
             <div>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('size')}</p>

@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ProductActions } from '@/components/ui/ProductActions'
-import { cn } from '@/lib/utils'
+import { cn, deriveCapacity } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
 function formatDimensions(product: Product): string | undefined {
@@ -33,6 +33,8 @@ export function ProductMainSection({
   product, name, categoryName, compatibleLids, fitsContainers, whatsappNumber, locale,
 }: Props) {
   const t = useTranslations('product')
+
+  const derivedCapacity = deriveCapacity(product)
 
   const { images, pairingSlides } = useMemo(() => {
     const ownImages = [product.image, ...(product.gallery ?? [])]
@@ -73,6 +75,8 @@ export function ProductMainSection({
   const pinchStartDistRef = useRef<number | null>(null)
   const pinchStartZoomRef = useRef<number>(1)
   const lastTapTimeRef    = useRef<number>(0)
+  const isTouchActiveRef  = useRef(false)
+  const lastTouchEndRef   = useRef<number>(0)
 
   // Check thumb overflow on mount and image list change; block wheel scroll on strip
   useEffect(() => {
@@ -205,12 +209,15 @@ export function ProductMainSection({
     if (!el) return
     function onWheel(e: WheelEvent) {
       e.preventDefault()
+      if (isTouchActiveRef.current) return
       setZoom((z) => Math.min(4, Math.max(1, z - e.deltaY * 0.002)))
     }
     function onTouchMove(e: TouchEvent) {
       if (e.touches.length >= 2) e.preventDefault()
     }
     function onMouseMove(e: MouseEvent) {
+      if (isTouchActiveRef.current) return
+      if (Date.now() - lastTouchEndRef.current < 500) return
       const r = lightboxImgRef.current?.getBoundingClientRect()
       if (!r) return
       setLightboxMouseOrigin({
@@ -238,6 +245,7 @@ export function ProductMainSection({
 
   // ── Touch: swipe, pinch-to-zoom, double-tap ─────────────────────────────
   function onTouchStart(e: React.TouchEvent) {
+    isTouchActiveRef.current = true
     if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX
       const dy = e.touches[0].clientY - e.touches[1].clientY
@@ -268,16 +276,18 @@ export function ProductMainSection({
       panPrevRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
       const r = lightboxImgRef.current?.getBoundingClientRect()
       if (!r) return
+      // r.width is the scaled width (zoom * CSS width); correct pan factor: zoom / (r.width * (zoom - 1))
+      const zoomMinus1 = Math.max(zoom - 1, 0.001)
       setLightboxMouseOrigin(o => ({
-        x: Math.max(0, Math.min(100, o.x - (dx / r.width) * 100)),
-        y: Math.max(0, Math.min(100, o.y - (dy / r.height) * 100)),
+        x: Math.max(0, Math.min(100, o.x - (dx * zoom * 100) / (r.width * zoomMinus1))),
+        y: Math.max(0, Math.min(100, o.y - (dy * zoom * 100) / (r.height * zoomMinus1))),
       }))
     }
   }
 
   function onTouchEnd(e: React.TouchEvent) {
     if (e.touches.length < 2) pinchStartDistRef.current = null
-    if (e.touches.length === 0) panPrevRef.current = null
+    if (e.touches.length === 0) { panPrevRef.current = null; isTouchActiveRef.current = false; lastTouchEndRef.current = Date.now() }
     if (e.changedTouches.length !== 1 || e.touches.length !== 0) return
 
     const touch = e.changedTouches[0]
@@ -505,7 +515,7 @@ export function ProductMainSection({
           <div className="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
             {[
               { label: t('material'), value: product.material },
-              { label: t('capacity'), value: product.capacity ? <span dir="ltr">{product.capacity}</span> : undefined },
+              { label: t('capacity'), value: derivedCapacity ? <span dir="ltr">{derivedCapacity}</span> : undefined },
               { label: t('piecesPerBox'), value: product.piecesPerBox?.toString() },
               { label: t('dimensions'), value: formatDimensions(product) },
             ].map(({ label, value }) => (
@@ -556,7 +566,7 @@ export function ProductMainSection({
             style={{
               transform: `scale(${zoom})`,
               transformOrigin: `${lightboxMouseOrigin.x}% ${lightboxMouseOrigin.y}%`,
-              transition: 'transform 0.1s ease',
+              transition: isTouchActiveRef.current ? 'none' : 'transform 0.1s ease',
               cursor: zoom > 1 ? 'grab' : 'default',
               userSelect: 'none',
               touchAction: 'none',

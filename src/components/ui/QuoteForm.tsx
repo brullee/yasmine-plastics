@@ -10,6 +10,17 @@ import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
 
 const CUSTOM = '__custom__'
+const CUSTOM_CATEGORY = '__custom_order__'
+
+function SelectChevron() {
+  return (
+    <div className="pointer-events-none absolute inset-y-0 end-3 flex items-center">
+      <svg className="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+      </svg>
+    </div>
+  )
+}
 
 const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy'
 const inputCls = (hasError: boolean | undefined) =>
@@ -25,10 +36,11 @@ export function QuoteForm({
   categories,
 }: Props) {
   const searchParams = useSearchParams()
-  const initialProduct = searchParams.get('product') ?? ''
-  const initialColor   = searchParams.get('color')   ?? ''
-  const initialSize    = searchParams.get('size')     ?? ''
-  const initialLid     = searchParams.get('lid')      ?? ''
+  const initialProduct  = searchParams.get('product')  ?? ''
+  const initialColor    = searchParams.get('color')    ?? ''
+  const initialSize     = searchParams.get('size')     ?? ''
+  const initialLid      = searchParams.get('lid')      ?? ''
+  const initialCategory = searchParams.get('category') ?? ''
 
   const t = useTranslations('quote.form')
   const tOpts = useTranslations('product.options')
@@ -36,7 +48,7 @@ export function QuoteForm({
   const locale = useLocale() as Locale
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState(
-    () => products.find(p => p.slug === initialProduct)?.category ?? ''
+    () => initialCategory || products.find(p => p.slug === initialProduct)?.category || ''
   )
   const { form, submitted, submitting, submitError, errors, isFormValid, handleChange, handleBlur, handleSubmit, setField } = useQuoteForm(
     initialProduct,
@@ -193,47 +205,54 @@ export function QuoteForm({
         <label htmlFor="q-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {t('category')}
         </label>
-        <select
-          id="q-category"
-          value={selectedCategory}
-          onChange={(e) => {
-            setSelectedCategory(e.target.value)
-            setField('product', '')
-            setField('color', '')
-            setField('size', '')
-            setField('lid', '')
-          }}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
-        >
-          <option value="">{t('selectCategory')}</option>
-          {categories.map((c) => (
-            <option key={c.slug} value={c.slug}>
-              {localizedName(c, locale)}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            id="q-category"
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value)
+              setField('product', '')
+              setField('color', '')
+              setField('size', '')
+              setField('lid', '')
+            }}
+            className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+          >
+            <option value="">{t('selectCategory')}</option>
+            {categories.map((c) => (
+              <option key={c.slug} value={c.slug}>
+                {localizedName(c, locale)}
+              </option>
+            ))}
+            <option value={CUSTOM_CATEGORY}>{t('customOrder')}</option>
+          </select>
+          <SelectChevron />
+        </div>
       </div>
 
-      {/* Product - only shown once a category is picked */}
-      {selectedCategory && (
+      {/* Product - only shown once a real category is picked */}
+      {selectedCategory && selectedCategory !== CUSTOM_CATEGORY && (
         <div>
           <label htmlFor="q-product" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             {t('product')}
           </label>
-          <select
-            id="q-product"
-            name="product"
-            value={form.product}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
-          >
-            <option value="">{t('selectProduct')}</option>
-            {filteredProducts.map((p) => (
-              <option key={p.slug} value={p.slug}>
-                {localizedName(p, locale)}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="q-product"
+              name="product"
+              value={form.product}
+              onChange={handleChange}
+              className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+            >
+              <option value="">{t('selectProduct')}</option>
+              {filteredProducts.map((p) => (
+                <option key={p.slug} value={p.slug}>
+                  {localizedName(p, locale)}
+                </option>
+              ))}
+            </select>
+            <SelectChevron />
+          </div>
         </div>
       )}
 

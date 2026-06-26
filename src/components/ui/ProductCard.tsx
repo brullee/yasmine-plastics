@@ -4,11 +4,11 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { cn, localizedName } from '@/lib/utils'
+import { cn, localizedName, deriveCapacity } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
 const EASE = 'cubic-bezier(.2,.75,.5,1)'
-const DUR  = '700ms'
+const DUR  = '500ms'
 
 interface Props {
   product: Product
@@ -43,8 +43,9 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
   // Re-triggers card hover after a QuickView modal closes with cursor already over the card
   const onMove = () => { if (!hoveredRef.current) onEnter() }
 
-  const colorCount = product.options.colors?.length ?? 0
-  const sizeCount  = product.options.sizes?.length ?? 0
+  const colorCount    = product.options.colors?.length ?? 0
+  const sizeCount     = product.options.sizes?.length ?? 0
+  const derivedCapacity = deriveCapacity(product)
 
   return (
     <div
@@ -133,17 +134,17 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
                 {product.material}
               </span>
             )}
-            {product.capacity && (
+            {derivedCapacity && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500" dir="ltr">
-                {product.capacity}
+                {derivedCapacity}
               </span>
             )}
-            {colorCount > 0 && !product.material && !product.capacity && (
+            {colorCount > 0 && !product.material && !derivedCapacity && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
                 {colorCount} {colorCount === 1 ? 'color' : 'colors'}
               </span>
             )}
-            {sizeCount > 0 && !product.material && !product.capacity && colorCount === 0 && (
+            {sizeCount > 0 && !product.material && !derivedCapacity && colorCount === 0 && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
                 {sizeCount} {sizeCount === 1 ? 'size' : 'sizes'}
               </span>

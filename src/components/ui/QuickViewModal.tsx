@@ -5,9 +5,8 @@ import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { cn } from '@/lib/utils'
+import { cn, buildWhatsAppUrl, localizedName, deriveCapacity } from '@/lib/utils'
 import { company } from '@/data/company'
-import { buildWhatsAppUrl, localizedName } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
 const EASE_OPEN  = 'cubic-bezier(0.25,1,0.5,1)'
@@ -69,8 +68,8 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase('flying'),    16)
-    const t2 = setTimeout(() => setPhase('expanding'), 16 + 260)
-    const t3 = setTimeout(() => setPhase('open'),      16 + 260 + 300)
+    const t2 = setTimeout(() => setPhase('expanding'), 16 + 320)
+    const t3 = setTimeout(() => setPhase('open'),      16 + 320 + 370)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -89,7 +88,8 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
     ? allProducts.filter(p => p.compatibleLids?.includes(product.slug))
     : []
 
-  const name        = localizedName(product, locale)
+  const name           = localizedName(product, locale)
+  const derivedCapacity = deriveCapacity(product)
   const whatsappUrl = buildWhatsAppUrl(company.whatsapp,
     locale === 'ar'
       ? `مرحباً، أنا مهتم بـ: ${name} (${product.slug})`
@@ -108,10 +108,10 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
         return { ...base, top: l.placed.top, left: l.placed.left, width: l.placed.width, height: l.placed.height, boxShadow: 'none', transition: 'none' }
       case 'flying':
         return { ...base, top: l.image.top, left: l.image.left, width: l.image.width, height: l.image.height,
-          transition: `top 260ms ${EASE_OPEN}, left 260ms ${EASE_OPEN}, width 260ms ${EASE_OPEN}, height 260ms ${EASE_OPEN}` }
+          transition: `top 320ms ${EASE_OPEN}, left 320ms ${EASE_OPEN}, width 320ms ${EASE_OPEN}, height 320ms ${EASE_OPEN}` }
       case 'expanding':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height,
-          transition: `top 300ms cubic-bezier(0.2,0,0,1), left 300ms cubic-bezier(0.2,0,0,1), width 300ms cubic-bezier(0.2,0,0,1), height 300ms cubic-bezier(0.2,0,0,1)` }
+          transition: `top 370ms cubic-bezier(0.2,0,0,1), left 370ms cubic-bezier(0.2,0,0,1), width 370ms cubic-bezier(0.2,0,0,1), height 370ms cubic-bezier(0.2,0,0,1)` }
       case 'open':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height, transition: 'none' }
       case 'closing':
@@ -219,16 +219,16 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             </h2>
 
             {/* Specs — material, capacity, piecesPerBox */}
-            {(product.material || product.capacity || product.piecesPerBox) && (
+            {(product.material || derivedCapacity || product.piecesPerBox) && (
               <div className="flex flex-wrap gap-2">
                 {product.material && (
                   <span className="text-xs font-semibold px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                     {product.material}
                   </span>
                 )}
-                {product.capacity && (
+                {derivedCapacity && (
                   <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400" dir="ltr">
-                    {product.capacity}
+                    {derivedCapacity}
                   </span>
                 )}
                 {product.piecesPerBox && (
@@ -256,7 +256,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             )}
 
             {/* Sizes */}
-            {product.options.sizes && product.options.sizes.length > 0 && (
+            {product.options.sizes && product.options.sizes.length > 1 && (
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                   {t('availableSizes')}

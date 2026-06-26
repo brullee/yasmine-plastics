@@ -336,9 +336,24 @@ export default buildConfig({
                       relationTo: 'materials',
                     },
                     {
+                      name: 'capacityAutoGenerate',
+                      type: 'checkbox',
+                      label: 'Auto-generate capacity from sizes',
+                      defaultValue: true,
+                      admin: { description: 'Derives capacity from size options. Single size shows as-is; multiple sizes show as a range (e.g. 100-300ml). Uncheck to enter manually.' },
+                    },
+                    {
                       type: 'row',
                       fields: [
-                        { name: 'capacity', type: 'text', admin: { description: 'Include the unit. E.g. "250ml", "3L".' } },
+                        {
+                          name: 'capacity',
+                          type: 'text',
+                          admin: {
+                            description: 'Include the unit. E.g. "250ml", "3L".',
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            condition: (data: any) => data.capacityAutoGenerate === false,
+                          },
+                        },
                         { name: 'piecesPerBox', type: 'number' },
                       ],
                     },
@@ -516,6 +531,8 @@ export default buildConfig({
                           relationTo: 'colors',
                           label: 'Color shown',
                           admin: {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            condition: (data: any) => (Array.isArray(data.colors) && data.colors.length > 1) || (Array.isArray(data.sizes) && data.sizes.length > 1),
                             components: {
                               Field: '@/components/payload/LinkedColorsField#LinkedColorsField',
                             },
@@ -527,6 +544,8 @@ export default buildConfig({
                           relationTo: 'sizes',
                           label: 'Size shown',
                           admin: {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            condition: (data: any) => (Array.isArray(data.colors) && data.colors.length > 1) || (Array.isArray(data.sizes) && data.sizes.length > 1),
                             components: {
                               Field: '@/components/payload/LinkedSizesField#LinkedSizesField',
                             },

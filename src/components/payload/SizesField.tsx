@@ -78,7 +78,7 @@ export function SizesField() {
             value={selected}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onChange={handleChange as any}
-            placeholder="Select or type to add..."
+            placeholder="Add a size"
           />
         </div>
         <div style={{ width: '160px', flexShrink: 0 }}>

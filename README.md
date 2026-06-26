@@ -37,6 +37,10 @@ Arabic is the default locale with no URL prefix (`/products`). English is at `/e
 
 Each gallery image can be tagged with a color and size in the admin. Selecting a color or size option on the product page jumps the carousel to the associated image, and vice versa — clicking a gallery image highlights the matching options.
 
+### Image Lightbox
+
+Clicking any product image opens a fullscreen lightbox. Supports pinch-to-zoom, double-tap to toggle zoom, touch pan when zoomed in, scroll-wheel zoom with cursor-tracked origin, swipe to navigate between images, and keyboard arrow/escape navigation.
+
 ### Quick View Modal
 
 Products can be previewed in an animated modal without leaving the catalog page. The modal includes a full image carousel, color/size selectors, and links to the associated lid or container.
