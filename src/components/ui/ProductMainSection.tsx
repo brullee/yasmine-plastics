@@ -73,6 +73,7 @@ export function ProductMainSection({
   const pinchStartDistRef = useRef<number | null>(null)
   const pinchStartZoomRef = useRef<number>(1)
   const lastTapTimeRef    = useRef<number>(0)
+  const isTouchActiveRef  = useRef(false)
 
   // Check thumb overflow on mount and image list change; block wheel scroll on strip
   useEffect(() => {
@@ -211,6 +212,7 @@ export function ProductMainSection({
       if (e.touches.length >= 2) e.preventDefault()
     }
     function onMouseMove(e: MouseEvent) {
+      if (isTouchActiveRef.current) return
       const r = lightboxImgRef.current?.getBoundingClientRect()
       if (!r) return
       setLightboxMouseOrigin({
@@ -238,6 +240,7 @@ export function ProductMainSection({
 
   // ── Touch: swipe, pinch-to-zoom, double-tap ─────────────────────────────
   function onTouchStart(e: React.TouchEvent) {
+    isTouchActiveRef.current = true
     if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX
       const dy = e.touches[0].clientY - e.touches[1].clientY
@@ -268,16 +271,18 @@ export function ProductMainSection({
       panPrevRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
       const r = lightboxImgRef.current?.getBoundingClientRect()
       if (!r) return
+      // r.width is the scaled width (zoom * CSS width); correct pan factor: zoom / (r.width * (zoom - 1))
+      const zoomMinus1 = Math.max(zoom - 1, 0.001)
       setLightboxMouseOrigin(o => ({
-        x: Math.max(0, Math.min(100, o.x - (dx / r.width) * 100)),
-        y: Math.max(0, Math.min(100, o.y - (dy / r.height) * 100)),
+        x: Math.max(0, Math.min(100, o.x - (dx * zoom * 100) / (r.width * zoomMinus1))),
+        y: Math.max(0, Math.min(100, o.y - (dy * zoom * 100) / (r.height * zoomMinus1))),
       }))
     }
   }
 
   function onTouchEnd(e: React.TouchEvent) {
     if (e.touches.length < 2) pinchStartDistRef.current = null
-    if (e.touches.length === 0) panPrevRef.current = null
+    if (e.touches.length === 0) { panPrevRef.current = null; isTouchActiveRef.current = false }
     if (e.changedTouches.length !== 1 || e.touches.length !== 0) return
 
     const touch = e.changedTouches[0]
