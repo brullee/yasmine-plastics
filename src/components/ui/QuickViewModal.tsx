@@ -68,8 +68,8 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase('flying'),    16)
-    const t2 = setTimeout(() => setPhase('expanding'), 16 + 260)
-    const t3 = setTimeout(() => setPhase('open'),      16 + 260 + 300)
+    const t2 = setTimeout(() => setPhase('expanding'), 16 + 320)
+    const t3 = setTimeout(() => setPhase('open'),      16 + 320 + 370)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -108,10 +108,10 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
         return { ...base, top: l.placed.top, left: l.placed.left, width: l.placed.width, height: l.placed.height, boxShadow: 'none', transition: 'none' }
       case 'flying':
         return { ...base, top: l.image.top, left: l.image.left, width: l.image.width, height: l.image.height,
-          transition: `top 260ms ${EASE_OPEN}, left 260ms ${EASE_OPEN}, width 260ms ${EASE_OPEN}, height 260ms ${EASE_OPEN}` }
+          transition: `top 320ms ${EASE_OPEN}, left 320ms ${EASE_OPEN}, width 320ms ${EASE_OPEN}, height 320ms ${EASE_OPEN}` }
       case 'expanding':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height,
-          transition: `top 300ms cubic-bezier(0.2,0,0,1), left 300ms cubic-bezier(0.2,0,0,1), width 300ms cubic-bezier(0.2,0,0,1), height 300ms cubic-bezier(0.2,0,0,1)` }
+          transition: `top 370ms cubic-bezier(0.2,0,0,1), left 370ms cubic-bezier(0.2,0,0,1), width 370ms cubic-bezier(0.2,0,0,1), height 370ms cubic-bezier(0.2,0,0,1)` }
       case 'open':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height, transition: 'none' }
       case 'closing':

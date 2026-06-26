@@ -8,7 +8,7 @@ import { cn, localizedName, deriveCapacity } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
 const EASE = 'cubic-bezier(.2,.75,.5,1)'
-const DUR  = '700ms'
+const DUR  = '500ms'
 
 interface Props {
   product: Product
