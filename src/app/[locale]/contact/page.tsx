@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { company } from '@/data/company'
 import { ContactForm } from '@/components/ui/ContactForm'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 interface Props {
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}/contact`,
+      url: localeUrl(locale, '/contact'),
       type: 'website',
     },
   }

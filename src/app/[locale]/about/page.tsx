@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export async function generateMetadata({
@@ -19,7 +19,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}/about`,
+      url: localeUrl(locale, '/about'),
       type: 'website',
     },
   }

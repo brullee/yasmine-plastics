@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { QuoteForm } from '@/components/ui/QuoteForm'
 import { getProducts, getCategories } from '@/lib/payload-data'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 interface Props {
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}/quote`,
+      url: localeUrl(locale, '/quote'),
       type: 'website',
     },
   }

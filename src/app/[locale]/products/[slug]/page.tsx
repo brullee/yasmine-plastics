@@ -7,7 +7,7 @@ import { ProductMainSection } from '@/components/ui/ProductMainSection'
 import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export const revalidate = 3600
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${name} | Yasmine Plastics`,
       description,
-      url: `${BASE_URL}/${locale}/products/${slug}`,
+      url: localeUrl(locale, `/products/${slug}`),
       type: 'website',
       images: product.image ? [{ url: product.image, width: 1400, height: 1400, alt: name }] : undefined,
     },

@@ -6,7 +6,7 @@ import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MapEmbed } from '@/components/ui/MapEmbed'
 import { company } from '@/data/company'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export async function generateMetadata({
@@ -25,7 +25,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}`,
+      url: localeUrl(locale),
       type: 'website',
     },
   }

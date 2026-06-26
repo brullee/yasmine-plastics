@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { getProducts, getCategories } from '@/lib/payload-data'
 import { ProductsPageClient } from '@/components/ui/ProductsPageClient'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 interface Props {
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}/products`,
+      url: localeUrl(locale, '/products'),
       type: 'website',
     },
   }
