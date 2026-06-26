@@ -19,7 +19,8 @@ export type Product = {
   // Key attributes - fill in as real data becomes available
   artCode?: string          // e.g. 'art-70-200' (art-neck-volume)
   material?: string
-  capacity?: string         // e.g. '250ml' | '750g'
+  capacityAutoGenerate?: boolean
+  capacity?: string         // e.g. '250ml' | '750g' — used only when capacityAutoGenerate is false
   piecesPerBox?: number
   shapeType?: 'circular' | 'rectangular'
   diameterTop?: number     // mm - circular; sole diameter when not tapered

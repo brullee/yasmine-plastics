@@ -93,6 +93,7 @@ function transformProduct(doc: any): Product {
     gallery: (doc.gallery ?? []).map((g: { image: unknown }) => mediaUrl(g.image)).filter(Boolean),
     artCode: doc.artCode,
     material: typeof doc.material === 'object' && doc.material !== null ? (doc.material.name ?? undefined) : undefined,
+    capacityAutoGenerate: doc.capacityAutoGenerate ?? true,
     capacity: doc.capacity,
     piecesPerBox: doc.piecesPerBox,
     shapeType: doc.shapeType,

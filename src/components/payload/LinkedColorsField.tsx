@@ -31,7 +31,8 @@ export function LinkedColorsField({ path }: { path: string }) {
   }, [colorIds.join(',')])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const selected = value != null ? (options.find(o => o.value === String(value)) ?? undefined) : undefined
-  const disabled = !colorIds.length
+  const disabled = colorIds.length <= 1
+  const placeholder = colorIds.length === 0 ? 'No colors on this product' : colorIds.length === 1 ? 'Only one color' : 'Select a value'
 
   return (
     <div className="field-type relationship" style={disabled ? { opacity: 0.35, pointerEvents: 'none' } : undefined}>
@@ -43,7 +44,7 @@ export function LinkedColorsField({ path }: { path: string }) {
         disabled={disabled}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onChange={(next: any) => setValue(next ? Number(next.value) : null)}
-        placeholder={disabled ? 'No colors on this product' : 'Select color…'}
+        placeholder={placeholder}
       />
       <p className="field-description">Selecting these color/size options on the product page jumps to this image.</p>
     </div>

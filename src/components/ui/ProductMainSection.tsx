@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ProductActions } from '@/components/ui/ProductActions'
-import { cn } from '@/lib/utils'
+import { cn, deriveCapacity } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
 function formatDimensions(product: Product): string | undefined {
@@ -33,6 +33,8 @@ export function ProductMainSection({
   product, name, categoryName, compatibleLids, fitsContainers, whatsappNumber, locale,
 }: Props) {
   const t = useTranslations('product')
+
+  const derivedCapacity = deriveCapacity(product)
 
   const { images, pairingSlides } = useMemo(() => {
     const ownImages = [product.image, ...(product.gallery ?? [])]
@@ -510,7 +512,7 @@ export function ProductMainSection({
           <div className="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
             {[
               { label: t('material'), value: product.material },
-              { label: t('capacity'), value: product.capacity ? <span dir="ltr">{product.capacity}</span> : undefined },
+              { label: t('capacity'), value: derivedCapacity ? <span dir="ltr">{derivedCapacity}</span> : undefined },
               { label: t('piecesPerBox'), value: product.piecesPerBox?.toString() },
               { label: t('dimensions'), value: formatDimensions(product) },
             ].map(({ label, value }) => (

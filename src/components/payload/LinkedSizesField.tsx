@@ -31,7 +31,8 @@ export function LinkedSizesField({ path }: { path: string }) {
   }, [sizeIds.join(',')])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const selected = value != null ? (options.find(o => o.value === String(value)) ?? undefined) : undefined
-  const disabled = !sizeIds.length
+  const disabled = sizeIds.length <= 1
+  const placeholder = sizeIds.length === 0 ? 'No sizes on this product' : sizeIds.length === 1 ? 'Only one size' : 'Select a value'
 
   return (
     <div className="field-type relationship" style={disabled ? { opacity: 0.35, pointerEvents: 'none' } : undefined}>
@@ -43,7 +44,7 @@ export function LinkedSizesField({ path }: { path: string }) {
         disabled={disabled}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onChange={(next: any) => setValue(next ? Number(next.value) : null)}
-        placeholder={disabled ? 'No sizes on this product' : 'Select size…'}
+        placeholder={placeholder}
       />
     </div>
   )
