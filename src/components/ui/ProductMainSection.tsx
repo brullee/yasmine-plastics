@@ -76,6 +76,7 @@ export function ProductMainSection({
   const pinchStartZoomRef = useRef<number>(1)
   const lastTapTimeRef    = useRef<number>(0)
   const isTouchActiveRef  = useRef(false)
+  const lastTouchEndRef   = useRef<number>(0)
 
   // Check thumb overflow on mount and image list change; block wheel scroll on strip
   useEffect(() => {
@@ -208,6 +209,7 @@ export function ProductMainSection({
     if (!el) return
     function onWheel(e: WheelEvent) {
       e.preventDefault()
+      if (isTouchActiveRef.current) return
       setZoom((z) => Math.min(4, Math.max(1, z - e.deltaY * 0.002)))
     }
     function onTouchMove(e: TouchEvent) {
@@ -215,6 +217,7 @@ export function ProductMainSection({
     }
     function onMouseMove(e: MouseEvent) {
       if (isTouchActiveRef.current) return
+      if (Date.now() - lastTouchEndRef.current < 500) return
       const r = lightboxImgRef.current?.getBoundingClientRect()
       if (!r) return
       setLightboxMouseOrigin({
@@ -284,7 +287,7 @@ export function ProductMainSection({
 
   function onTouchEnd(e: React.TouchEvent) {
     if (e.touches.length < 2) pinchStartDistRef.current = null
-    if (e.touches.length === 0) { panPrevRef.current = null; isTouchActiveRef.current = false }
+    if (e.touches.length === 0) { panPrevRef.current = null; isTouchActiveRef.current = false; lastTouchEndRef.current = Date.now() }
     if (e.changedTouches.length !== 1 || e.touches.length !== 0) return
 
     const touch = e.changedTouches[0]
