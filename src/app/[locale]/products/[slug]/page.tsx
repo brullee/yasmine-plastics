@@ -39,12 +39,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${name}. ${categoryName} من ياسمين للبلاستيك.${product.material ? ` مصنوع من ${product.material}.` : ''} اطلب عرض سعر للطلبات الصناعية والجملة.`
     : `${name}. ${categoryName} by Yasmine Plastics.${product.material ? ` Made from ${product.material}.` : ''} Request a wholesale or bulk order quote.`
 
+  const brand = locale === 'ar' ? 'ياسمين للبلاستيك' : 'Yasmine Plastics'
+  const fullTitle = `${name} - ${brand}`
+
   return {
-    title: name,
+    title: { absolute: fullTitle },
     description,
     alternates: pageAlternates(locale, `/products/${slug}`),
     openGraph: {
-      title: `${name} | Yasmine Plastics`,
+      title: fullTitle,
       description,
       url: localeUrl(locale, `/products/${slug}`),
       type: 'website',

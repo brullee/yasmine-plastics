@@ -525,7 +525,7 @@ export function ProductMainSection({
           ref={lightboxRef}
           role="dialog"
           aria-modal="true"
-          aria-label={`${name} — image ${lightboxIndex + 1} of ${images.length}`}
+          aria-label={`${name}, image ${lightboxIndex + 1} of ${images.length}`}
           tabIndex={-1}
           className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center outline-none"
           onClick={closeLightbox}

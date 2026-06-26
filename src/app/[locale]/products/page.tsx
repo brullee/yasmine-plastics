@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = t('productsTitle')
   const description = t('productsDescription')
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: pageAlternates(locale, '/products'),
     openGraph: {

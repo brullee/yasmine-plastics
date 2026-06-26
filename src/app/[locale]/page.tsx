@@ -83,6 +83,11 @@ export default async function HomePage({
     email: company.email,
     foundingDate: '2008',
     description: 'Manufacturer of plastic cups, containers, lids, and custom plastic products in Jordan.',
+    areaServed: [
+      { '@type': 'Country', name: 'Jordan' },
+      { '@type': 'Country', name: 'Saudi Arabia' },
+      { '@type': 'Country', name: 'Iraq' },
+    ],
     address: {
       '@type': 'PostalAddress',
       streetAddress: company.addressEn,
