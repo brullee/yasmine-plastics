@@ -39,22 +39,25 @@ export default async function proxy(req: NextRequest) {
   const validLocales = routing.locales as readonly string[]
 
   if (saved && validLocales.includes(saved)) {
+    const defaultLocale = routing.defaultLocale
     const urlLocale = routing.locales.find(
       (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
     )
 
-    if (!urlLocale) {
-      // No locale prefix - redirect to saved preference (existing behaviour)
-      const url = req.nextUrl.clone()
-      url.pathname = `/${saved}${pathname === '/' ? '' : pathname}`
-      return NextResponse.redirect(url)
-    }
+    // Strip any locale prefix to get the bare path
+    const barePath = urlLocale
+      ? (pathname.slice(`/${urlLocale}`.length) || '/')
+      : pathname
 
-    if (urlLocale !== saved) {
-      // URL has a different locale than the saved preference (e.g. back button hit
-      // an old /en/ URL after the user switched to Arabic) - redirect to match preference
+    // No prefix means Arabic (default). Explicit prefix identifies the locale.
+    const effectiveUrlLocale = urlLocale ?? defaultLocale
+
+    // Redirect if preference doesn't match, or URL has a stale /ar/ prefix that should be stripped.
+    if (effectiveUrlLocale !== saved || urlLocale === defaultLocale) {
       const url = req.nextUrl.clone()
-      url.pathname = `/${saved}${pathname.slice(`/${urlLocale}`.length) || '/'}`
+      url.pathname = saved === defaultLocale
+        ? barePath
+        : `/${saved}${barePath === '/' ? '' : barePath}`
       return NextResponse.redirect(url)
     }
   }

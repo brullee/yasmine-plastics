@@ -107,12 +107,14 @@
     },
     "whatsapp": "Contact via WhatsApp",
     "quote": "Get a Quote",
+    "zoomHint": "Scroll to zoom",
     "notFound": "Product not found.",
     "notFoundText": "The product you are looking for does not exist or has been removed."
   },
   "contact": {
     "title": "Contact Us",
     "subtitle": "Fill in the form or reach us directly through any of the channels below.",
+    "priceNote": "All pricing is on request. We don't sell online.",
     "info": {
       "phone": "Phone",
       "whatsapp": "WhatsApp",
@@ -140,6 +142,7 @@
   "quote": {
     "title": "Request a Quote",
     "subtitle": "Fill the form below and our team will reply with a custom quote for your needs.",
+    "priceNote": "All pricing is on request. We don't sell online.",
     "step1": "Submit your requirements",
     "step2": "We review & prepare your quote",
     "step3": "Our quote lands in your inbox",
@@ -194,15 +197,15 @@
     "contactUs": "Contact Us"
   },
   "meta": {
-    "homeTitle": "Yasmine Plastics | Custom Plastic Manufacturing Since 1989",
+    "homeTitle": "Yasmine Plastics - Custom Plastic Manufacturing Since 1989",
     "homeDescription": "Custom plastic cups, containers, lids, and made-to-order products manufactured in Jordan. Backed by over 35 years of plastics industry experience. Serving businesses across the Arab world. Request a bulk order quote.",
-    "productsTitle": "Plastic Products Catalogue",
+    "productsTitle": "Our Products - Yasmine Plastics",
     "productsDescription": "Browse our range of plastic cups, containers, lids, and other products. Custom colours, dimensions, and specifications available. Prices quoted on request.",
-    "contactTitle": "Contact Us",
+    "contactTitle": "Contact Us - Yasmine Plastics",
     "contactDescription": "Contact Yasmine Plastics in Amman, Jordan. Call, email, or send a message. Our team responds within 24 hours.",
-    "quoteTitle": "Request a Quote",
+    "quoteTitle": "Request a Quote - Yasmine Plastics",
     "quoteDescription": "Request a custom price quote for plastic products. Specify your product, quantity, colours, and delivery location. We reply within 24 hours.",
-    "aboutTitle": "About Yasmine Plastics",
+    "aboutTitle": "About Us - Yasmine Plastics",
     "aboutDescription": "Founded in Amman in 2008, built on plastics industry experience going back to 1989. We design and manufacture custom molds, shapes, and products to your exact specifications."
   }
 }

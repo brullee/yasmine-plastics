@@ -6,7 +6,7 @@ import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MapEmbed } from '@/components/ui/MapEmbed'
 import { company } from '@/data/company'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export async function generateMetadata({
@@ -25,7 +25,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}`,
+      url: localeUrl(locale),
       type: 'website',
     },
   }
@@ -83,6 +83,11 @@ export default async function HomePage({
     email: company.email,
     foundingDate: '2008',
     description: 'Manufacturer of plastic cups, containers, lids, and custom plastic products in Jordan.',
+    areaServed: [
+      { '@type': 'Country', name: 'Jordan' },
+      { '@type': 'Country', name: 'Saudi Arabia' },
+      { '@type': 'Country', name: 'Iraq' },
+    ],
     address: {
       '@type': 'PostalAddress',
       streetAddress: company.addressEn,
@@ -200,7 +205,7 @@ export default async function HomePage({
           </div>
         </ScrollReveal>
       </section>
-      <MapEmbed />
+      <MapEmbed locale={locale} />
     </>
   )
 }

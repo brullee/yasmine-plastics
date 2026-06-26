@@ -7,7 +7,7 @@ import { ProductMainSection } from '@/components/ui/ProductMainSection'
 import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export const revalidate = 3600
@@ -39,14 +39,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${name}. ${categoryName} من ياسمين للبلاستيك.${product.material ? ` مصنوع من ${product.material}.` : ''} اطلب عرض سعر للطلبات الصناعية والجملة.`
     : `${name}. ${categoryName} by Yasmine Plastics.${product.material ? ` Made from ${product.material}.` : ''} Request a wholesale or bulk order quote.`
 
+  const brand = locale === 'ar' ? 'ياسمين للبلاستيك' : 'Yasmine Plastics'
+  const fullTitle = `${name} - ${brand}`
+
   return {
-    title: name,
+    title: { absolute: fullTitle },
     description,
     alternates: pageAlternates(locale, `/products/${slug}`),
     openGraph: {
-      title: `${name} | Yasmine Plastics`,
+      title: fullTitle,
       description,
-      url: `${BASE_URL}/${locale}/products/${slug}`,
+      url: localeUrl(locale, `/products/${slug}`),
       type: 'website',
       images: product.image ? [{ url: product.image, width: 1400, height: 1400, alt: name }] : undefined,
     },

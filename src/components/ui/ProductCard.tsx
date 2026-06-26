@@ -29,6 +29,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
 
   const onEnter = () => {
     if (hoveredRef.current) return
+    if (!window.matchMedia('(hover: hover)').matches) return
     hoveredRef.current = true
     setHovered(true)
     const el = cardRef.current
@@ -133,7 +134,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
               </span>
             )}
             {product.capacity && (
-              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+              <span className="text-[11px] text-gray-400 dark:text-gray-500" dir="ltr">
                 {product.capacity}
               </span>
             )}

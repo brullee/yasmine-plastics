@@ -2,7 +2,7 @@ export const revalidate = 3600
 
 import type { MetadataRoute } from 'next'
 import { getProducts } from '@/lib/payload-data'
-import { BASE_URL } from '@/lib/seo'
+import { localeUrl } from '@/lib/seo'
 
 const locales = ['ar', 'en'] as const
 
@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticEntries = staticPages.flatMap(({ path, changeFrequency, priority }) =>
     locales.map((locale) => ({
-      url: `${BASE_URL}/${locale}${path}`,
+      url: localeUrl(locale, path),
       lastModified: now,
       changeFrequency,
       priority,
@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const productEntries = products.flatMap((product) =>
     locales.map((locale) => ({
-      url: `${BASE_URL}/${locale}/products/${product.slug}`,
+      url: localeUrl(locale, `/products/${product.slug}`),
       lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.7,

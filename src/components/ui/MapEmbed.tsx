@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { company } from '@/data/company'
+import type { Locale } from '@/types'
 
-export function MapEmbed() {
+export function MapEmbed({ locale }: { locale: Locale }) {
   const [zoom, setZoom] = useState(14)
 
   useEffect(() => {
@@ -14,7 +15,8 @@ export function MapEmbed() {
     return () => mq.removeEventListener('change', update)
   }, [])
 
-  const src = company.mapEmbedUrl.replace(/z=\d+/, `z=${zoom}`)
+  const hl = locale === 'ar' ? 'ar' : 'en'
+  const src = company.mapEmbedUrl.replace(/z=\d+/, `z=${zoom}`) + `&hl=${hl}`
 
   return (
     <section className="h-64 sm:h-80 md:h-96 lg:h-[450px] w-full">

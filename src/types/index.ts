@@ -48,6 +48,7 @@ export type CompanyInfo = {
   hoursEn: string
   hoursAr: string
   mapEmbedUrl: string
+  mapEmbedUrlEn: string
   mapShareUrl: string
 }
 

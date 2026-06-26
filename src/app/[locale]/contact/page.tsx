@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { company } from '@/data/company'
 import { ContactForm } from '@/components/ui/ContactForm'
-import { pageAlternates, BASE_URL } from '@/lib/seo'
+import { pageAlternates, localeUrl, BASE_URL } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 interface Props {
@@ -15,13 +15,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = t('contactTitle')
   const description = t('contactDescription')
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: pageAlternates(locale, '/contact'),
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/${locale}/contact`,
+      url: localeUrl(locale, '/contact'),
       type: 'website',
     },
   }
@@ -62,7 +62,8 @@ export default async function ContactPage({ params }: Props) {
         <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">
           {t('title')}
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-lg">{t('subtitle')}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">{t('subtitle')}</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">{t('priceNote')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
@@ -106,7 +107,7 @@ export default async function ContactPage({ params }: Props) {
           <div className="flex-1 min-h-48 rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
             <iframe
               title="Yasmine Plastics location"
-              src={company.mapEmbedUrl}
+              src={company.mapEmbedUrl + `&hl=${locale === 'ar' ? 'ar' : 'en'}`}
               width="100%"
               height="100%"
               loading="lazy"
