@@ -31,6 +31,38 @@ export async function generateMetadata({
   }
 }
 
+function ShapesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 7.5L12 2.25L3 7.5M21 7.5L12 12.75M21 7.5V16.5L12 21.75M3 7.5L12 12.75M3 7.5V16.5L12 21.75M12 12.75V21.75" />
+    </svg>
+  )
+}
+
+function MoldIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M11.4194 15.1694L17.25 21C18.2855 22.0355 19.9645 22.0355 21 21C22.0355 19.9645 22.0355 18.2855 21 17.25L15.1233 11.3733M11.4194 15.1694L13.9155 12.1383C14.2315 11.7546 14.6542 11.5132 15.1233 11.3733M11.4194 15.1694L6.76432 20.8219C6.28037 21.4096 5.55897 21.75 4.79768 21.75C3.39064 21.75 2.25 20.6094 2.25 19.2023C2.25 18.441 2.59044 17.7196 3.1781 17.2357L10.0146 11.6056M15.1233 11.3733C15.6727 11.2094 16.2858 11.1848 16.8659 11.2338C16.9925 11.2445 17.1206 11.25 17.25 11.25C19.7353 11.25 21.75 9.23528 21.75 6.75C21.75 6.08973 21.6078 5.46268 21.3523 4.89779L18.0762 8.17397C16.9605 7.91785 16.0823 7.03963 15.8262 5.92397L19.1024 2.64774C18.5375 2.39223 17.9103 2.25 17.25 2.25C14.7647 2.25 12.75 4.26472 12.75 6.75C12.75 6.87938 12.7555 7.00749 12.7662 7.13411C12.8571 8.20956 12.6948 9.39841 11.8617 10.0845L11.7596 10.1686M10.0146 11.6056L5.90901 7.5H4.5L2.25 3.75L3.75 2.25L7.5 4.5V5.90901L11.7596 10.1686M10.0146 11.6056L11.7596 10.1686M18.375 18.375L15.75 15.75M4.86723 19.125H4.87473V19.1325H4.86723V19.125Z" />
+    </svg>
+  )
+}
+
+function ColorsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4.09835 19.9017C5.56282 21.3661 7.93719 21.3661 9.40165 19.9017L15.8033 13.5M6.75 21C4.67893 21 3 19.3211 3 17.25V4.125C3 3.50368 3.50368 3 4.125 3H9.375C9.99632 3 10.5 3.50368 10.5 4.125V8.1967M6.75 21C8.82107 21 10.5 19.3211 10.5 17.25V8.1967M6.75 21H19.875C20.4963 21 21 20.4963 21 19.875V14.625C21 14.0037 20.4963 13.5 19.875 13.5H15.8033M10.5 8.1967L13.3791 5.31757C13.8185 4.87823 14.5308 4.87823 14.9701 5.31757L18.6824 9.02988C19.1218 9.46922 19.1218 10.1815 18.6824 10.6209L15.8033 13.5M6.75 17.25H6.7575V17.2575H6.75V17.25Z" />
+    </svg>
+  )
+}
+
+function PrintIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M9.53086 16.1224C9.08517 15.0243 8.00801 14.25 6.75 14.25C5.09315 14.25 3.75 15.5931 3.75 17.25C3.75 18.4926 2.74262 19.5 1.49998 19.5C1.44928 19.5 1.39898 19.4983 1.34912 19.495C2.12648 20.8428 3.58229 21.75 5.24998 21.75C7.72821 21.75 9.73854 19.7467 9.74993 17.2711C9.74998 17.2641 9.75 17.2571 9.75 17.25C9.75 16.8512 9.67217 16.4705 9.53086 16.1224ZM9.53086 16.1224C10.7252 15.7153 11.8612 15.1705 12.9175 14.5028M7.875 14.4769C8.2823 13.2797 8.8281 12.1411 9.49724 11.0825M12.9175 14.5028C14.798 13.3141 16.4259 11.7362 17.6806 9.85406L21.5566 4.04006C21.6827 3.85093 21.75 3.6287 21.75 3.40139C21.75 2.76549 21.2345 2.25 20.5986 2.25C20.3713 2.25 20.1491 2.31729 19.9599 2.44338L14.1459 6.31937C12.2638 7.57413 10.6859 9.20204 9.49724 11.0825M12.9175 14.5028C12.2396 12.9833 11.0167 11.7604 9.49724 11.0825" />
+    </svg>
+  )
+}
+
 function ManufacturingIcon() {
   return (
     <svg viewBox="0 0 48 48" className="w-12 h-12 text-brand-navy dark:text-blue-300" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -128,8 +160,53 @@ export default async function HomePage({
         </div>
       </section>
 
+      {/* Custom manufacturing emphasis */}
+      <section className="py-20 bg-brand-navy/10 dark:bg-brand-navy/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <ScrollReveal direction="left">
+              <div>
+                <span className="inline-block text-xs font-bold tracking-widest uppercase text-brand-navy dark:text-blue-300 mb-4">
+                  {t('custom.eyebrow')}
+                </span>
+                <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-5 leading-tight">
+                  {t('custom.headline')}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed mb-8">
+                  {t('custom.body')}
+                </p>
+                <Link
+                  href="/quote?category=__custom_order__"
+                  className="inline-flex items-center px-7 py-3 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-white dark:text-brand-navy dark:hover:bg-gray-200 transition-colors text-base"
+                >
+                  {t('custom.cta')}
+                </Link>
+              </div>
+            </ScrollReveal>
+            <div className="grid grid-cols-2 gap-4">
+              {(
+                [
+                  { icon: <ShapesIcon />, title: t('custom.tile1Title'), text: t('custom.tile1Text') },
+                  { icon: <MoldIcon />,   title: t('custom.tile2Title'), text: t('custom.tile2Text') },
+                  { icon: <ColorsIcon />, title: t('custom.tile3Title'), text: t('custom.tile3Text') },
+                  { icon: <PrintIcon />,  title: t('custom.tile4Title'), text: t('custom.tile4Text') },
+                ] as const
+              ).map(({ icon, title, text }, i) => (
+                <ScrollReveal key={title} direction="up" delay={i * 80}>
+                  <div className="p-5 bg-white dark:bg-brand-navy/40 rounded-xl h-full">
+                    <div className="mb-3 text-brand-navy dark:text-blue-300">{icon}</div>
+                    <h3 className="font-semibold text-brand-navy dark:text-white mb-1 text-sm">{title}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{text}</p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Why choose us */}
-      <section className="py-20 bg-gray-50 dark:bg-brand-navyDeep">
+      <section className="py-20 bg-white dark:bg-brand-navyDeep">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-brand-navy dark:text-white mb-14">
             {t('whyUs.title')}
@@ -187,7 +264,7 @@ export default async function HomePage({
       </section> */}
 
 {/* Bottom CTA banner */}
-      <section className="py-20 bg-brand-navy/10 dark:bg-brand-navy/40">
+      <section className="py-20 bg-sky-50 dark:bg-brand-navy/40">
         <ScrollReveal direction="up">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-4">

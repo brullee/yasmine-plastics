@@ -48,7 +48,7 @@ export async function generateMetadata({
     return {
       ...base,
       title: { default: 'ياسمين للبلاستيك', template: '%s | ياسمين للبلاستيك' },
-      description: 'منتجات بلاستيكية وقوالب، مصنّعة وفق المواصفات منذ عام 1989. نخدم الأردن والعالم العربي.',
+      description: 'مصنّع بلاستيك مخصص في الأردن. منتجات وقوالب وفق مواصفاتك الدقيقة. خبرة صناعية منذ 1989. نخدم الأردن والعالم العربي.',
       openGraph: { siteName: 'ياسمين للبلاستيك', locale: 'ar_JO', type: 'website' },
     }
   }
@@ -56,7 +56,7 @@ export async function generateMetadata({
   return {
     ...base,
     title: { default: 'Yasmine Plastics', template: '%s | Yasmine Plastics' },
-    description: 'Plastic products and molds, manufactured to spec since 1989. Serving Jordan and the Arab world.',
+    description: 'Custom plastic manufacturer in Jordan. Products and molds built to your exact spec. Backed by plastics industry experience since 1989. Serving Jordan and the Arab world.',
     openGraph: { siteName: 'Yasmine Plastics', locale: 'en_US', type: 'website' },
   }
 }

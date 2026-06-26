@@ -14,6 +14,38 @@ interface Props {
   locale: Locale
 }
 
+function CantFindBanner() {
+  const t = useTranslations('products')
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-6 py-5 flex flex-col gap-3">
+        <div>
+          <p className="font-semibold text-brand-navy dark:text-white text-sm mb-1">{t('cantFind.title')}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
+        </div>
+        <Link
+          href="/contact"
+          className="self-start px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
+        >
+          {t('cantFind.cta')}
+        </Link>
+      </div>
+      <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-6 py-5 flex flex-col gap-3">
+        <div>
+          <p className="font-semibold text-brand-navy dark:text-white text-sm mb-1">{t('customOrder.title')}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('customOrder.text')}</p>
+        </div>
+        <Link
+          href="/quote?category=__custom_order__"
+          className="self-start px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
+        >
+          {t('customOrder.cta')}
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 export function ProductsPageClient({ products, categories, locale }: Props) {
   const searchParams = useSearchParams()
   const activeCategory = searchParams.get('category')
@@ -46,15 +78,8 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
                 />
               ))}
             </div>
-
-            <div className="mt-10 rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div>
-                <p className="font-semibold text-brand-navy dark:text-white text-base mb-1">{t('cantFind.title')}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
-              </div>
-              <Link href="/contact" className="shrink-0 px-6 py-2.5 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors">
-                {t('cantFind.cta')}
-              </Link>
+            <div className="mt-10">
+              <CantFindBanner />
             </div>
           </div>
         </div>
@@ -89,32 +114,14 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
 
       <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-          <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <p className="font-semibold text-brand-navy dark:text-white text-sm mb-0.5">{t('cantFind.title')}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
-            </div>
-            <Link href="/contact" className="shrink-0 px-5 py-2 bg-brand-navy text-white text-xs font-semibold rounded-lg hover:bg-brand-navyDark transition-colors">
-              {t('cantFind.cta')}
-            </Link>
-          </div>
+          <CantFindBanner />
 
           {filtered.length > 0
             ? <ProductsGrid products={filtered} allProducts={products} locale={locale} />
             : <div className="text-center py-20 text-gray-400 dark:text-gray-500">{t('notFound')}</div>
           }
 
-          {filtered.length > 6 && (
-            <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <p className="font-semibold text-brand-navy dark:text-white text-sm mb-0.5">{t('cantFind.title')}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
-              </div>
-              <Link href="/contact" className="shrink-0 px-5 py-2 bg-brand-navy text-white text-xs font-semibold rounded-lg hover:bg-brand-navyDark transition-colors">
-                {t('cantFind.cta')}
-              </Link>
-            </div>
-          )}
+          {filtered.length > 6 && <CantFindBanner />}
         </div>
       </div>
     </>
