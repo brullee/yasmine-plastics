@@ -106,7 +106,7 @@ export default async function ContactPage({ params }: Props) {
           <div className="flex-1 min-h-48 rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
             <iframe
               title="Yasmine Plastics location"
-              src={company.mapEmbedUrl}
+              src={company.mapEmbedUrl + `&hl=${locale === 'ar' ? 'ar' : 'en'}`}
               width="100%"
               height="100%"
               loading="lazy"

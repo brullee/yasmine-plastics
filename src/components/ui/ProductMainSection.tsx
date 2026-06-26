@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
@@ -34,13 +34,15 @@ export function ProductMainSection({
 }: Props) {
   const t = useTranslations('product')
 
-  const ownImages = [product.image, ...(product.gallery ?? [])]
-  const pairingSlides = fitsContainers.flatMap((c) =>
-    (c.pairingImages?.[product.slug] ?? [])
-      .filter((url) => !ownImages.includes(url))
-      .map((url) => ({ slug: c.slug, url }))
-  )
-  const images = [...ownImages, ...pairingSlides.map((e) => e.url)]
+  const { images, pairingSlides } = useMemo(() => {
+    const ownImages = [product.image, ...(product.gallery ?? [])]
+    const slides = fitsContainers.flatMap((c) =>
+      (c.pairingImages?.[product.slug] ?? [])
+        .filter((url) => !ownImages.includes(url))
+        .map((url) => ({ slug: c.slug, url }))
+    )
+    return { images: [...ownImages, ...slides.map((e) => e.url)], pairingSlides: slides }
+  }, [product.image, product.gallery, product.slug, fitsContainers])
 
   const firstPartnerSlug = compatibleLids[0]?.slug ?? fitsContainers[0]?.slug ?? null
 
@@ -58,16 +60,19 @@ export function ProductMainSection({
   const [thumbCanScrollUp, setThumbCanScrollUp]     = useState(false)
   const [thumbCanScrollDown, setThumbCanScrollDown] = useState(false)
 
-  const [hoveredThumb, setHoveredThumb] = useState<number | null>(null)
 
-  const openerRef      = useRef<HTMLButtonElement>(null)
-  const lightboxRef    = useRef<HTMLDivElement>(null)
-  const lightboxImgRef = useRef<HTMLDivElement>(null)
-  const touchStartX    = useRef<number | null>(null)
-  const thumbStripRef  = useRef<HTMLDivElement>(null)
-  const scrollRafRef   = useRef<number | null>(null)
-  const scrollSpeedRef = useRef(0)
-  const hoverTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const openerRef         = useRef<HTMLButtonElement>(null)
+  const lightboxRef       = useRef<HTMLDivElement>(null)
+  const lightboxImgRef    = useRef<HTMLDivElement>(null)
+  const touchStartX       = useRef<number | null>(null)
+  const panPrevRef        = useRef<{ x: number; y: number } | null>(null)
+  const thumbStripRef     = useRef<HTMLDivElement>(null)
+  const scrollRafRef      = useRef<number | null>(null)
+  const scrollSpeedRef    = useRef(0)
+  const hoverTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pinchStartDistRef = useRef<number | null>(null)
+  const pinchStartZoomRef = useRef<number>(1)
+  const lastTapTimeRef    = useRef<number>(0)
 
   // Check thumb overflow on mount and image list change; block wheel scroll on strip
   useEffect(() => {
@@ -87,7 +92,7 @@ export function ProductMainSection({
     }
   }, [images])
 
-  const displayImage = images[hoveredThumb ?? carouselIndex]
+  const displayImage = images[carouselIndex]
 
   function stopThumbScroll() {
     scrollSpeedRef.current = 0
@@ -193,7 +198,7 @@ export function ProductMainSection({
     return () => window.removeEventListener('keydown', onKey)
   }, [lightboxOpen, lightboxPrev, lightboxNext, closeLightbox, images.length])
 
-  // ── Scroll-wheel zoom (native listener needed for preventDefault) ────────
+  // ── Scroll-wheel zoom + pinch-zoom preventDefault + global mouse tracking ─
   useEffect(() => {
     if (!lightboxOpen) return
     const el = lightboxRef.current
@@ -202,8 +207,25 @@ export function ProductMainSection({
       e.preventDefault()
       setZoom((z) => Math.min(4, Math.max(1, z - e.deltaY * 0.002)))
     }
+    function onTouchMove(e: TouchEvent) {
+      if (e.touches.length >= 2) e.preventDefault()
+    }
+    function onMouseMove(e: MouseEvent) {
+      const r = lightboxImgRef.current?.getBoundingClientRect()
+      if (!r) return
+      setLightboxMouseOrigin({
+        x: ((e.clientX - r.left) / r.width) * 100,
+        y: ((e.clientY - r.top) / r.height) * 100,
+      })
+    }
     el.addEventListener('wheel', onWheel, { passive: false })
-    return () => el.removeEventListener('wheel', onWheel)
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    el.addEventListener('mousemove', onMouseMove)
+    return () => {
+      el.removeEventListener('wheel', onWheel)
+      el.removeEventListener('touchmove', onTouchMove)
+      el.removeEventListener('mousemove', onMouseMove)
+    }
   }, [lightboxOpen])
 
   // ── Preload adjacent images ──────────────────────────────────────────────
@@ -214,21 +236,77 @@ export function ProductMainSection({
     preload(images[(lightboxIndex - 1 + images.length) % images.length])
   }, [lightboxIndex, lightboxOpen, images])
 
-  // ── Touch / swipe ────────────────────────────────────────────────────────
+  // ── Touch: swipe, pinch-to-zoom, double-tap ─────────────────────────────
   function onTouchStart(e: React.TouchEvent) {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      pinchStartDistRef.current = Math.sqrt(dx * dx + dy * dy)
+      pinchStartZoomRef.current = zoom
+      panPrevRef.current = null
+      return
+    }
     touchStartX.current = e.touches[0].clientX
+    if (zoom > 1) panPrevRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
   }
+
+  function onTouchMove(e: React.TouchEvent) {
+    if (e.touches.length === 2 && pinchStartDistRef.current !== null) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      setZoom(Math.min(4, Math.max(1, pinchStartZoomRef.current * (dist / pinchStartDistRef.current))))
+      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2
+      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2
+      const r = lightboxImgRef.current?.getBoundingClientRect()
+      if (r) setLightboxMouseOrigin({ x: ((midX - r.left) / r.width) * 100, y: ((midY - r.top) / r.height) * 100 })
+      return
+    }
+    if (e.touches.length === 1 && zoom > 1 && panPrevRef.current) {
+      const dx = e.touches[0].clientX - panPrevRef.current.x
+      const dy = e.touches[0].clientY - panPrevRef.current.y
+      panPrevRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      const r = lightboxImgRef.current?.getBoundingClientRect()
+      if (!r) return
+      setLightboxMouseOrigin(o => ({
+        x: Math.max(0, Math.min(100, o.x - (dx / r.width) * 100)),
+        y: Math.max(0, Math.min(100, o.y - (dy / r.height) * 100)),
+      }))
+    }
+  }
+
   function onTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null) return
-    const delta = e.changedTouches[0].clientX - touchStartX.current
-    if (zoom === 1 && Math.abs(delta) > 50) delta < 0 ? lightboxNext() : lightboxPrev()
-    touchStartX.current = null
+    if (e.touches.length < 2) pinchStartDistRef.current = null
+    if (e.touches.length === 0) panPrevRef.current = null
+    if (e.changedTouches.length !== 1 || e.touches.length !== 0) return
+
+    const touch = e.changedTouches[0]
+    const now = Date.now()
+
+    if (now - lastTapTimeRef.current < 300) {
+      lastTapTimeRef.current = 0
+      touchStartX.current = null
+      if (zoom > 1) {
+        setZoom(1)
+      } else {
+        const r = lightboxImgRef.current?.getBoundingClientRect()
+        if (r) setLightboxMouseOrigin({ x: ((touch.clientX - r.left) / r.width) * 100, y: ((touch.clientY - r.top) / r.height) * 100 })
+        setZoom(2.5)
+      }
+      return
+    }
+    lastTapTimeRef.current = now
+
+    if (touchStartX.current !== null) {
+      const delta = touch.clientX - touchStartX.current
+      if (zoom === 1 && Math.abs(delta) > 50) delta < 0 ? lightboxNext() : lightboxPrev()
+      touchStartX.current = null
+    }
   }
 
   // ── Color / size → carousel jump ────────────────────────────────────────
   function handleColorChange(color: string | null) {
     setSelectedColor(color)
-    setHoveredThumb(null)
     if (!color) return
     const url = product.options.colorImageMap?.[color]
     if (!url) return
@@ -238,7 +316,6 @@ export function ProductMainSection({
 
   function handleSizeChange(size: string | null) {
     setSelectedSize(size)
-    setHoveredThumb(null)
     if (!size) return
     const url = product.options.sizeImageMap?.[size]
     if (!url) return
@@ -249,7 +326,6 @@ export function ProductMainSection({
   // ── Partner change ───────────────────────────────────────────────────────
   function handlePartnerChange(slug: string | null) {
     setSelectedPartner(slug)
-    setHoveredThumb(null)
     if (!slug) return
     const ownPairingUrl = product.pairingImages?.[slug]?.[0]
     if (ownPairingUrl) {
@@ -299,12 +375,12 @@ export function ProductMainSection({
                   onClick={() => setCarouselIndex(i)}
                   onMouseEnter={() => {
                     clearHoverTimer()
-                    hoverTimerRef.current = setTimeout(() => setHoveredThumb(i), 80)
+                    hoverTimerRef.current = setTimeout(() => setCarouselIndex(i), 60)
                   }}
-                  onMouseLeave={() => { clearHoverTimer(); setHoveredThumb(null) }}
+                  onMouseLeave={clearHoverTimer}
                   className={cn(
                     'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors',
-                    i === (hoveredThumb ?? carouselIndex)
+                    i === carouselIndex
                       ? 'border-brand-navy dark:border-sky-400'
                       : 'border-transparent hover:border-gray-300 dark:hover:border-gray-500'
                   )}
@@ -429,7 +505,7 @@ export function ProductMainSection({
           <div className="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
             {[
               { label: t('material'), value: product.material },
-              { label: t('capacity'), value: product.capacity },
+              { label: t('capacity'), value: product.capacity ? <span dir="ltr">{product.capacity}</span> : undefined },
               { label: t('piecesPerBox'), value: product.piecesPerBox?.toString() },
               { label: t('dimensions'), value: formatDimensions(product) },
             ].map(({ label, value }) => (
@@ -454,20 +530,21 @@ export function ProductMainSection({
           className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center outline-none"
           onClick={closeLightbox}
           onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
           {/* Close */}
           <button
             onClick={closeLightbox}
             aria-label="Close"
-            className="absolute top-4 end-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="absolute top-3 end-3 z-10 p-2 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white hover:bg-black/75 transition-colors"
           >
             <XIcon />
           </button>
 
           {/* Counter */}
           {images.length > 1 && (
-            <span className="absolute top-4 start-4 text-white/60 text-sm tabular-nums">
+            <span className="absolute top-3 start-3 z-10 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white text-sm tabular-nums">
               <span dir="ltr">{lightboxIndex + 1} / {images.length}</span>
             </span>
           )}
@@ -475,20 +552,14 @@ export function ProductMainSection({
           {/* Image */}
           <div
             ref={lightboxImgRef}
-            className="relative w-full h-full max-w-5xl max-h-[90vh] mx-16"
+            className="relative w-full h-full max-w-5xl max-h-[90vh] mx-2 sm:mx-14"
             style={{
               transform: `scale(${zoom})`,
               transformOrigin: `${lightboxMouseOrigin.x}% ${lightboxMouseOrigin.y}%`,
               transition: 'transform 0.1s ease',
               cursor: zoom > 1 ? 'grab' : 'default',
-              touchAction: 'pinch-zoom',
-            }}
-            onMouseMove={(e) => {
-              const r = e.currentTarget.getBoundingClientRect()
-              setLightboxMouseOrigin({
-                x: ((e.clientX - r.left) / r.width) * 100,
-                y: ((e.clientY - r.top) / r.height) * 100,
-              })
+              userSelect: 'none',
+              touchAction: 'none',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -502,25 +573,35 @@ export function ProductMainSection({
             />
           </div>
 
-          {/* Prev / Next */}
+          {/* Prev / Next — large invisible tap area prevents near-miss dismissals */}
           {images.length > 1 && (
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); lightboxPrev() }}
                 aria-label="Previous image"
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="group absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
               >
-                <ChevronIcon direction="left" />
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
+                  <ChevronIcon direction="left" />
+                </span>
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); lightboxNext() }}
                 aria-label="Next image"
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                className="group absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
               >
-                <ChevronIcon direction="right" />
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
+                  <ChevronIcon direction="right" />
+                </span>
               </button>
             </>
           )}
+
+          {/* Scroll-to-zoom hint — desktop/mouse only */}
+          <div className="pointer-events-none select-none absolute bottom-5 left-1/2 -translate-x-1/2 hidden [@media(hover:hover)]:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white text-sm">
+            <ScrollWheelIcon />
+            <span>{t('zoomHint')}</span>
+          </div>
         </div>,
         document.body
       )}
@@ -541,6 +622,15 @@ function XIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  )
+}
+
+function ScrollWheelIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="6" y="2" width="12" height="20" rx="6" />
+      <line x1="12" y1="6" x2="12" y2="10" />
     </svg>
   )
 }

@@ -200,7 +200,7 @@ export default async function HomePage({
           </div>
         </ScrollReveal>
       </section>
-      <MapEmbed />
+      <MapEmbed locale={locale} />
     </>
   )
 }

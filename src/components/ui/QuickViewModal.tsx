@@ -10,8 +10,8 @@ import { company } from '@/data/company'
 import { buildWhatsAppUrl, localizedName } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
-const EASE_OPEN  = 'cubic-bezier(.55,0,.1,1)'
-const EASE_CLOSE = 'cubic-bezier(.2,.75,.5,1)'
+const EASE_OPEN  = 'cubic-bezier(0.25,1,0.5,1)'
+const EASE_CLOSE = 'cubic-bezier(0.4,0,1,1)'
 
 type Phase = 'placed' | 'flying' | 'expanding' | 'open' | 'closing'
 
@@ -67,17 +67,16 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
     return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Phase sequencing — mirrors Nectar timing
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('flying'),    75)
-    const t2 = setTimeout(() => setPhase('expanding'), 75 + 760)
-    const t3 = setTimeout(() => setPhase('open'),      75 + 760 + 560)
+    const t1 = setTimeout(() => setPhase('flying'),    16)
+    const t2 = setTimeout(() => setPhase('expanding'), 16 + 260)
+    const t3 = setTimeout(() => setPhase('open'),      16 + 260 + 300)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleClose() {
     setPhase('closing')
-    setTimeout(onClose, 320)
+    setTimeout(onClose, 160)
   }
 
   const resolvedLids = allProducts && product.category !== 'cups'
@@ -109,16 +108,16 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
         return { ...base, top: l.placed.top, left: l.placed.left, width: l.placed.width, height: l.placed.height, boxShadow: 'none', transition: 'none' }
       case 'flying':
         return { ...base, top: l.image.top, left: l.image.left, width: l.image.width, height: l.image.height,
-          transition: `top 750ms ${EASE_OPEN}, left 750ms ${EASE_OPEN}, width 750ms ${EASE_OPEN}, height 750ms ${EASE_OPEN}` }
+          transition: `top 260ms ${EASE_OPEN}, left 260ms ${EASE_OPEN}, width 260ms ${EASE_OPEN}, height 260ms ${EASE_OPEN}` }
       case 'expanding':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height,
-          transition: `top 550ms ${EASE_OPEN}, left 550ms ${EASE_OPEN}, width 550ms ${EASE_OPEN}, height 550ms ${EASE_OPEN}` }
+          transition: `top 300ms cubic-bezier(0.2,0,0,1), left 300ms cubic-bezier(0.2,0,0,1), width 300ms cubic-bezier(0.2,0,0,1), height 300ms cubic-bezier(0.2,0,0,1)` }
       case 'open':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height, transition: 'none' }
       case 'closing':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height,
-          transform: 'scale(0.85)', opacity: 0,
-          transition: `transform 300ms ${EASE_CLOSE}, opacity 300ms ${EASE_CLOSE}` }
+          transform: 'scale(0.88)', opacity: 0,
+          transition: `transform 160ms ${EASE_CLOSE}, opacity 160ms ${EASE_CLOSE}` }
     }
   })()
 
@@ -197,7 +196,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto"
             style={{
               opacity:    contentVisible ? 1 : 0,
-              transition: contentVisible ? 'opacity 0.28s ease' : 'none',
+              transition: contentVisible ? 'opacity 0.14s ease' : 'none',
             }}
           >
             {/* Close */}
@@ -228,7 +227,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                   </span>
                 )}
                 {product.capacity && (
-                  <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">
+                  <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400" dir="ltr">
                     {product.capacity}
                   </span>
                 )}
@@ -321,7 +320,8 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 onClick={handleClose}
                 className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyDark transition-colors"
               >
-                {tProducts('viewDetails')} {locale === 'ar' ? '←' : '→'}
+                {tProducts('viewDetails')}
+                <ArrowIcon direction={locale === 'ar' ? 'left' : 'right'} />
               </Link>
               <a
                 href={whatsappUrl}
@@ -338,6 +338,24 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
       </div>
     </>,
     document.body
+  )
+}
+
+function ArrowIcon({ direction }: { direction: 'left' | 'right' }) {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {direction === 'right' ? (
+        <>
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="13 6 19 12 13 18" />
+        </>
+      ) : (
+        <>
+          <line x1="19" y1="12" x2="5" y2="12" />
+          <polyline points="11 6 5 12 11 18" />
+        </>
+      )}
+    </svg>
   )
 }
 
