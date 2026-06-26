@@ -566,7 +566,7 @@ export function ProductMainSection({
             style={{
               transform: `scale(${zoom})`,
               transformOrigin: `${lightboxMouseOrigin.x}% ${lightboxMouseOrigin.y}%`,
-              transition: 'transform 0.1s ease',
+              transition: isTouchActiveRef.current ? 'none' : 'transform 0.1s ease',
               cursor: zoom > 1 ? 'grab' : 'default',
               userSelect: 'none',
               touchAction: 'none',
