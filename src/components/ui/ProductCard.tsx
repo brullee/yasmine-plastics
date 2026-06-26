@@ -135,18 +135,18 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
               </span>
             )}
             {derivedCapacity && (
-              <span className="text-[11px] text-gray-400 dark:text-gray-500" dir="ltr">
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 uppercase tracking-wide" dir="ltr">
                 {derivedCapacity}
               </span>
             )}
-            {colorCount > 0 && !product.material && !derivedCapacity && (
+            {colorCount > 1 && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                {colorCount} {colorCount === 1 ? 'color' : 'colors'}
+                {colorCount} colors
               </span>
             )}
-            {sizeCount > 0 && !product.material && !derivedCapacity && colorCount === 0 && (
+            {sizeCount > 1 && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                {sizeCount} {sizeCount === 1 ? 'size' : 'sizes'}
+                {sizeCount} sizes
               </span>
             )}
           </div>
