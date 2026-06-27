@@ -176,7 +176,7 @@ export default async function HomePage({
                   {t('custom.body')}
                 </p>
                 <Link
-                  href="/quote?category=__custom_order__"
+                  href="/contact"
                   className="inline-flex items-center px-7 py-3 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-white dark:text-brand-navy dark:hover:bg-gray-200 transition-colors text-base"
                 >
                   {t('custom.cta')}

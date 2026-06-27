@@ -6,7 +6,7 @@
     "dev": "rm -rf .next && next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "next build && git push"
+    "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.5.2",

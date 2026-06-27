@@ -17,31 +17,17 @@ interface Props {
 function CantFindBanner() {
   const t = useTranslations('products')
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-6 py-5 flex flex-col gap-3">
-        <div>
-          <p className="font-semibold text-brand-navy dark:text-white text-sm mb-1">{t('cantFind.title')}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
-        </div>
-        <Link
-          href="/contact"
-          className="self-start px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
-        >
-          {t('cantFind.cta')}
-        </Link>
+    <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-6 py-5 flex items-end justify-between gap-6">
+      <div>
+        <p className="font-semibold text-brand-navy dark:text-white text-sm mb-1">{t('cantFind.title')}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
       </div>
-      <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-6 py-5 flex flex-col gap-3">
-        <div>
-          <p className="font-semibold text-brand-navy dark:text-white text-sm mb-1">{t('customOrder.title')}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">{t('customOrder.text')}</p>
-        </div>
-        <Link
-          href="/quote?category=__custom_order__"
-          className="self-start px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
-        >
-          {t('customOrder.cta')}
-        </Link>
-      </div>
+      <Link
+        href="/contact"
+        className="shrink-0 px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
+      >
+        {t('cantFind.cta')}
+      </Link>
     </div>
   )
 }
