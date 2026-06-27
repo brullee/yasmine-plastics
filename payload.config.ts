@@ -12,6 +12,7 @@ const pendingNormalize = new Set<string>()
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
+  upload: { limits: { fileSize: 10485760 } },
   i18n: {
     translations: {
       en: { general: { noLabel: '–' } },
@@ -78,7 +79,6 @@ export default buildConfig({
       upload: {
         adminThumbnail: 'thumbnail',
         mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-        maxFileSize: 10485760,
       },
       access: { read: () => true },
       admin: {
