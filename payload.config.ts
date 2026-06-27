@@ -78,6 +78,7 @@ export default buildConfig({
       upload: {
         adminThumbnail: 'thumbnail',
         mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        maxFileSize: 10485760,
       },
       access: { read: () => true },
       admin: {

@@ -11,7 +11,7 @@
 
 A bilingual (AR/EN) B2B product catalog and quote request site for a plastics manufacturer based in Jordan.
 
-**Live site → [yasmineplastics.com](https://yasmineplastics.com)**
+**Live site ➜ [yasmineplastics.com](https://yasmineplastics.com)**
 
 </div>
 
@@ -25,7 +25,7 @@ A website for my family's plastics manufacturing business. Buyers can browse pro
 
 ## What it does
 
-The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, and media — including a bulk image upload flow with automatic normalization.
+The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, and media, including a bulk image upload flow with automatic normalization.
 
 ## Features
 
@@ -35,7 +35,7 @@ Arabic is the default locale with no URL prefix (`/products`). English is at `/e
 
 ### Product Gallery with Color and Size Jumps
 
-Each gallery image can be tagged with a color and size in the admin. Selecting a color or size option on the product page jumps the carousel to the associated image, and vice versa — clicking a gallery image highlights the matching options.
+Each gallery image can be tagged with a color and size in the admin. Selecting a color or size option on the product page jumps the carousel to the associated image, and vice versa: clicking a gallery image highlights the matching options.
 
 ### Image Lightbox
 
@@ -87,7 +87,7 @@ Full dark/light theme via next-themes, with the admin panel defaulting to dark m
 |---|---|
 | Framework | Next.js 16 (App Router) + React 19 |
 | Language | TypeScript |
-| Styling | Tailwind CSS + SASS |
+| Styling | Tailwind CSS (+ Sass, required by Payload admin UI) |
 | CMS / Admin | Payload CMS v3 |
 | Database | Neon (PostgreSQL via Drizzle) |
 | Image storage | Cloudflare R2 |
@@ -103,9 +103,9 @@ Full dark/light theme via next-themes, with the admin panel defaulting to dark m
 ## Technical Notes
 
 - Payload generates the admin UI from collection schemas, no custom admin UI needed
-- R2 client uploads bypass Vercel's 4.5MB request limit — files go browser → R2 directly via a presigned URL
+- R2 client uploads bypass Vercel's 4.5MB request limit; files go browser ➜ R2 directly via a presigned URL
 - R2 is served through `media.yasmineplastics.com` via Cloudflare's CDN; cache is purged after each normalization re-upload
 - The admin subdomain (`admin.yasmineplastics.com`) is routed to `/admin` via a Cloudflare redirect rule, no separate deployment
-- Material type is pre-selected in the admin form based on category (Cups/Containers/Lids → PP, Buckets → PS)
+- Material type is pre-selected in the admin form based on category (Cups/Containers/Lids ➜ PP, Buckets ➜ PS)
 - Sizes can be created inline from the product form without navigating away
 - Arabic locale has no URL prefix; `/ar/*` URLs redirect to `/*` via the next-intl middleware

@@ -120,15 +120,15 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
           <Link
             href={`/products/${product.slug}`}
             className={cn(
-              'block text-sm font-medium leading-snug transition-colors duration-300',
+              'block text-sm font-medium leading-snug line-clamp-2 transition-colors duration-300',
               hovered ? 'text-brand-navy dark:text-sky-300' : 'text-brand-navy dark:text-white'
             )}
           >
             {name}
           </Link>
 
-          {/* Specs row — secondary info always visible */}
-          <div className="flex items-center flex-wrap gap-1.5 mt-1.5 min-h-[18px]">
+          {/* Specs row */}
+          <div className="flex items-center flex-wrap gap-1.5 mt-1.5 overflow-hidden max-h-[22px]">
             {product.material && (
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                 {product.material}
@@ -141,12 +141,12 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
             )}
             {colorCount > 1 && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                {colorCount} colors
+                {t('colorCount', { count: colorCount })}
               </span>
             )}
             {sizeCount > 1 && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                {sizeCount} sizes
+                {t('sizeCount', { count: sizeCount })}
               </span>
             )}
           </div>

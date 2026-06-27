@@ -99,7 +99,9 @@
       "cta": "Request a Quote"
     },
     "notFound": "No products found.",
-    "wipNotice": "This page is still being built, reach us by phone, WhatsApp, or email to explore our full product range."
+    "wipNotice": "This page is still being built, reach us by phone, WhatsApp, or email to explore our full product range.",
+    "colorCount": "{count} colors",
+    "sizeCount": "{count} sizes"
   },
   "product": {
     "category": "Category",
