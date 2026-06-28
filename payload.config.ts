@@ -8,7 +8,6 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml } from '@/lib/emailTemplates'
 
-const pendingNormalize = new Set<string>()
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
@@ -89,28 +88,17 @@ export default buildConfig({
         afterChange: [
           async ({ doc, operation, previousDoc, req }) => {
             if (!doc.normalizeImage || !doc.filename) return
-            const docIdStr = String(doc.id)
 
-            if (operation === 'create') {
-              // File reaches R2 after create hooks complete; flag here and
-              // process on the auto-update Payload fires right after.
-              pendingNormalize.add(docIdStr)
-              return
-            }
-
-            if (operation !== 'update') return
-
-            const isPostCreateUpdate = pendingNormalize.has(docIdStr)
-            // File replaced on an existing record (not our own normalizer's rename,
-            // which sets width/height to 1400 in the same payload.update call).
+            const isCreate = operation === 'create'
+            // File replaced on an existing record (not our own normalizer's update,
+            // which sets width/height to 1400).
             const isFileReplacement =
-              !isPostCreateUpdate &&
+              operation === 'update' &&
               !!previousDoc?.filename &&
               doc.filename !== previousDoc.filename &&
               !(doc.width === 1400 && doc.height === 1400)
 
-            if (!isPostCreateUpdate && !isFileReplacement) return
-            if (isPostCreateUpdate) pendingNormalize.delete(docIdStr)
+            if (!isCreate && !isFileReplacement) return
 
             const { filename, id, processingMode } = doc
             const { payload } = req

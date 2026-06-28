@@ -1,3 +1,5 @@
 #!/bin/bash
+set -e
+next build
 [ -n "$1" ] && npm version "$1"
-next build && git push --follow-tags
+git push --follow-tags
