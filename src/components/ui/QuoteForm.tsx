@@ -10,7 +10,6 @@ import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
 
 const CUSTOM = '__custom__'
-const CUSTOM_CATEGORY = '__custom_order__'
 
 function SelectChevron() {
   return (
@@ -224,14 +223,13 @@ export function QuoteForm({
                 {localizedName(c, locale)}
               </option>
             ))}
-            <option value={CUSTOM_CATEGORY}>{t('customOrder')}</option>
           </select>
           <SelectChevron />
         </div>
       </div>
 
-      {/* Product - only shown once a real category is picked */}
-      {selectedCategory && selectedCategory !== CUSTOM_CATEGORY && (
+      {/* Product - only shown once a category is picked */}
+      {selectedCategory && (
         <div>
           <label htmlFor="q-product" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             {t('product')}

@@ -9,8 +9,8 @@
   },
   "home": {
     "hero": {
-      "title": "Quality Plastics, Built to Your Spec",
-      "subtitle": "Plastic products and molds, manufactured to your exact spec.",
+      "title": "Quality Plastics, Built to Your Specifications",
+      "subtitle": "Plastic products and molds, manufactured to your exact specifications.",
       "browseCta": "Browse Products",
       "quoteCta": "Request a Quote"
     },
@@ -93,13 +93,10 @@
       "text": "We carry a wide range of products. Get in touch and we'll help you find the right one.",
       "cta": "Contact Us"
     },
-    "customOrder": {
-      "title": "Want something made to order?",
-      "text": "We manufacture from scratch. Request a quote and we'll build it to your exact spec.",
-      "cta": "Request a Quote"
-    },
     "notFound": "No products found.",
-    "wipNotice": "This page is still being built, reach us by phone, WhatsApp, or email to explore our full product range."
+    "wipNotice": "This page is still being built, reach us by phone, WhatsApp, or email to explore our full product range.",
+    "colorCount": "{count} colors",
+    "sizeCount": "{count} sizes"
   },
   "product": {
     "category": "Category",
@@ -132,7 +129,7 @@
   },
   "contact": {
     "title": "Contact Us",
-    "subtitle": "Fill in the form or reach us directly through any of the channels below.",
+    "subtitle": "Have a question or a project in mind? Fill in the form and let's start a conversation.",
     "priceNote": "All pricing is on request. We don't sell online.",
     "info": {
       "phone": "Phone",
@@ -160,11 +157,11 @@
   },
   "quote": {
     "title": "Request a Quote",
-    "subtitle": "Fill the form below and our team will reply with a custom quote for your needs.",
+    "subtitle": "Ordering from our range or need something custom-built? Send us the details and we'll put a quote together.",
     "priceNote": "All pricing is on request. We don't sell online.",
-    "step1": "Submit your requirements",
-    "step2": "We review & prepare your quote",
-    "step3": "Our quote lands in your inbox",
+    "step1": "You submit your requirements",
+    "step2": "We review and get in touch",
+    "step3": "We send your quote to your inbox",
     "stepsTitle": "What happens next?",
     "form": {
       "firstName": "First Name",
@@ -174,7 +171,6 @@
       "phone": "Phone / WhatsApp Number",
       "category": "Category",
       "selectCategory": "Select a category",
-      "customOrder": "Custom Order",
       "product": "Product Interested In",
       "selectProduct": "Select a product",
       "delivery": "Delivery Location / City",
@@ -218,7 +214,7 @@
   },
   "meta": {
     "homeTitle": "Yasmine Plastics - Custom Plastic Manufacturer in Jordan",
-    "homeDescription": "Custom plastic manufacturer in Jordan. We build to your exact spec: shapes, molds, colours, and print. Established in 2008, backed by plastics industry experience since 1989. Serving businesses across the Arab world.",
+    "homeDescription": "Custom plastic manufacturer in Jordan. We build to your exact specifications: shapes, molds, colours, and print. Established in 2008, backed by plastics industry experience since 1989. Serving businesses across the Arab world.",
     "productsTitle": "Our Products - Yasmine Plastics",
     "productsDescription": "Browse our plastic products: cups, containers, lids, and more. Can't find what you need? We manufacture to order. Custom specs and colours available. Prices on request.",
     "contactTitle": "Contact Us - Yasmine Plastics",

@@ -58,7 +58,7 @@ export default async function QuotePage({ params }: Props) {
         </div>
 
         <div className="lg:sticky lg:top-24">
-          <div className="bg-brand-sky dark:bg-brand-navyDark rounded-2xl p-6">
+          <div className="bg-blue-50 dark:bg-brand-navyDark rounded-2xl p-6">
             <h2 className="text-base font-bold text-brand-navy dark:text-white mb-5 uppercase tracking-wide">
               {t('stepsTitle')}
             </h2>

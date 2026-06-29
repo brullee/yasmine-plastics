@@ -63,6 +63,7 @@ export function ProductMainSection({
   const [thumbCanScrollDown, setThumbCanScrollDown] = useState(false)
 
 
+  const imageContainerRef = useRef<HTMLDivElement>(null)
   const openerRef         = useRef<HTMLButtonElement>(null)
   const lightboxRef       = useRef<HTMLDivElement>(null)
   const lightboxImgRef    = useRef<HTMLDivElement>(null)
@@ -315,13 +316,17 @@ export function ProductMainSection({
   }
 
   // ── Color / size → carousel jump ────────────────────────────────────────
+  function nudgeToImage() {
+    imageContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+
   function handleColorChange(color: string | null) {
     setSelectedColor(color)
     if (!color) return
     const url = product.options.colorImageMap?.[color]
     if (!url) return
     const idx = images.indexOf(url)
-    if (idx !== -1) setCarouselIndex(idx)
+    if (idx !== -1) { setCarouselIndex(idx); nudgeToImage() }
   }
 
   function handleSizeChange(size: string | null) {
@@ -330,7 +335,7 @@ export function ProductMainSection({
     const url = product.options.sizeImageMap?.[size]
     if (!url) return
     const idx = images.indexOf(url)
-    if (idx !== -1) setCarouselIndex(idx)
+    if (idx !== -1) { setCarouselIndex(idx); nudgeToImage() }
   }
 
   // ── Partner change ───────────────────────────────────────────────────────
@@ -340,12 +345,12 @@ export function ProductMainSection({
     const ownPairingUrl = product.pairingImages?.[slug]?.[0]
     if (ownPairingUrl) {
       const idx = images.indexOf(ownPairingUrl)
-      if (idx !== -1) { setCarouselIndex(idx); return }
+      if (idx !== -1) { setCarouselIndex(idx); nudgeToImage(); return }
     }
     const slide = pairingSlides.find((e) => e.slug === slug)
     if (slide) {
       const idx = images.indexOf(slide.url)
-      if (idx !== -1) setCarouselIndex(idx)
+      if (idx !== -1) { setCarouselIndex(idx); nudgeToImage() }
     }
   }
 
@@ -353,7 +358,7 @@ export function ProductMainSection({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
 
       {/* ── Left: Image + thumbnails ── */}
-      <div className="relative">
+      <div ref={imageContainerRef} className="relative">
         {/* Vertical thumbnail strip — absolute so it never affects the image's layout size */}
         {images.length > 1 && (
           <div className="absolute start-0 top-0 bottom-0 w-16 flex flex-col">
@@ -478,13 +483,13 @@ export function ProductMainSection({
               ART-{product.artCode}
             </p>
           )}
-          <h1 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white leading-tight">
+          <h1 className="text-xl lg:text-4xl font-bold text-brand-navy dark:text-white leading-tight">
             {name}
           </h1>
         </div>
 
-        {/* Category pill */}
-        <div className="inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5">
+        {/* Category pill — desktop only */}
+        <div className="hidden lg:inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5">
           <span className="text-gray-500 dark:text-gray-400 text-sm">{t('category')}:</span>
           <span className="text-brand-navy dark:text-white font-semibold text-sm">{categoryName}</span>
         </div>

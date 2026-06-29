@@ -74,7 +74,7 @@ export default async function ContactPage({ params }: Props) {
 
         {/* Right: contact info + map */}
         <div className="flex flex-col gap-8">
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 space-y-5">
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-6 space-y-5">
             <ContactItem label={t('info.phone')}>
               <div className="flex flex-col gap-1">
                 <a href={`tel:${company.phone}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start inline-block">{company.phone}</a>
