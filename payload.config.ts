@@ -244,6 +244,24 @@ export default buildConfig({
                 data.hasCompatibleLids = !!(cat as Record<string, unknown>).supportsCompatibleLids
               }
             }
+            if (data.capacityAutoGenerate !== false) {
+              const sizeIds: unknown[] = data.sizes ?? []
+              if (sizeIds.length) {
+                const labels = await Promise.all(
+                  sizeIds.map(async (id) => {
+                    if (typeof id === 'object' && id !== null && 'label' in id) return (id as { label: string }).label
+                    const s = await req.payload.findByID({ collection: 'sizes', id: id as string })
+                    return (s as { label?: string }).label ?? ''
+                  })
+                )
+                const nums = labels.map(l => parseFloat(l)).filter(n => !isNaN(n)).sort((a, b) => a - b)
+                if (nums.length) {
+                  const unit = data.sizeUnit ?? ''
+                  const range = nums.length === 1 ? `${nums[0]}` : `${nums[0]}-${nums[nums.length - 1]}`
+                  data.capacity = `${range}${unit}`
+                }
+              }
+            }
             return data
           },
         ],
