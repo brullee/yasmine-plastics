@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ProductActions } from '@/components/ui/ProductActions'
+import { QuickViewModal } from '@/components/ui/QuickViewModal'
 import { cn, deriveCapacity } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
@@ -25,12 +26,13 @@ interface Props {
   categoryName: string
   compatibleLids: Product[]
   fitsContainers: Product[]
+  allProducts: Product[]
   whatsappNumber: string
   locale: Locale
 }
 
 export function ProductMainSection({
-  product, name, categoryName, compatibleLids, fitsContainers, whatsappNumber, locale,
+  product, name, categoryName, compatibleLids, fitsContainers, allProducts, whatsappNumber, locale,
 }: Props) {
   const t = useTranslations('product')
 
@@ -49,6 +51,12 @@ export function ProductMainSection({
   const firstPartnerSlug = compatibleLids[0]?.slug ?? fitsContainers[0]?.slug ?? null
 
   const [selectedPartner, setSelectedPartner] = useState<string | null>(firstPartnerSlug)
+  const [qv, setQv] = useState<{ product: Product; originRect: DOMRect } | null>(null)
+
+  function handlePartnerQuickView(slug: string, rect: DOMRect) {
+    const p = [...compatibleLids, ...fitsContainers].find((p) => p.slug === slug)
+    if (p) setQv({ product: p, originRect: rect })
+  }
   const [selectedColor, setSelectedColor] = useState<string | null>(product.options.colors?.[0]?.en ?? null)
   const [selectedSize, setSelectedSize] = useState<string | null>(product.options.sizes?.[0] ?? null)
   const [carouselIndex, setCarouselIndex] = useState(0)
@@ -502,6 +510,7 @@ export function ProductMainSection({
           fitsContainers={fitsContainers}
           selectedPartner={selectedPartner}
           onPartnerChange={handlePartnerChange}
+          onPartnerQuickView={handlePartnerQuickView}
           selectedColor={selectedColor}
           onColorChange={handleColorChange}
           selectedSize={selectedSize}
@@ -619,6 +628,17 @@ export function ProductMainSection({
           </div>
         </div>,
         document.body
+      )}
+
+      {/* ── Partner quick view ── */}
+      {qv && (
+        <QuickViewModal
+          product={qv.product}
+          originRect={qv.originRect}
+          locale={locale}
+          allProducts={allProducts}
+          onClose={() => setQv(null)}
+        />
       )}
     </div>
   )

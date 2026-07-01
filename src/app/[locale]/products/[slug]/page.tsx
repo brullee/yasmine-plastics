@@ -136,6 +136,7 @@ export default async function ProductDetailPage({ params }: Props) {
           categoryName={categoryName}
           compatibleLids={compatibleLids}
           fitsContainers={fitsContainers}
+          allProducts={allProducts}
           whatsappNumber={company.whatsapp}
           locale={locale}
         />

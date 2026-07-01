@@ -1,5 +1,6 @@
 import path from 'path'
 import { after } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { buildConfig } from 'payload'
 import { normalizeMediaAfterUpload } from '@/lib/image-normalize'
 import { postgresAdapter } from '@payloadcms/db-postgres'
@@ -276,6 +277,16 @@ export default buildConfig({
               }
             }
             return data
+          },
+        ],
+        afterChange: [
+          ({ doc }) => {
+            if (doc.slug) {
+              revalidatePath(`/products/${doc.slug}`)
+              revalidatePath(`/en/products/${doc.slug}`)
+            }
+            revalidatePath('/products')
+            revalidatePath('/en/products')
           },
         ],
       },

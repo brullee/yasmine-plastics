@@ -100,14 +100,12 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
 
       <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-          <CantFindBanner />
-
           {filtered.length > 0
             ? <ProductsGrid products={filtered} allProducts={products} locale={locale} />
             : <div className="text-center py-20 text-gray-400 dark:text-gray-500">{t('notFound')}</div>
           }
 
-          {filtered.length > 6 && <CantFindBanner />}
+          <CantFindBanner />
         </div>
       </div>
     </>
