@@ -11,8 +11,6 @@
 
 A bilingual (AR/EN) B2B product catalog and quote request site for a plastics manufacturer based in Jordan.
 
-**Live site ➜ [yasmineplastics.com](https://yasmineplastics.com)**
-
 </div>
 
 > **Note:** This is the production codebase for [yasmineplastics.com](https://yasmineplastics.com), a real business. The code is public for portfolio review only. Reproducing, impersonating, or operating a copy of this site or its brand in any form is strictly prohibited. Legal action will be pursued if necessary.
@@ -25,7 +23,7 @@ A website for my family's plastics manufacturing business. Buyers can browse pro
 
 ## What it does
 
-The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, and media, including a bulk image upload flow with automatic normalization.
+The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. A dedicated homepage section highlights custom manufacturing capabilities and links to a pre-configured quote flow for custom orders. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, units, and media, including a bulk image upload flow with automatic normalization.
 
 ## Features
 
@@ -43,7 +41,7 @@ Clicking any product image opens a fullscreen lightbox. Supports pinch-to-zoom, 
 
 ### Quick View Modal
 
-Products can be previewed in an animated modal without leaving the catalog page. The modal includes a full image carousel, color/size selectors, and links to the associated lid or container.
+Products can be previewed in an animated modal without leaving the catalog page. The modal includes a full image carousel, color/size selectors, and links to the associated lid or container. On product detail pages, an eye icon on the paired product panel opens the same quick view modal in-context, so the user never has to navigate away to check the companion product.
 
 ### Image Normalization Pipeline
 
@@ -61,9 +59,13 @@ Two modes are available: Standard (tighter crop, 65% canvas fill) and Gentle (55
 
 The media library supports bulk image upload with client-side WebP compression. All files are compressed in parallel before upload, with a Payload-styled progress overlay and cancellation support.
 
+### Capacity Auto-generation
+
+Product capacity is derived automatically from the product's size options. When auto-generation is on (the default), the admin computes a range at save time: one size shows `100ml`, multiple sizes show `100–300ml`. Disabling it reveals a manual text field. Size units (ml, L, g, oz, etc.) are a separate database collection so the admin can add new units without code changes.
+
 ### SEO
 
-Every page has meta titles, descriptions, Open Graph tags, canonical URLs, and hreflang tags. Product pages include Product schema (JSON-LD). The site generates a `sitemap.xml` and `robots.txt`.
+Every page has meta titles, descriptions, Open Graph tags, canonical URLs, and hreflang tags. A default OG image is generated at build time via `opengraph-image.tsx` (navy gradient, brand name, tagline). Product pages include Product schema (JSON-LD). The site generates a `sitemap.xml` and `robots.txt`.
 
 ### Quote Request and Contact Forms
 
@@ -109,3 +111,5 @@ Full dark/light theme via next-themes, with the admin panel defaulting to dark m
 - Material type is pre-selected in the admin form based on category (Cups/Containers/Lids ➜ PP, Buckets ➜ PS)
 - Sizes can be created inline from the product form without navigating away
 - Arabic locale has no URL prefix; `/ar/*` URLs redirect to `/*` via the next-intl middleware
+- Size units (ml, L, g, oz, etc.) are a Payload collection; `sizeUnit` on products is a relationship, not a hardcoded select
+- Capacity is auto-derived from size options via `deriveCapacity()` in `src/lib/utils.ts`; the DB field is written by a `beforeChange` hook

@@ -83,7 +83,9 @@ function transformProduct(doc: any): Product {
         .filter((s: unknown) => s && typeof s === 'object')
         .map((s: unknown) => (s as { label: string }).label)
         .filter(Boolean),
-      sizeUnit: doc.sizeUnit ?? undefined,
+      sizeUnit: typeof doc.sizeUnit === 'object' && doc.sizeUnit !== null
+        ? ((doc.sizeUnit as Record<string, unknown>).label as string | undefined)
+        : (doc.sizeUnit ?? undefined),
       colorImageMap: Object.keys(colorImageMap).length ? colorImageMap : undefined,
       sizeImageMap: Object.keys(sizeImageMap).length ? sizeImageMap : undefined,
     },

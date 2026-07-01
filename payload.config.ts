@@ -1,5 +1,6 @@
 import path from 'path'
 import { after } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { buildConfig } from 'payload'
 import { normalizeMediaAfterUpload } from '@/lib/image-normalize'
 import { postgresAdapter } from '@payloadcms/db-postgres'
@@ -178,6 +179,14 @@ export default buildConfig({
       ],
     },
     {
+      slug: 'units',
+      admin: { useAsTitle: 'label' },
+      access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      fields: [
+        { name: 'label', label: 'Unit', type: 'text', required: true },
+      ],
+    },
+    {
       slug: 'categories',
       admin: { useAsTitle: 'nameEn' },
       fields: [
@@ -244,7 +253,40 @@ export default buildConfig({
                 data.hasCompatibleLids = !!(cat as Record<string, unknown>).supportsCompatibleLids
               }
             }
+            if (data.capacityAutoGenerate !== false) {
+              const sizeIds: unknown[] = data.sizes ?? []
+              if (sizeIds.length) {
+                const labels = await Promise.all(
+                  sizeIds.map(async (id) => {
+                    if (typeof id === 'object' && id !== null && 'label' in id) return (id as { label: string }).label
+                    const s = await req.payload.findByID({ collection: 'sizes', id: id as string })
+                    return (s as { label?: string }).label ?? ''
+                  })
+                )
+                const nums = labels.map(l => parseFloat(l)).filter(n => !isNaN(n)).sort((a, b) => a - b)
+                if (nums.length) {
+                  let unitLabel = ''
+                  if (data.sizeUnit) {
+                    const unitId = typeof data.sizeUnit === 'object' && data.sizeUnit !== null ? (data.sizeUnit as { id: unknown }).id : data.sizeUnit
+                    const u = await req.payload.findByID({ collection: 'units', id: unitId as string })
+                    unitLabel = (u as { label?: string }).label ?? ''
+                  }
+                  const range = nums.length === 1 ? `${nums[0]}` : `${nums[0]}-${nums[nums.length - 1]}`
+                  data.capacity = `${range}${unitLabel}`
+                }
+              }
+            }
             return data
+          },
+        ],
+        afterChange: [
+          ({ doc }) => {
+            if (doc.slug) {
+              revalidatePath(`/products/${doc.slug}`)
+              revalidatePath(`/en/products/${doc.slug}`)
+            }
+            revalidatePath('/products')
+            revalidatePath('/en/products')
           },
         ],
       },
@@ -423,20 +465,15 @@ export default buildConfig({
                 },
                 {
                   name: 'sizeUnit',
-                  type: 'select',
+                  type: 'relationship',
+                  relationTo: 'units',
                   label: 'Size Unit',
-                  options: [
-                    { label: 'ml', value: 'ml' },
-                    { label: 'L', value: 'L' },
-                    { label: 'g', value: 'g' },
-                    { label: 'oz', value: 'oz' },
-                  ],
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   validate: (value: any, { siblingData }: { siblingData: any }) => {
                     const sizes = siblingData?.sizes
-                    if (Array.isArray(sizes) && sizes.length > 0 && !value) {
-                      return 'Unit of measurement is required when sizes are set'
-                    }
+                    const hasSizes = Array.isArray(sizes) && sizes.length > 0
+                    if (hasSizes && !value) return 'Unit of measurement is required when sizes are set'
+                    if (!hasSizes && value) return 'A unit is selected but no sizes are added'
                     return true
                   },
                   admin: { hidden: true },
