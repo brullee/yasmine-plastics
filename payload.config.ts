@@ -178,6 +178,14 @@ export default buildConfig({
       ],
     },
     {
+      slug: 'units',
+      admin: { useAsTitle: 'label' },
+      access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      fields: [
+        { name: 'label', label: 'Unit', type: 'text', required: true },
+      ],
+    },
+    {
       slug: 'categories',
       admin: { useAsTitle: 'nameEn' },
       fields: [
@@ -256,9 +264,14 @@ export default buildConfig({
                 )
                 const nums = labels.map(l => parseFloat(l)).filter(n => !isNaN(n)).sort((a, b) => a - b)
                 if (nums.length) {
-                  const unit = data.sizeUnit ?? ''
+                  let unitLabel = ''
+                  if (data.sizeUnit) {
+                    const unitId = typeof data.sizeUnit === 'object' && data.sizeUnit !== null ? (data.sizeUnit as { id: unknown }).id : data.sizeUnit
+                    const u = await req.payload.findByID({ collection: 'units', id: unitId as string })
+                    unitLabel = (u as { label?: string }).label ?? ''
+                  }
                   const range = nums.length === 1 ? `${nums[0]}` : `${nums[0]}-${nums[nums.length - 1]}`
-                  data.capacity = `${range}${unit}`
+                  data.capacity = `${range}${unitLabel}`
                 }
               }
             }
@@ -441,20 +454,15 @@ export default buildConfig({
                 },
                 {
                   name: 'sizeUnit',
-                  type: 'select',
+                  type: 'relationship',
+                  relationTo: 'units',
                   label: 'Size Unit',
-                  options: [
-                    { label: 'ml', value: 'ml' },
-                    { label: 'L', value: 'L' },
-                    { label: 'g', value: 'g' },
-                    { label: 'oz', value: 'oz' },
-                  ],
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   validate: (value: any, { siblingData }: { siblingData: any }) => {
                     const sizes = siblingData?.sizes
-                    if (Array.isArray(sizes) && sizes.length > 0 && !value) {
-                      return 'Unit of measurement is required when sizes are set'
-                    }
+                    const hasSizes = Array.isArray(sizes) && sizes.length > 0
+                    if (hasSizes && !value) return 'Unit of measurement is required when sizes are set'
+                    if (!hasSizes && value) return 'A unit is selected but no sizes are added'
                     return true
                   },
                   admin: { hidden: true },
