@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { getProducts, getCategories } from '@/lib/payload-data'
-import { ProductsPageClient } from '@/components/ui/ProductsPageClient'
+import { ProductsPageClient } from './_components/ProductsPageClient'
 import { pageAlternates, localeUrl, brandName } from '@/lib/seo'
 import type { Locale } from '@/types'
 

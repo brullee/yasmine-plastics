@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { company } from '@/data/company'
-import { ContactForm } from '@/components/ui/ContactForm'
+import { ContactForm } from './_components/ContactForm'
 import { pageAlternates, localeUrl, BASE_URL, brandName } from '@/lib/seo'
 import type { Locale } from '@/types'
 
