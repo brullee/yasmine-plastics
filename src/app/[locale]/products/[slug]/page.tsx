@@ -7,7 +7,7 @@ import { ProductMainSection } from '@/components/ui/ProductMainSection'
 import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
-import { pageAlternates, localeUrl } from '@/lib/seo'
+import { pageAlternates, localeUrl, brandName } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export const revalidate = 3600
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${name}. ${categoryName} من ياسمين للبلاستيك.${product.material ? ` مصنوع من ${product.material}.` : ''} اطلب عرض سعر للطلبات الصناعية والجملة.`
     : `${name}. ${categoryName} by Yasmine Plastics.${product.material ? ` Made from ${product.material}.` : ''} Request a wholesale or bulk order quote.`
 
-  const brand = locale === 'ar' ? 'ياسمين للبلاستيك' : 'Yasmine Plastics'
+  const brand = brandName(locale)
   const fullTitle = `${name} - ${brand}`
 
   return {
@@ -51,6 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: localeUrl(locale, `/products/${slug}`),
       type: 'website',
+      siteName: brand,
     },
   }
 }

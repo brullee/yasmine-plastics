@@ -1,5 +1,9 @@
 export const BASE_URL = 'https://www.yasmineplastics.com'
 
+export function brandName(locale: string) {
+  return locale === 'en' ? 'Yasmine Plastics' : 'ياسمين للبلاستيك'
+}
+
 export function localeUrl(locale: string, path: string = '') {
   return locale === 'ar' ? `${BASE_URL}${path}` : `${BASE_URL}/en${path}`
 }

@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { getProducts, getCategories } from '@/lib/payload-data'
 import { ProductsPageClient } from '@/components/ui/ProductsPageClient'
-import { pageAlternates, localeUrl } from '@/lib/seo'
+import { pageAlternates, localeUrl, brandName } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 interface Props {
@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: localeUrl(locale, '/products'),
       type: 'website',
+      siteName: brandName(locale),
     },
   }
 }

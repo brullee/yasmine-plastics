@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { pageAlternates, localeUrl } from '@/lib/seo'
+import { pageAlternates, localeUrl, brandName } from '@/lib/seo'
 import type { Locale } from '@/types'
 
 export async function generateMetadata({
@@ -21,6 +21,7 @@ export async function generateMetadata({
       description,
       url: localeUrl(locale, '/about'),
       type: 'website',
+      siteName: brandName(locale),
     },
   }
 }
