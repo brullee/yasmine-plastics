@@ -488,7 +488,7 @@ export function ProductMainSection({
         {/* Name */}
         <div>
           {product.artCode && (
-            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1 font-mono">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1 font-mono">
               ART-{product.artCode}
             </p>
           )}
@@ -535,7 +535,7 @@ export function ProductMainSection({
               { label: t('dimensions'), value: formatDimensions(product) },
             ].map(({ label, value }) => (
               <div key={label} className="bg-white dark:bg-gray-800 px-4 py-3">
-                <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-0.5">{label}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
                 <p className="text-sm font-semibold text-brand-navy dark:text-white">{value || '-'}</p>
               </div>
             ))}

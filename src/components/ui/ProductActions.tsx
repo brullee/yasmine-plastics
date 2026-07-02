@@ -102,7 +102,7 @@ export function ProductActions({
               {locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
             </p>
             {partnerColor && (
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {partnerColor === CUSTOM
                   ? tOpts('custom')
                   : locale === 'ar'
@@ -120,7 +120,7 @@ export function ProductActions({
                   'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                   partnerColor === color.en
                     ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                    : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                    : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                 )}
               >
                 {locale === 'ar' ? color.ar : color.en}
@@ -132,7 +132,7 @@ export function ProductActions({
                 'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                 partnerColor === CUSTOM
                   ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                  : 'bg-gray-50 border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-transparent dark:border-gray-500 dark:text-gray-400 dark:hover:border-gray-300 dark:hover:text-gray-200'
+                  : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
               )}
             >
               {tOpts('custom')}
@@ -146,7 +146,7 @@ export function ProductActions({
             <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
               {locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
             </p>
-            {partnerSize && <span className="text-sm text-gray-500 dark:text-gray-400" dir="ltr">{partnerSize}{partnerSizeUnit ?? ''}</span>}
+            {partnerSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{partnerSize}{partnerSizeUnit ?? ''}</span>}
           </div>
           <div className="flex flex-wrap gap-2">
             {partnerSizes.map((size) => (
@@ -157,7 +157,7 @@ export function ProductActions({
                   'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                   partnerSize === size
                     ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                    : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                    : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                 )}
               >
                 <span dir="ltr">{size}{partnerSizeUnit ?? ''}</span>
@@ -179,7 +179,7 @@ export function ProductActions({
             <div>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
                 </span>
               </div>
@@ -193,7 +193,7 @@ export function ProductActions({
             <div>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
                 </span>
               </div>
@@ -204,11 +204,11 @@ export function ProductActions({
 
           {/* Colors */}
           {colorOptions.length > 0 && (
-            <div className={cn(!!(lids?.length || fitsContainers?.length) && 'border-t border-gray-100 dark:border-gray-700 pt-5')}>
+            <div className={cn(!!(lids?.length || fitsContainers?.length) && 'border-t border-gray-200 dark:border-gray-700 pt-5')}>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('color')}</p>
                 {selectedColor && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     {selectedColor === CUSTOM
                       ? tOpts('custom')
                       : locale === 'ar'
@@ -226,7 +226,7 @@ export function ProductActions({
                       'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                       selectedColor === color.en
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
                     {locale === 'ar' ? color.ar : color.en}
@@ -238,7 +238,7 @@ export function ProductActions({
                     'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                     selectedColor === CUSTOM
                       ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                      : 'bg-gray-50 border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-transparent dark:border-gray-500 dark:text-gray-400 dark:hover:border-gray-300 dark:hover:text-gray-200'
+                      : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
                   )}
                 >
                   {tOpts('custom')}
@@ -252,7 +252,7 @@ export function ProductActions({
             <div>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('size')}</p>
-                {selectedSize && <span className="text-sm text-gray-500 dark:text-gray-400" dir="ltr">{selectedSize}{sizeUnit ?? ''}</span>}
+                {selectedSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{selectedSize}{sizeUnit ?? ''}</span>}
               </div>
               <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => (
@@ -263,7 +263,7 @@ export function ProductActions({
                       'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                       selectedSize === size
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
                     <span dir="ltr">{size}{sizeUnit ?? ''}</span>
@@ -278,8 +278,8 @@ export function ProductActions({
 
       {/* MOQ notice — shown once if any custom color is selected */}
       {(selectedColor === CUSTOM || partnerColor === CUSTOM) && (
-        <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-4 py-3">
-          <svg className="mt-0.5 shrink-0 text-amber-500" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <div className="flex items-start gap-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/70 rounded-lg px-4 py-3">
+          <svg className="mt-0.5 shrink-0 text-amber-700 dark:text-amber-400" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNotice')}</p>
@@ -336,70 +336,97 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
       {products.map((p) => {
-          const name = localizedName(p, locale)
-          const isSelected = selectedSlug === p.slug
-          return (
-            <div
-              key={p.slug}
-              className={cn(
-                'group flex items-center gap-2 rounded-lg border transition-colors',
-                isSelected
-                  ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
-                  : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-brand-navy dark:hover:border-blue-400'
-              )}
+        const name = localizedName(p, locale)
+        const isSelected = selectedSlug === p.slug
+        return (
+          <div
+            key={p.slug}
+            className={cn(
+              'group flex items-center gap-2 rounded-lg border transition-colors',
+              isSelected
+                ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
+                : 'bg-gray-100 dark:bg-transparent border-gray-400 dark:border-gray-500 hover:border-brand-navy dark:hover:border-blue-400'
+            )}
+          >
+            <button
+              type="button"
+              onClick={() => onSelect(p.slug)}
+              className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
             >
+              <div data-thumb className="relative w-8 h-8 rounded-md overflow-hidden bg-white flex-shrink-0">
+                <Image src={p.image} alt={name} fill sizes="32px" className="object-contain p-1" />
+              </div>
+              <span className={cn(
+                'text-xs font-medium leading-snug',
+                isSelected
+                  ? 'text-brand-navy dark:text-sky-200'
+                  : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-white'
+              )}>
+                {name}
+              </span>
+            </button>
+            {onQuickView && (
               <button
                 type="button"
-                onClick={() => onSelect(p.slug)}
-                className="flex items-center gap-3 flex-1 min-w-0 p-2.5 text-start"
-              >
-                <div data-thumb className="relative w-12 h-12 rounded-md overflow-hidden bg-white flex-shrink-0">
-                  <Image src={p.image} alt={name} fill sizes="48px" className="object-contain p-1" />
-                </div>
-                <span className={cn(
-                  'text-xs font-medium leading-snug',
+                onClick={(e) => {
+                  const thumb = e.currentTarget.closest('div')?.querySelector('[data-thumb]')
+                  const rect = (thumb ?? e.currentTarget).getBoundingClientRect()
+                  onQuickView(p.slug, rect)
+                }}
+                aria-label={locale === 'ar' ? `معاينة ${name}` : `Quick view ${name}`}
+                className={cn(
+                  'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
                   isSelected
-                    ? 'text-brand-navy dark:text-sky-200'
-                    : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-white'
-                )}>
-                  {name}
-                </span>
+                    ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
+                    : 'text-gray-400 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                )}
+              >
+                <EyeIcon />
               </button>
-              {onQuickView && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    const thumb = e.currentTarget.closest('div')?.querySelector('[data-thumb]')
-                    const rect = (thumb ?? e.currentTarget).getBoundingClientRect()
-                    onQuickView(p.slug, rect)
-                  }}
-                  aria-label={locale === 'ar' ? `معاينة ${name}` : `Quick view ${name}`}
-                  className={cn(
-                    'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
-                    isSelected
-                      ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
-                      : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
-                  )}
-                >
-                  <EyeIcon />
-                </button>
-              )}
-            </div>
-          )
-        })}
-      <button
-        type="button"
-        onClick={() => onSelect(NONE_PARTNER)}
+            )}
+          </div>
+        )
+      })}
+      <div
         className={cn(
-          'flex items-center justify-center px-4 py-2.5 rounded-lg border text-sm font-medium transition-all',
+          'flex items-center rounded-lg border transition-colors',
           noneSelected
-            ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-            : 'bg-gray-50 border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-transparent dark:border-gray-500 dark:text-gray-400 dark:hover:border-gray-300 dark:hover:text-gray-200'
+            ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
+            : 'bg-gray-100 dark:bg-transparent border-dashed border-gray-400 dark:border-gray-500 hover:border-gray-500 dark:hover:border-gray-400'
         )}
       >
-        {locale === 'ar' ? 'بدون' : 'None'}
-      </button>
+        <button
+          type="button"
+          onClick={() => onSelect(NONE_PARTNER)}
+          className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
+        >
+          <div className={cn(
+            'w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0',
+            noneSelected
+              ? 'bg-brand-navy/10 text-brand-navy dark:bg-sky-400/10 dark:text-sky-400'
+              : 'bg-gray-200 text-gray-500 dark:bg-gray-600 dark:text-gray-300'
+          )}>
+            <BanIcon />
+          </div>
+          <span className={cn(
+            'text-xs font-medium',
+            noneSelected
+              ? 'text-brand-navy dark:text-sky-200'
+              : 'text-gray-700 dark:text-gray-300'
+          )}>
+            {locale === 'ar' ? 'بدون' : 'None'}
+          </span>
+        </button>
+      </div>
     </div>
+  )
+}
+
+function BanIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+    </svg>
   )
 }
 

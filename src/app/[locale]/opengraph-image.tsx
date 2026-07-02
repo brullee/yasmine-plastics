@@ -1,48 +1,32 @@
 import { ImageResponse } from 'next/og'
+import { readFileSync } from 'fs'
+import path from 'path'
+import sharp from 'sharp'
 
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
-export const alt = 'Yasmine Plastics - Custom Plastic Manufacturing'
+export const alt = 'Yasmine Plastics'
 
-export default function Image() {
+export default async function Image() {
+  const svgBuffer = readFileSync(path.join(process.cwd(), 'public', 'YasmineLogo.svg'))
+  const logoW = 780
+  const logoH = Math.round(logoW * (130.67 / 755.59))
+  const pngBuffer = await sharp(svgBuffer).resize(logoW * 2, logoH * 2).png().toBuffer()
+  const logoSrc = `data:image/png;base64,${pngBuffer.toString('base64')}`
+
   return new ImageResponse(
     (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0a2240 0%, #0d3562 100%)',
+          background: 'white',
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'sans-serif',
-          padding: '80px',
         }}
       >
-        <div
-          style={{
-            color: 'white',
-            fontSize: 84,
-            fontWeight: 700,
-            letterSpacing: -2,
-            marginBottom: 24,
-            textAlign: 'center',
-          }}
-        >
-          Yasmine Plastics
-        </div>
-        <div
-          style={{
-            color: '#93c5fd',
-            fontSize: 36,
-            fontWeight: 400,
-            letterSpacing: 1,
-            textAlign: 'center',
-          }}
-        >
-          Custom Plastic Manufacturing · Jordan
-        </div>
+        <img src={logoSrc} width={logoW} height={logoH} alt="Yasmine Plastics" />
       </div>
     ),
     { ...size }
