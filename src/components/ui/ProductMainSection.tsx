@@ -350,7 +350,7 @@ export function ProductMainSection({
   // ── Partner change ───────────────────────────────────────────────────────
   function handlePartnerChange(slug: string | null) {
     setSelectedPartner(slug)
-    if (!slug) return
+    if (!slug || slug === '__none__') return
     const ownPairingUrl = product.pairingImages?.[slug]?.[0]
     if (ownPairingUrl) {
       const idx = images.indexOf(ownPairingUrl)

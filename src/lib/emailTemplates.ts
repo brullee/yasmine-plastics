@@ -114,7 +114,7 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
 </html>`
 }
 
-export function quoteEmailHtml({ firstName, lastName, company, email, phone, productName, productSlug, color, size, lidName, lidSlug, delivery, details }: {
+export function quoteEmailHtml({ firstName, lastName, company, email, phone, productName, productSlug, color, size, lidName, lidSlug, lidColor, lidSize, delivery, details }: {
   firstName: string
   lastName: string
   company?: string
@@ -126,6 +126,8 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
   size?: string
   lidName?: string
   lidSlug?: string
+  lidColor?: string
+  lidSize?: string
   delivery?: string
   details?: string
 }) {
@@ -168,6 +170,8 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
             ${row('Color', displayColor)}
             ${size && size !== '-' ? row('Size', size) : ''}
             ${lidName && lidSlug ? row('Lid', `${lidName} (${lidSlug})`) : row('Lid', lidName)}
+            ${row('Paired Color', lidColor === '__custom__' ? 'Custom' : lidColor)}
+            ${lidSize && lidSize !== '-' ? row('Paired Size', lidSize) : ''}
           </table>
         </td></tr>` : ''}
 

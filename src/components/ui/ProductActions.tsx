@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
@@ -8,6 +8,9 @@ import { cn, buildWhatsAppUrl, localizedName } from '@/lib/utils'
 import type { Product, Locale } from '@/types'
 
 const CUSTOM = '__custom__'
+const NONE_PARTNER = '__none__'
+
+
 
 interface Props {
   colors?: { en: string; ar: string }[]
@@ -39,6 +42,8 @@ export function ProductActions({
 
   const [internalColor, setInternalColor] = useState<string | null>(colors?.[0]?.en ?? null)
   const [internalSize, setInternalSize] = useState<string | null>(sizes?.[0] ?? null)
+  const [partnerColor, setPartnerColor] = useState<string | null>(null)
+  const [partnerSize, setPartnerSize] = useState<string | null>(null)
 
   const selectedColor = onColorChange !== undefined ? (controlledColor ?? null) : internalColor
   const setSelectedColor = onColorChange ?? setInternalColor
@@ -52,6 +57,15 @@ export function ProductActions({
     null
   const selectedLidName = selectedPartnerProduct ? localizedName(selectedPartnerProduct, locale) : null
 
+  const partnerColors = selectedPartnerProduct?.options?.colors ?? []
+  const partnerSizes = selectedPartnerProduct?.options?.sizes ?? []
+  const partnerSizeUnit = selectedPartnerProduct?.options?.sizeUnit
+
+  useEffect(() => {
+    setPartnerColor(partnerColors[0]?.en ?? null)
+    setPartnerSize(partnerSizes[0] ?? null)
+  }, [selectedPartner]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const hasOptions =
     colorOptions.length > 0 ||
     (sizes?.length ?? 0) > 1 ||
@@ -62,18 +76,98 @@ export function ProductActions({
     `مرحباً، أنا مهتم بـ: ${productName} (${productSlug})`,
     ...(selectedColor ? [`اللون: ${selectedColor === CUSTOM ? 'مخصص' : (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)}`] : []),
     ...(selectedSize ? [`المقاس: ${selectedSize}`] : []),
-    ...(selectedLidName ? [`الغطاء: ${selectedLidName}`] : []),
+    ...(selectedLidName ? [`المرافق: ${selectedLidName}`] : []),
+    ...(partnerColor ? [`لون المرافق: ${partnerColor === CUSTOM ? 'مخصص' : (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor)}`] : []),
+    ...(partnerSize ? [`مقاس المرافق: ${partnerSize}`] : []),
   ] : [
     `Hi, I'm interested in: ${productName} (${productSlug})`,
     ...(selectedColor ? [`Color: ${selectedColor === CUSTOM ? 'Custom' : selectedColor}`] : []),
     ...(selectedSize ? [`Size: ${selectedSize}`] : []),
-    ...(selectedLidName ? [`Lid: ${selectedLidName}`] : []),
+    ...(selectedLidName ? [`Paired: ${selectedLidName}`] : []),
+    ...(partnerColor ? [`Paired Color: ${partnerColor === CUSTOM ? 'Custom' : partnerColor}`] : []),
+    ...(partnerSize ? [`Paired Size: ${partnerSize}`] : []),
   ]
   const chatUrl = buildWhatsAppUrl(whatsappNumber, chatLines.join('\n'))
 
   function togglePartner(slug: string) {
     onPartnerChange?.(slug)
   }
+
+  const partnerOptions = selectedPartnerProduct && (partnerColors.length > 0 || partnerSizes.length > 1) ? (
+    <div className="mt-3 space-y-4">
+      {partnerColors.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-2.5">
+            <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+              {locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
+            </p>
+            {partnerColor && (
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {partnerColor === CUSTOM
+                  ? tOpts('custom')
+                  : locale === 'ar'
+                    ? (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor)
+                    : partnerColor}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {partnerColors.map((color) => (
+              <button
+                key={color.en}
+                onClick={() => setPartnerColor(color.en)}
+                className={cn(
+                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                  partnerColor === color.en
+                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                    : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                )}
+              >
+                {locale === 'ar' ? color.ar : color.en}
+              </button>
+            ))}
+            <button
+              onClick={() => setPartnerColor(CUSTOM)}
+              className={cn(
+                'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                partnerColor === CUSTOM
+                  ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                  : 'bg-gray-50 border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-transparent dark:border-gray-500 dark:text-gray-400 dark:hover:border-gray-300 dark:hover:text-gray-200'
+              )}
+            >
+              {tOpts('custom')}
+            </button>
+          </div>
+        </div>
+      )}
+      {partnerSizes.length > 1 && (
+        <div>
+          <div className="flex items-center gap-2 mb-2.5">
+            <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+              {locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
+            </p>
+            {partnerSize && <span className="text-sm text-gray-500 dark:text-gray-400" dir="ltr">{partnerSize}{partnerSizeUnit ?? ''}</span>}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {partnerSizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => setPartnerSize(size)}
+                className={cn(
+                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                  partnerSize === size
+                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                    : 'bg-gray-50 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                )}
+              >
+                <span dir="ltr">{size}{partnerSizeUnit ?? ''}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  ) : null
 
   return (
     <>
@@ -83,10 +177,14 @@ export function ProductActions({
           {/* Compatible containers (shown on lid pages) */}
           {fitsContainers && fitsContainers.length > 0 && (
             <div>
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2.5">
-                {t('fitsContainers')}
-              </p>
+              <div className="flex items-center gap-2 mb-2.5">
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
+                </span>
+              </div>
               <PartnerGrid products={fitsContainers} selectedSlug={selectedPartner ?? null} locale={locale} onSelect={togglePartner} onQuickView={onPartnerQuickView} />
+              {partnerOptions}
             </div>
           )}
 
@@ -94,23 +192,28 @@ export function ProductActions({
           {lids && lids.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('lid')}</p>
-                {selectedLidName && <span className="text-sm text-gray-500 dark:text-gray-400">{selectedLidName}</span>}
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
+                </span>
               </div>
               <PartnerGrid products={lids} selectedSlug={selectedPartner ?? null} locale={locale} onSelect={togglePartner} onQuickView={onPartnerQuickView} />
+              {partnerOptions}
             </div>
           )}
 
           {/* Colors */}
           {colorOptions.length > 0 && (
-            <div>
+            <div className={cn(!!(lids?.length || fitsContainers?.length) && 'border-t border-gray-100 dark:border-gray-700 pt-5')}>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('color')}</p>
-                {selectedColor && selectedColor !== CUSTOM && (
+                {selectedColor && (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {locale === 'ar'
-                      ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)
-                      : selectedColor}
+                    {selectedColor === CUSTOM
+                      ? tOpts('custom')
+                      : locale === 'ar'
+                        ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)
+                        : selectedColor}
                   </span>
                 )}
               </div>
@@ -141,14 +244,6 @@ export function ProductActions({
                   {tOpts('custom')}
                 </button>
               </div>
-              {selectedColor === CUSTOM && (
-                <div className="mt-3 flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-4 py-3">
-                  <svg className="mt-0.5 shrink-0 text-amber-500" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNotice')}</p>
-                </div>
-              )}
             </div>
           )}
 
@@ -181,21 +276,34 @@ export function ProductActions({
         </div>
       )}
 
+      {/* MOQ notice — shown once if any custom color is selected */}
+      {(selectedColor === CUSTOM || partnerColor === CUSTOM) && (
+        <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-4 py-3">
+          <svg className="mt-0.5 shrink-0 text-amber-500" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNotice')}</p>
+        </div>
+      )}
+
       {/* CTA buttons */}
       <div className="flex flex-col sm:flex-row gap-3 pt-1">
         <Link
           href={(() => {
             const p = new URLSearchParams()
-            if (fitsContainers?.length && selectedPartner) {
+            const hasPartner = selectedPartner && selectedPartner !== NONE_PARTNER
+            if (fitsContainers?.length && hasPartner) {
               // On a lid page: send inquiry as if the container is the product + this lid is the accessory
-              p.set('product', selectedPartner)
+              p.set('product', selectedPartner!)
               p.set('lid', productSlug)
             } else {
               p.set('product', productSlug)
-              if (selectedPartner) p.set('lid', selectedPartner)
+              if (hasPartner) p.set('lid', selectedPartner!)
             }
             if (selectedColor) p.set('color', selectedColor)
             if (selectedSize) p.set('size', selectedSize)
+            if (partnerColor) p.set('partnerColor', partnerColor)
+            if (partnerSize) p.set('partnerSize', partnerSize)
             return `/quote?${p.toString()}`
           })()}
           className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyDark transition-colors"
@@ -224,60 +332,73 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
   onSelect: (slug: string) => void
   onQuickView?: (slug: string, rect: DOMRect) => void
 }) {
+  const noneSelected = selectedSlug === NONE_PARTNER
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
       {products.map((p) => {
-        const name = localizedName(p, locale)
-        const isSelected = selectedSlug === p.slug
-        return (
-          <div
-            key={p.slug}
-            className={cn(
-              'group flex items-center gap-2 rounded-lg border transition-colors',
-              isSelected
-                ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
-                : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-brand-navy dark:hover:border-blue-400'
-            )}
-          >
-            <button
-              type="button"
-              onClick={() => onSelect(p.slug)}
-              className="flex items-center gap-3 flex-1 min-w-0 p-2.5 text-start"
-            >
-              <div data-thumb className="relative w-12 h-12 rounded-md overflow-hidden bg-white flex-shrink-0">
-                <Image src={p.image} alt={name} fill sizes="48px" className="object-contain p-1" />
-              </div>
-              <span className={cn(
-                'text-xs font-medium leading-snug',
+          const name = localizedName(p, locale)
+          const isSelected = selectedSlug === p.slug
+          return (
+            <div
+              key={p.slug}
+              className={cn(
+                'group flex items-center gap-2 rounded-lg border transition-colors',
                 isSelected
-                  ? 'text-brand-navy dark:text-sky-200'
-                  : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-white'
-              )}>
-                {name}
-              </span>
-            </button>
-            {onQuickView && (
+                  ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
+                  : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-brand-navy dark:hover:border-blue-400'
+              )}
+            >
               <button
                 type="button"
-                onClick={(e) => {
-                  const thumb = e.currentTarget.closest('div')?.querySelector('[data-thumb]')
-                  const rect = (thumb ?? e.currentTarget).getBoundingClientRect()
-                  onQuickView(p.slug, rect)
-                }}
-                aria-label={locale === 'ar' ? `معاينة ${name}` : `Quick view ${name}`}
-                className={cn(
-                  'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
-                  isSelected
-                    ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
-                    : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
-                )}
+                onClick={() => onSelect(p.slug)}
+                className="flex items-center gap-3 flex-1 min-w-0 p-2.5 text-start"
               >
-                <EyeIcon />
+                <div data-thumb className="relative w-12 h-12 rounded-md overflow-hidden bg-white flex-shrink-0">
+                  <Image src={p.image} alt={name} fill sizes="48px" className="object-contain p-1" />
+                </div>
+                <span className={cn(
+                  'text-xs font-medium leading-snug',
+                  isSelected
+                    ? 'text-brand-navy dark:text-sky-200'
+                    : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-white'
+                )}>
+                  {name}
+                </span>
               </button>
-            )}
-          </div>
-        )
-      })}
+              {onQuickView && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    const thumb = e.currentTarget.closest('div')?.querySelector('[data-thumb]')
+                    const rect = (thumb ?? e.currentTarget).getBoundingClientRect()
+                    onQuickView(p.slug, rect)
+                  }}
+                  aria-label={locale === 'ar' ? `معاينة ${name}` : `Quick view ${name}`}
+                  className={cn(
+                    'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
+                    isSelected
+                      ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
+                      : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                >
+                  <EyeIcon />
+                </button>
+              )}
+            </div>
+          )
+        })}
+      <button
+        type="button"
+        onClick={() => onSelect(NONE_PARTNER)}
+        className={cn(
+          'flex items-center justify-center px-4 py-2.5 rounded-lg border text-sm font-medium transition-all',
+          noneSelected
+            ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+            : 'bg-gray-50 border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-transparent dark:border-gray-500 dark:text-gray-400 dark:hover:border-gray-300 dark:hover:text-gray-200'
+        )}
+      >
+        {locale === 'ar' ? 'بدون' : 'None'}
+      </button>
     </div>
   )
 }

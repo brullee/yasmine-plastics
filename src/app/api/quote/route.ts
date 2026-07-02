@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     if (!success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   } catch {}
 
-  const { firstName, lastName, company, email, phone, product, productName, color, size, lid, lidName, delivery, details, honeypot, _token } = await req.json()
+  const { firstName, lastName, company, email, phone, product, productName, color, size, lid, lidName, lidColor, lidSize, delivery, details, honeypot, _token } = await req.json()
 
   if (honeypot) return NextResponse.json({ ok: true })
 
@@ -42,6 +42,8 @@ export async function POST(req: Request) {
     color       ? `Color: ${color}` : null,
     size && size !== '-' ? `Size: ${size}` : null,
     lidName     ? `Lid: ${lidName} (${lid})` : null,
+    lidColor    ? `Paired Color: ${lidColor}` : null,
+    lidSize && lidSize !== '-' ? `Paired Size: ${lidSize}` : null,
     delivery    ? `\nDelivery: ${delivery}` : null,
     details     ? `\nDetails:\n${details}` : null,
   ].filter(Boolean).join('\n')
@@ -51,7 +53,7 @@ export async function POST(req: Request) {
       to: MAIL_TO,
       replyTo: email,
       subject: `Quote Request from ${name}`,
-      html: quoteEmailHtml({ firstName, lastName, company, email, phone, productName, productSlug: product, color, size, lidName, lidSlug: lid, delivery, details }),
+      html: quoteEmailHtml({ firstName, lastName, company, email, phone, productName, productSlug: product, color, size, lidName, lidSlug: lid, lidColor, lidSize, delivery, details }),
       text: textLines,
     })
   } catch (err) {

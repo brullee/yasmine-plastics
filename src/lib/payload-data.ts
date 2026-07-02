@@ -30,7 +30,10 @@ function mediaUrl(media: unknown): string {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function transformProduct(doc: any): Product {
-  const category = typeof doc.category === 'object' ? (doc.category?.slug ?? '') : (doc.category ?? '')
+  const categoryObj = typeof doc.category === 'object' ? doc.category : null
+  const category = categoryObj?.slug ?? (doc.category ?? '')
+  const categoryNameEn = categoryObj?.nameEn ?? category
+  const categoryNameAr = categoryObj?.nameAr ?? category
 
   const compatibleLids: string[] = []
   const pairingImages: Record<string, string[]> = {}
@@ -71,6 +74,8 @@ function transformProduct(doc: any): Product {
     nameAr: doc.nameAr ?? '',
     internalName: doc.internalName,
     category,
+    categoryNameEn,
+    categoryNameAr,
     options: {
       colors: (() => {
         const arr = (doc.colors ?? [])

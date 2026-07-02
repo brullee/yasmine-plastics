@@ -6,6 +6,8 @@ export type Product = {
   nameAr: string
   internalName?: string     // factory/internal name - admin-only, not shown on consumer UI
   category: string
+  categoryNameEn: string
+  categoryNameAr: string
   options: {
     colors?: { en: string; ar: string }[]
     sizes?: string[]
