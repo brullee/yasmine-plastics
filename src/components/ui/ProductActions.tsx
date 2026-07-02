@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn, buildWhatsAppUrl, localizedName } from '@/lib/utils'
+import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
 import type { Product, Locale } from '@/types'
 
 const CUSTOM = '__custom__'
@@ -96,75 +97,32 @@ export function ProductActions({
   const partnerOptions = selectedPartnerProduct && (partnerColors.length > 0 || partnerSizes.length > 1) ? (
     <div className="mt-3 space-y-4">
       {partnerColors.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-2.5">
-            <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-              {locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
-            </p>
-            {partnerColor && (
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {partnerColor === CUSTOM
-                  ? tOpts('custom')
-                  : locale === 'ar'
-                    ? (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor)
-                    : partnerColor}
-              </span>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {partnerColors.map((color) => (
-              <button
-                key={color.en}
-                onClick={() => setPartnerColor(color.en)}
-                className={cn(
-                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                  partnerColor === color.en
-                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                    : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                )}
-              >
-                {locale === 'ar' ? color.ar : color.en}
-              </button>
-            ))}
-            <button
-              onClick={() => setPartnerColor(CUSTOM)}
-              className={cn(
-                'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                partnerColor === CUSTOM
-                  ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                  : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
-              )}
-            >
-              {tOpts('custom')}
-            </button>
-          </div>
-        </div>
+        <ChipRow
+          label={locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
+          value={partnerColor ? (partnerColor === CUSTOM ? tOpts('custom') : locale === 'ar' ? (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor) : partnerColor) : undefined}
+        >
+          {partnerColors.map((color) => (
+            <ChipButton key={color.en} active={partnerColor === color.en} onClick={() => setPartnerColor(color.en)}>
+              {locale === 'ar' ? color.ar : color.en}
+            </ChipButton>
+          ))}
+          <ChipButton custom active={partnerColor === CUSTOM} onClick={() => setPartnerColor(CUSTOM)}>
+            {tOpts('custom')}
+          </ChipButton>
+        </ChipRow>
       )}
       {partnerSizes.length > 1 && (
-        <div>
-          <div className="flex items-center gap-2 mb-2.5">
-            <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-              {locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
-            </p>
-            {partnerSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{partnerSize}{partnerSizeUnit ?? ''}</span>}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {partnerSizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => setPartnerSize(size)}
-                className={cn(
-                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                  partnerSize === size
-                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                    : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                )}
-              >
-                <span dir="ltr">{size}{partnerSizeUnit ?? ''}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <ChipRow
+          label={locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
+          value={partnerSize ? `${partnerSize}${partnerSizeUnit ?? ''}` : undefined}
+          valueDir="ltr"
+        >
+          {partnerSizes.map((size) => (
+            <ChipButton key={size} active={partnerSize === size} onClick={() => setPartnerSize(size)}>
+              <span dir="ltr">{size}{partnerSizeUnit ?? ''}</span>
+            </ChipButton>
+          ))}
+        </ChipRow>
       )}
     </div>
   ) : null
@@ -205,72 +163,35 @@ export function ProductActions({
           {/* Colors */}
           {colorOptions.length > 0 && (
             <div className={cn(!!(lids?.length || fitsContainers?.length) && 'border-t border-gray-200 dark:border-gray-700 pt-5')}>
-              <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('color')}</p>
-                {selectedColor && (
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {selectedColor === CUSTOM
-                      ? tOpts('custom')
-                      : locale === 'ar'
-                        ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)
-                        : selectedColor}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
+              <ChipRow
+                label={tOpts('color')}
+                value={selectedColor ? (selectedColor === CUSTOM ? tOpts('custom') : locale === 'ar' ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor) : selectedColor) : undefined}
+              >
                 {colorOptions.map((color) => (
-                  <button
-                    key={color.en}
-                    onClick={() => setSelectedColor(color.en)}
-                    className={cn(
-                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      selectedColor === color.en
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
+                  <ChipButton key={color.en} active={selectedColor === color.en} onClick={() => setSelectedColor(color.en)}>
                     {locale === 'ar' ? color.ar : color.en}
-                  </button>
+                  </ChipButton>
                 ))}
-                <button
-                  onClick={() => setSelectedColor(CUSTOM)}
-                  className={cn(
-                    'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                    selectedColor === CUSTOM
-                      ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                      : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
-                  )}
-                >
+                <ChipButton custom active={selectedColor === CUSTOM} onClick={() => setSelectedColor(CUSTOM)}>
                   {tOpts('custom')}
-                </button>
-              </div>
+                </ChipButton>
+              </ChipRow>
             </div>
           )}
 
           {/* Sizes */}
           {sizes && sizes.length > 1 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('size')}</p>
-                {selectedSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{selectedSize}{sizeUnit ?? ''}</span>}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={cn(
-                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      selectedSize === size
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    <span dir="ltr">{size}{sizeUnit ?? ''}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <ChipRow
+              label={tOpts('size')}
+              value={selectedSize ? `${selectedSize}${sizeUnit ?? ''}` : undefined}
+              valueDir="ltr"
+            >
+              {sizes.map((size) => (
+                <ChipButton key={size} active={selectedSize === size} onClick={() => setSelectedSize(size)}>
+                  <span dir="ltr">{size}{sizeUnit ?? ''}</span>
+                </ChipButton>
+              ))}
+            </ChipRow>
           )}
 
         </div>

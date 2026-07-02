@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
+import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
 
 const CUSTOM = '__custom__'
 
@@ -286,73 +287,29 @@ export function QuoteForm({
       {/* Product-specific options */}
       {(colorOptions.length > 0 || sizeOptions.length > 0) && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
-
           {colorOptions.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('color')}</p>
-                {form.color && form.color !== CUSTOM && (
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {locale === 'ar' ? (colorOptions.find(c => c.en === form.color)?.ar ?? form.color) : form.color}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {colorOptions.map((color) => (
-                  <button
-                    key={color.en}
-                    type="button"
-                    onClick={() => setField('color', color.en)}
-                    className={cn(
-                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      form.color === color.en
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {locale === 'ar' ? color.ar : color.en}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => setField('color', CUSTOM)}
-                  className={cn(
-                    'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                    form.color === CUSTOM
-                      ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                      : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
-                  )}
-                >
-                  {tOpts('custom')}
-                </button>
-              </div>
-            </div>
+            <ChipRow
+              label={tOpts('color')}
+              value={form.color ? (form.color === CUSTOM ? tOpts('custom') : locale === 'ar' ? (colorOptions.find(c => c.en === form.color)?.ar ?? form.color) : form.color) : undefined}
+            >
+              {colorOptions.map((color) => (
+                <ChipButton key={color.en} active={form.color === color.en} onClick={() => setField('color', color.en)}>
+                  {locale === 'ar' ? color.ar : color.en}
+                </ChipButton>
+              ))}
+              <ChipButton custom active={form.color === CUSTOM} onClick={() => setField('color', CUSTOM)}>
+                {tOpts('custom')}
+              </ChipButton>
+            </ChipRow>
           )}
-
           {sizeOptions.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('size')}</p>
-                {form.size && <span className="text-sm text-gray-600 dark:text-gray-400">{form.size}</span>}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {sizeOptions.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => setField('size', size)}
-                    className={cn(
-                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      form.size === size
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <ChipRow label={tOpts('size')} value={form.size || undefined}>
+              {sizeOptions.map((size) => (
+                <ChipButton key={size} active={form.size === size} onClick={() => setField('size', size)}>
+                  {size}
+                </ChipButton>
+              ))}
+            </ChipRow>
           )}
         </div>
       )}
@@ -360,124 +317,58 @@ export function QuoteForm({
       {/* Paired product section */}
       {lidOptions.length > 0 && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2.5">
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-                {locale === 'ar' ? 'مرفوق مع' : 'Paired With'}
-              </p>
-              {form.lid && (
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {lidOptions.find(l => l.slug === form.lid)?.name}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {lidOptions.map((l) => (
-                <button
-                  key={l.slug}
-                  type="button"
-                  onClick={() => {
-                    setField('lid', l.slug)
-                    const newLid = products.find(p => p.slug === l.slug)
-                    setPartnerColor(newLid?.options.colors?.[0]?.en ?? '')
-                    setPartnerSize(newLid?.options.sizes?.[0] ?? '')
-                  }}
-                  className={cn(
-                    'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                    form.lid === l.slug
-                      ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                      : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                  )}
-                >
-                  {l.name}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => { setField('lid', ''); setPartnerColor(''); setPartnerSize('') }}
-                className={cn(
-                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                  !form.lid
-                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                    : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
-                )}
+          <ChipRow
+            label={locale === 'ar' ? 'مرفوق مع' : 'Paired With'}
+            value={form.lid ? lidOptions.find(l => l.slug === form.lid)?.name : undefined}
+          >
+            {lidOptions.map((l) => (
+              <ChipButton
+                key={l.slug}
+                active={form.lid === l.slug}
+                onClick={() => {
+                  setField('lid', l.slug)
+                  const newLid = products.find(p => p.slug === l.slug)
+                  setPartnerColor(newLid?.options.colors?.[0]?.en ?? '')
+                  setPartnerSize(newLid?.options.sizes?.[0] ?? '')
+                }}
               >
-                {locale === 'ar' ? 'بدون' : 'None'}
-              </button>
-            </div>
-          </div>
+                {l.name}
+              </ChipButton>
+            ))}
+            <ChipButton custom active={!form.lid} onClick={() => { setField('lid', ''); setPartnerColor(''); setPartnerSize('') }}>
+              {locale === 'ar' ? 'بدون' : 'None'}
+            </ChipButton>
+          </ChipRow>
 
           {form.lid && (lidColorOptions.length > 0 || lidSizeOptions.length > 1) && (
             <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-4">
               {lidColorOptions.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-                      {locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
-                    </p>
-                    {partnerColor && partnerColor !== CUSTOM && (
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {locale === 'ar' ? (lidColorOptions.find(c => c.en === partnerColor)?.ar ?? partnerColor) : partnerColor}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {lidColorOptions.map((color) => (
-                      <button
-                        key={color.en}
-                        type="button"
-                        onClick={() => setPartnerColor(color.en)}
-                        className={cn(
-                          'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                          partnerColor === color.en
-                            ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                            : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                        )}
-                      >
-                        {locale === 'ar' ? color.ar : color.en}
-                      </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => setPartnerColor(CUSTOM)}
-                      className={cn(
-                        'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                        partnerColor === CUSTOM
-                          ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                          : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
-                      )}
-                    >
-                      {tOpts('custom')}
-                    </button>
-                  </div>
-                </div>
+                <ChipRow
+                  label={locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
+                  value={partnerColor ? (partnerColor === CUSTOM ? tOpts('custom') : locale === 'ar' ? (lidColorOptions.find(c => c.en === partnerColor)?.ar ?? partnerColor) : partnerColor) : undefined}
+                >
+                  {lidColorOptions.map((color) => (
+                    <ChipButton key={color.en} active={partnerColor === color.en} onClick={() => setPartnerColor(color.en)}>
+                      {locale === 'ar' ? color.ar : color.en}
+                    </ChipButton>
+                  ))}
+                  <ChipButton custom active={partnerColor === CUSTOM} onClick={() => setPartnerColor(CUSTOM)}>
+                    {tOpts('custom')}
+                  </ChipButton>
+                </ChipRow>
               )}
               {lidSizeOptions.length > 1 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-                      {locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
-                    </p>
-                    {partnerSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{partnerSize}{lidSizeUnit}</span>}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {lidSizeOptions.map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => setPartnerSize(size)}
-                        className={cn(
-                          'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                          partnerSize === size
-                            ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                            : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                        )}
-                      >
-                        <span dir="ltr">{size}{lidSizeUnit}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <ChipRow
+                  label={locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
+                  value={partnerSize ? `${partnerSize}${lidSizeUnit}` : undefined}
+                  valueDir="ltr"
+                >
+                  {lidSizeOptions.map((size) => (
+                    <ChipButton key={size} active={partnerSize === size} onClick={() => setPartnerSize(size)}>
+                      <span dir="ltr">{size}{lidSizeUnit}</span>
+                    </ChipButton>
+                  ))}
+                </ChipRow>
               )}
             </div>
           )}
