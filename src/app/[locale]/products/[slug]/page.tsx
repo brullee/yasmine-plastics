@@ -51,7 +51,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: localeUrl(locale, `/products/${slug}`),
       type: 'website',
-      images: product.image ? [{ url: product.image, width: 1400, height: 1400, alt: name }] : undefined,
     },
   }
 }
