@@ -6,7 +6,10 @@
     "dev": "rm -rf .next && next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "bash scripts/deploy.sh"
+    "deploy": "next build && git push --follow-tags",
+    "deploy:patch": "next build && npm version patch && git push --follow-tags",
+    "deploy:minor": "next build && npm version minor && git push --follow-tags",
+    "deploy:major": "next build && npm version major && git push --follow-tags"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.5.2",
