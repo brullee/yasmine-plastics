@@ -54,7 +54,7 @@ export function BottomFade() {
   return (
     <div
       ref={divRef}
-      className="pointer-events-none fixed bottom-0 left-0 right-0 h-40 z-30"
+      className="pointer-events-none fixed bottom-0 left-0 right-0 h-24 sm:h-40 z-30 opacity-40 sm:opacity-100"
       style={{
         opacity: 1,
         background: resolvedTheme === 'dark'

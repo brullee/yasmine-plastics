@@ -26,10 +26,9 @@ export default async function proxy(req: NextRequest) {
     const path = req.nextUrl.pathname.replace(/^\/(ar|en)(\/|$)/, '/') || '/'
     const productMatch = path.match(/^\/products\/([^/]+)\/?$/)
     if (productMatch) {
-      const url = req.nextUrl.clone()
-      url.pathname = '/api/admin-redirect'
-      url.search   = `?collection=products&slug=${productMatch[1]}`
-      return NextResponse.redirect(url)
+      return NextResponse.redirect(
+        new URL(`/api/admin-redirect?collection=products&slug=${productMatch[1]}`, 'https://www.yasmineplastics.com')
+      )
     }
     return NextResponse.redirect(new URL('/admin', 'https://www.yasmineplastics.com'))
   }

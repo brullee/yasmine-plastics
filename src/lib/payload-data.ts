@@ -30,7 +30,10 @@ function mediaUrl(media: unknown): string {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function transformProduct(doc: any): Product {
-  const category = typeof doc.category === 'object' ? (doc.category?.slug ?? '') : (doc.category ?? '')
+  const categoryObj = typeof doc.category === 'object' ? doc.category : null
+  const category = categoryObj?.slug ?? (doc.category ?? '')
+  const categoryNameEn = categoryObj?.nameEn ?? category
+  const categoryNameAr = categoryObj?.nameAr ?? category
 
   const compatibleLids: string[] = []
   const pairingImages: Record<string, string[]> = {}
@@ -71,18 +74,42 @@ function transformProduct(doc: any): Product {
     nameAr: doc.nameAr ?? '',
     internalName: doc.internalName,
     category,
+    categoryNameEn,
+    categoryNameAr,
     options: {
-      colors: (doc.colors ?? [])
-        .filter((c: unknown) => c && typeof c === 'object')
-        .map((c: unknown) => {
-          const color = c as Record<string, string>
-          return { en: color.nameEn ?? '', ar: color.nameAr || (color.nameEn ?? '') }
-        })
-        .filter((c: { en: string; ar: string }) => c.en),
-      sizes: (doc.sizes ?? [])
-        .filter((s: unknown) => s && typeof s === 'object')
-        .map((s: unknown) => (s as { label: string }).label)
-        .filter(Boolean),
+      colors: (() => {
+        const arr = (doc.colors ?? [])
+          .filter((c: unknown) => c && typeof c === 'object')
+          .map((c: unknown) => {
+            const color = c as Record<string, string>
+            return { en: color.nameEn ?? '', ar: color.nameAr || (color.nameEn ?? '') }
+          })
+          .filter((c: { en: string; ar: string }) => c.en) as { en: string; ar: string }[]
+        const mainColorEn =
+          typeof doc.mainImageLinkedColors === 'object' && doc.mainImageLinkedColors !== null
+            ? (doc.mainImageLinkedColors as Record<string, string>).nameEn
+            : null
+        if (mainColorEn) {
+          const idx = arr.findIndex((c: { en: string; ar: string }) => c.en === mainColorEn)
+          if (idx > 0) arr.unshift(arr.splice(idx, 1)[0])
+        }
+        return arr
+      })(),
+      sizes: (() => {
+        const arr = (doc.sizes ?? [])
+          .filter((s: unknown) => s && typeof s === 'object')
+          .map((s: unknown) => (s as { label: string }).label)
+          .filter(Boolean) as string[]
+        const mainSizeLabel =
+          typeof doc.mainImageLinkedSizes === 'object' && doc.mainImageLinkedSizes !== null
+            ? (doc.mainImageLinkedSizes as Record<string, string>).label
+            : null
+        if (mainSizeLabel) {
+          const idx = arr.findIndex((s: string) => s === mainSizeLabel)
+          if (idx > 0) arr.unshift(arr.splice(idx, 1)[0])
+        }
+        return arr
+      })(),
       sizeUnit: typeof doc.sizeUnit === 'object' && doc.sizeUnit !== null
         ? ((doc.sizeUnit as Record<string, unknown>).label as string | undefined)
         : (doc.sizeUnit ?? undefined),

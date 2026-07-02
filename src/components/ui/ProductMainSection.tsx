@@ -255,6 +255,7 @@ export function ProductMainSection({
   // ── Touch: swipe, pinch-to-zoom, double-tap ─────────────────────────────
   function onTouchStart(e: React.TouchEvent) {
     isTouchActiveRef.current = true
+    if (lightboxImgRef.current) lightboxImgRef.current.style.transition = 'none'
     if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX
       const dy = e.touches[0].clientY - e.touches[1].clientY
@@ -296,7 +297,7 @@ export function ProductMainSection({
 
   function onTouchEnd(e: React.TouchEvent) {
     if (e.touches.length < 2) pinchStartDistRef.current = null
-    if (e.touches.length === 0) { panPrevRef.current = null; isTouchActiveRef.current = false; lastTouchEndRef.current = Date.now() }
+    if (e.touches.length === 0) { panPrevRef.current = null; isTouchActiveRef.current = false; lastTouchEndRef.current = Date.now(); if (lightboxImgRef.current) lightboxImgRef.current.style.transition = 'transform 0.1s ease' }
     if (e.changedTouches.length !== 1 || e.touches.length !== 0) return
 
     const touch = e.changedTouches[0]
@@ -349,7 +350,7 @@ export function ProductMainSection({
   // ── Partner change ───────────────────────────────────────────────────────
   function handlePartnerChange(slug: string | null) {
     setSelectedPartner(slug)
-    if (!slug) return
+    if (!slug || slug === '__none__') return
     const ownPairingUrl = product.pairingImages?.[slug]?.[0]
     if (ownPairingUrl) {
       const idx = images.indexOf(ownPairingUrl)
@@ -580,7 +581,7 @@ export function ProductMainSection({
             style={{
               transform: `scale(${zoom})`,
               transformOrigin: `${lightboxMouseOrigin.x}% ${lightboxMouseOrigin.y}%`,
-              transition: isTouchActiveRef.current ? 'none' : 'transform 0.1s ease',
+              transition: 'transform 0.1s ease',
               cursor: zoom > 1 ? 'grab' : 'default',
               userSelect: 'none',
               touchAction: 'none',

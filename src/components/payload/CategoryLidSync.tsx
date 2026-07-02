@@ -16,6 +16,7 @@ export function CategoryLidSync() {
       .then((r) => r.json())
       .then((cat) => setValue(!!cat.supportsCompatibleLids))
       .catch(() => setValue(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId])
 
   return null

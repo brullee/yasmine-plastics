@@ -35,11 +35,13 @@ export function QuoteForm({
   categories,
 }: Props) {
   const searchParams = useSearchParams()
-  const initialProduct  = searchParams.get('product')  ?? ''
-  const initialColor    = searchParams.get('color')    ?? ''
-  const initialSize     = searchParams.get('size')     ?? ''
-  const initialLid      = searchParams.get('lid')      ?? ''
-  const initialCategory = searchParams.get('category') ?? ''
+  const initialProduct     = searchParams.get('product')      ?? ''
+  const initialColor       = searchParams.get('color')        ?? ''
+  const initialSize        = searchParams.get('size')         ?? ''
+  const initialLid         = searchParams.get('lid')          ?? ''
+  const initialCategory    = searchParams.get('category')     ?? ''
+  const initialPartnerColor = searchParams.get('partnerColor') ?? ''
+  const initialPartnerSize  = searchParams.get('partnerSize')  ?? ''
 
   const t = useTranslations('quote.form')
   const tOpts = useTranslations('product.options')
@@ -86,6 +88,8 @@ export function QuoteForm({
     <form onSubmit={(e) => handleSubmit(e, turnstileToken ?? '', {
         productName: currentProduct ? localizedName(currentProduct, locale) : '',
         lidName: lidOptions.find((l) => l.slug === form.lid)?.name ?? '',
+        ...(initialPartnerColor ? { lidColor: initialPartnerColor } : {}),
+        ...(initialPartnerSize  ? { lidSize:  initialPartnerSize  } : {}),
       })} noValidate className="space-y-5">
       {/* Honeypot */}
       <input
