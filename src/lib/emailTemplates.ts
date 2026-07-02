@@ -114,9 +114,8 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
 </html>`
 }
 
-export function quoteEmailHtml({ firstName, lastName, company, email, phone, productName, productSlug, color, size, lidName, lidSlug, lidColor, lidSize, delivery, details }: {
-  firstName: string
-  lastName: string
+export function quoteEmailHtml({ fullName, company, email, phone, productName, productSlug, color, size, lidName, lidSlug, lidColor, lidSize, delivery, details }: {
+  fullName: string
   company?: string
   email: string
   phone: string
@@ -153,7 +152,7 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
         <tr><td style="background:#ffffff;padding:4px 0 8px;">
           <p style="margin:8px 16px 4px;font-size:12px;color:${NAVY};text-transform:uppercase;letter-spacing:1px;font-weight:600;">Contact</p>
           <table width="100%" cellpadding="0" cellspacing="0">
-            ${row('Name', `${firstName} ${lastName}`)}
+            ${row('Name', fullName)}
             ${company ? row('Company', company) : ''}
             ${divider()}
             ${row('Email', email, `mailto:${email}`)}
@@ -190,7 +189,7 @@ export function quoteEmailHtml({ firstName, lastName, company, email, phone, pro
 
         <!-- Footer -->
         <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
-          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${firstName}.</p>
+          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${fullName}.</p>
         </td></tr>
 
       </table>

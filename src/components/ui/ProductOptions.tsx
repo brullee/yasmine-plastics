@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
+import { MOQWarning } from '@/components/ui/MOQWarning'
 
 interface Props {
   colors?: string[]
@@ -68,15 +69,8 @@ export function ProductOptions({ colors, sizes, lids }: Props) {
             </button>
           </div>
           {selectedColor === CUSTOM && (
-            <div className="mt-3 flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-4 py-3">
-              <svg className="mt-0.5 shrink-0 text-amber-500" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-                {t('moqNotice')}
-              </p>
+            <div className="mt-3">
+              <MOQWarning>{t('moqNotice')}</MOQWarning>
             </div>
           )}
         </div>

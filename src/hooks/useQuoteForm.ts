@@ -23,8 +23,7 @@ function buildInitialForm(
   initialLid: string,
 ): QuoteFormFields {
   return {
-    firstName: '',
-    lastName: '',
+    fullName: '',
     company: '',
     email: '',
     phone: '',
@@ -53,8 +52,7 @@ export function useQuoteForm(
   const [touched, setTouched] = useState<Touched>({})
 
   const errors: QuoteFormErrors = {}
-  if (touched.firstName && !form.firstName.trim()) errors.firstName = 'required'
-  if (touched.lastName && !form.lastName.trim()) errors.lastName = 'required'
+  if (touched.fullName && !form.fullName.trim()) errors.fullName = 'required'
   if (touched.email) {
     if (!form.email.trim()) errors.email = 'required'
     else if (!validateEmail(form.email)) errors.email = 'invalidEmail'
@@ -65,8 +63,7 @@ export function useQuoteForm(
   }
 
   const isFormValid =
-    !!form.firstName.trim() &&
-    !!form.lastName.trim() &&
+    !!form.fullName.trim() &&
     validateEmail(form.email) &&
     validatePhone(form.phone)
 
@@ -94,7 +91,7 @@ export function useQuoteForm(
   async function handleSubmit(e: FormEvent, token: string, extras?: Record<string, string>) {
     e.preventDefault()
     if (form.honeypot) return
-    setTouched({ firstName: true, lastName: true, email: true, phone: true })
+    setTouched({ fullName: true, email: true, phone: true })
     if (!isFormValid) return
     setSubmitting(true)
     setSubmitError(false)

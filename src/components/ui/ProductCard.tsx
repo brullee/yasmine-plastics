@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn, localizedName, deriveCapacity } from '@/lib/utils'
+import { EyeIcon } from '@/components/ui/Icons'
+import { SpecBadge } from '@/components/ui/SpecBadge'
 import type { Product, Locale } from '@/types'
 
 const EASE = 'cubic-bezier(.2,.75,.5,1)'
@@ -57,12 +59,23 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
       onMouseMove={onMove}
     >
       {/* ── Nectar background-color-expand ───────────────────────────────── */}
+      {/* Base layer: static idle shadow, only transform animates */}
       <div
         className="absolute inset-0 rounded-xl bg-white dark:bg-slate-800 pointer-events-none"
         style={{
           transform:  `scale(${bgScale.x}, ${bgScale.y})`,
-          boxShadow:  hovered ? 'var(--card-shadow-hover)' : 'var(--card-shadow-idle)',
-          transition: `transform ${DUR} ${EASE}, box-shadow ${DUR} ${EASE}`,
+          boxShadow:  'var(--card-shadow-idle)',
+          transition: `transform ${DUR} ${EASE}`,
+        }}
+      />
+      {/* Hover shadow layer: opacity-only transition avoids per-frame repaint */}
+      <div
+        className="absolute inset-0 rounded-xl pointer-events-none"
+        style={{
+          transform:  `scale(${bgScale.x}, ${bgScale.y})`,
+          boxShadow:  'var(--card-shadow-hover)',
+          opacity:    hovered ? 1 : 0,
+          transition: `transform ${DUR} ${EASE}, opacity ${DUR} ${EASE}`,
         }}
       />
 
@@ -108,7 +121,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
               }}
             >
               <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-[#0d1b2a] border border-gray-200 dark:border-transparent text-brand-navy dark:text-white text-xs font-semibold rounded-full shadow transition-colors">
-                <EyeIcon />
+                <EyeIcon size={12} strokeWidth={2.5} />
                 {t('quickView')}
               </span>
             </button>
@@ -130,14 +143,10 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
           {/* Specs row */}
           <div className="flex items-center flex-wrap gap-1.5 mt-1.5 overflow-hidden max-h-[22px]">
             {product.material && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                {product.material}
-              </span>
+              <SpecBadge compact>{product.material}</SpecBadge>
             )}
             {derivedCapacity && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 uppercase tracking-wide" dir="ltr">
-                {derivedCapacity}
-              </span>
+              <SpecBadge compact dir="ltr">{derivedCapacity}</SpecBadge>
             )}
             {colorCount > 1 && (
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
@@ -156,10 +165,3 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
   )
 }
 
-function EyeIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-    </svg>
-  )
-}

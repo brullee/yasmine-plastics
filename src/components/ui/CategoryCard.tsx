@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import type { Category, Locale } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
+import { formatArabicCount } from '@/lib/i18n'
 
 interface Props {
   category: Category
@@ -42,7 +43,7 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
           {productCount !== undefined && (
             <span className="text-white/90 text-base font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity duration-[450ms] [transition-timing-function:cubic-bezier(.15,.75,.5,1)]">
               {locale === 'ar'
-                ? productCount === 1 ? 'منتج واحد' : productCount === 2 ? 'منتجان' : productCount <= 10 ? `${productCount} منتجات` : productCount < 100 ? `${productCount} منتجاً` : `${productCount} منتج`
+                ? formatArabicCount(productCount, { one: 'منتج واحد', two: 'منتجان', few: 'منتجات', many: 'منتجاً', other: 'منتج' })
                 : productCount === 1 ? '1 product' : `${productCount} products`}
             </span>
           )}

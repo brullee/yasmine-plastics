@@ -2,9 +2,11 @@
 
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
 import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ProductsGrid } from '@/components/ui/ProductsGrid'
+import { HeroSection } from '@/components/ui/HeroSection'
+import { Breadcrumb } from '@/components/ui/Breadcrumb'
+import { CantFindBanner } from '@/components/ui/CantFindBanner'
 import { localizedName } from '@/lib/utils'
 import type { Product, Category, Locale } from '@/types'
 
@@ -12,24 +14,6 @@ interface Props {
   products: Product[]
   categories: Category[]
   locale: Locale
-}
-
-function CantFindBanner() {
-  const t = useTranslations('products')
-  return (
-    <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-600 bg-blue-50 dark:bg-slate-800 px-6 py-5 flex items-end justify-between gap-6">
-      <div>
-        <p className="font-semibold text-brand-navy dark:text-white text-sm mb-1">{t('cantFind.title')}</p>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
-      </div>
-      <Link
-        href="/contact"
-        className="shrink-0 px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
-      >
-        {t('cantFind.cta')}
-      </Link>
-    </div>
-  )
 }
 
 export function ProductsPageClient({ products, categories, locale }: Props) {
@@ -45,15 +29,10 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
   if (!activeCategory) {
     return (
       <>
-        <div className="bg-brand-navy dark:bg-brand-navyDeep border-b border-brand-navyDark dark:border-gray-700 py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{t('title')}</h1>
-            <p className="text-white/60">{t('browseByCategory')}</p>
-          </div>
-        </div>
+        <HeroSection title={t('title')} subtitle={t('browseByCategory')} />
 
-        <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh] flex flex-col">
+          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex flex-col flex-1 gap-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {categories.map((cat) => (
                 <CategoryCard
@@ -64,7 +43,7 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
                 />
               ))}
             </div>
-            <div className="mt-10">
+            <div className="mt-auto">
               <CantFindBanner />
             </div>
           </div>
@@ -75,21 +54,11 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
 
   return (
     <>
-      <div className="bg-brand-navy dark:bg-brand-navyDeep border-b border-brand-navyDark dark:border-gray-700 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">{categoryName}</h1>
-        </div>
-      </div>
+      <HeroSection title={categoryName ?? ''} />
 
       <div className="bg-gray-50 dark:bg-brand-navyDeep border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
-          <nav className="flex items-center gap-1.5" aria-label="Breadcrumb">
-            <Link href="/products" className="hover:text-brand-navy dark:hover:text-white transition-colors">
-              {tNav('products')}
-            </Link>
-            <span aria-hidden="true">›</span>
-            <span className="text-gray-900 dark:text-gray-300">{categoryName}</span>
-          </nav>
+          <Breadcrumb items={[{ label: tNav('products'), href: '/products' }, { label: categoryName ?? '' }]} />
           <span>
             {locale === 'ar'
               ? `عرض ${filtered.length} من كل النتائج`
@@ -98,14 +67,16 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
         </div>
       </div>
 
-      <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh] flex flex-col">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-1 gap-6">
           {filtered.length > 0
             ? <ProductsGrid products={filtered} allProducts={products} locale={locale} />
             : <div className="text-center py-20 text-gray-400 dark:text-gray-500">{t('notFound')}</div>
           }
 
-          <CantFindBanner />
+          <div className="mt-auto pt-6">
+            <CantFindBanner />
+          </div>
         </div>
       </div>
     </>

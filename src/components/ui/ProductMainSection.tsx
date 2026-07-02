@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { createPortal } from 'react-dom'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ProductActions } from '@/components/ui/ProductActions'
 import { QuickViewModal } from '@/components/ui/QuickViewModal'
+import { ProductImageLightbox } from '@/components/ui/ProductImageLightbox'
 import { cn, deriveCapacity } from '@/lib/utils'
+import { ChevronIcon, ExpandIcon } from '@/components/ui/Icons'
 import type { Product, Locale } from '@/types'
 
 function formatDimensions(product: Product): string | undefined {
@@ -61,31 +62,19 @@ export function ProductMainSection({
   const [selectedSize, setSelectedSize] = useState<string | null>(product.options.sizes?.[0] ?? null)
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
-  const [zoom, setZoom] = useState(1)
+  const [lightboxOpenAt, setLightboxOpenAt] = useState(0)
 
   const [hoverZoom, setHoverZoom] = useState(false)
   const [hoverOrigin, setHoverOrigin] = useState({ x: 50, y: 50 })
-  const [lightboxMouseOrigin, setLightboxMouseOrigin] = useState({ x: 50, y: 50 })
   const [thumbCanScrollUp, setThumbCanScrollUp]     = useState(false)
   const [thumbCanScrollDown, setThumbCanScrollDown] = useState(false)
 
-
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const openerRef         = useRef<HTMLButtonElement>(null)
-  const lightboxRef       = useRef<HTMLDivElement>(null)
-  const lightboxImgRef    = useRef<HTMLDivElement>(null)
-  const touchStartX       = useRef<number | null>(null)
-  const panPrevRef        = useRef<{ x: number; y: number } | null>(null)
   const thumbStripRef     = useRef<HTMLDivElement>(null)
   const scrollRafRef      = useRef<number | null>(null)
   const scrollSpeedRef    = useRef(0)
   const hoverTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pinchStartDistRef = useRef<number | null>(null)
-  const pinchStartZoomRef = useRef<number>(1)
-  const lastTapTimeRef    = useRef<number>(0)
-  const isTouchActiveRef  = useRef(false)
-  const lastTouchEndRef   = useRef<number>(0)
 
   // Check thumb overflow on mount and image list change; block wheel scroll on strip
   useEffect(() => {
@@ -145,183 +134,6 @@ export function ProductMainSection({
       }
     }
     scrollRafRef.current = requestAnimationFrame(tick)
-  }
-
-  // ── Lightbox navigation ──────────────────────────────────────────────────
-  const lightboxPrev = useCallback(() =>
-    setLightboxIndex((i) => (i - 1 + images.length) % images.length), [images.length])
-
-  const lightboxNext = useCallback(() =>
-    setLightboxIndex((i) => (i + 1) % images.length), [images.length])
-
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index)
-    setLightboxOpen(true)
-  }
-
-  const closeLightbox = useCallback(() => {
-    setLightboxOpen(false)
-    setZoom(1)
-    openerRef.current?.focus()
-  }, [])
-
-  // Reset zoom on image change
-  useEffect(() => setZoom(1), [lightboxIndex])
-
-  // ── Scroll lock ──────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!lightboxOpen) return
-    const scrollY = window.scrollY
-    document.body.style.position = 'fixed'
-    document.body.style.top      = `-${scrollY}px`
-    document.body.style.width    = '100%'
-    lightboxRef.current?.focus()
-    return () => {
-      document.body.style.position = ''
-      document.body.style.top      = ''
-      document.body.style.width    = ''
-      window.scrollTo(0, scrollY)
-    }
-  }, [lightboxOpen])
-
-  // ── Keyboard: ESC, arrows, Home/End, Tab trap ────────────────────────────
-  useEffect(() => {
-    if (!lightboxOpen) return
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape')     { closeLightbox(); return }
-      if (e.key === 'ArrowLeft')  { lightboxPrev(); return }
-      if (e.key === 'ArrowRight') { lightboxNext(); return }
-      if (e.key === 'Home')       { setLightboxIndex(0); return }
-      if (e.key === 'End')        { setLightboxIndex(images.length - 1); return }
-      if (e.key === 'Tab') {
-        const focusable = lightboxRef.current?.querySelectorAll<HTMLElement>(
-          'button, [href], [tabindex]:not([tabindex="-1"])'
-        )
-        if (!focusable?.length) return
-        const first = focusable[0]
-        const last  = focusable[focusable.length - 1]
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault(); last.focus()
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault(); first.focus()
-        }
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [lightboxOpen, lightboxPrev, lightboxNext, closeLightbox, images.length])
-
-  // ── Scroll-wheel zoom + pinch-zoom preventDefault + global mouse tracking ─
-  useEffect(() => {
-    if (!lightboxOpen) return
-    const el = lightboxRef.current
-    if (!el) return
-    function onWheel(e: WheelEvent) {
-      e.preventDefault()
-      if (isTouchActiveRef.current) return
-      setZoom((z) => Math.min(4, Math.max(1, z - e.deltaY * 0.002)))
-    }
-    function onTouchMove(e: TouchEvent) {
-      if (e.touches.length >= 2) e.preventDefault()
-    }
-    function onMouseMove(e: MouseEvent) {
-      if (isTouchActiveRef.current) return
-      if (Date.now() - lastTouchEndRef.current < 500) return
-      const r = lightboxImgRef.current?.getBoundingClientRect()
-      if (!r) return
-      setLightboxMouseOrigin({
-        x: ((e.clientX - r.left) / r.width) * 100,
-        y: ((e.clientY - r.top) / r.height) * 100,
-      })
-    }
-    el.addEventListener('wheel', onWheel, { passive: false })
-    el.addEventListener('touchmove', onTouchMove, { passive: false })
-    el.addEventListener('mousemove', onMouseMove)
-    return () => {
-      el.removeEventListener('wheel', onWheel)
-      el.removeEventListener('touchmove', onTouchMove)
-      el.removeEventListener('mousemove', onMouseMove)
-    }
-  }, [lightboxOpen])
-
-  // ── Preload adjacent images ──────────────────────────────────────────────
-  useEffect(() => {
-    if (!lightboxOpen || images.length <= 1) return
-    const preload = (src: string) => { const img = new window.Image(); img.src = src }
-    preload(images[(lightboxIndex + 1) % images.length])
-    preload(images[(lightboxIndex - 1 + images.length) % images.length])
-  }, [lightboxIndex, lightboxOpen, images])
-
-  // ── Touch: swipe, pinch-to-zoom, double-tap ─────────────────────────────
-  function onTouchStart(e: React.TouchEvent) {
-    isTouchActiveRef.current = true
-    if (lightboxImgRef.current) lightboxImgRef.current.style.transition = 'none'
-    if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX
-      const dy = e.touches[0].clientY - e.touches[1].clientY
-      pinchStartDistRef.current = Math.sqrt(dx * dx + dy * dy)
-      pinchStartZoomRef.current = zoom
-      panPrevRef.current = null
-      return
-    }
-    touchStartX.current = e.touches[0].clientX
-    if (zoom > 1) panPrevRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
-  }
-
-  function onTouchMove(e: React.TouchEvent) {
-    if (e.touches.length === 2 && pinchStartDistRef.current !== null) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX
-      const dy = e.touches[0].clientY - e.touches[1].clientY
-      const dist = Math.sqrt(dx * dx + dy * dy)
-      setZoom(Math.min(4, Math.max(1, pinchStartZoomRef.current * (dist / pinchStartDistRef.current))))
-      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2
-      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2
-      const r = lightboxImgRef.current?.getBoundingClientRect()
-      if (r) setLightboxMouseOrigin({ x: ((midX - r.left) / r.width) * 100, y: ((midY - r.top) / r.height) * 100 })
-      return
-    }
-    if (e.touches.length === 1 && zoom > 1 && panPrevRef.current) {
-      const dx = e.touches[0].clientX - panPrevRef.current.x
-      const dy = e.touches[0].clientY - panPrevRef.current.y
-      panPrevRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
-      const r = lightboxImgRef.current?.getBoundingClientRect()
-      if (!r) return
-      // r.width is the scaled width (zoom * CSS width); correct pan factor: zoom / (r.width * (zoom - 1))
-      const zoomMinus1 = Math.max(zoom - 1, 0.001)
-      setLightboxMouseOrigin(o => ({
-        x: Math.max(0, Math.min(100, o.x - (dx * zoom * 100) / (r.width * zoomMinus1))),
-        y: Math.max(0, Math.min(100, o.y - (dy * zoom * 100) / (r.height * zoomMinus1))),
-      }))
-    }
-  }
-
-  function onTouchEnd(e: React.TouchEvent) {
-    if (e.touches.length < 2) pinchStartDistRef.current = null
-    if (e.touches.length === 0) { panPrevRef.current = null; isTouchActiveRef.current = false; lastTouchEndRef.current = Date.now(); if (lightboxImgRef.current) lightboxImgRef.current.style.transition = 'transform 0.1s ease' }
-    if (e.changedTouches.length !== 1 || e.touches.length !== 0) return
-
-    const touch = e.changedTouches[0]
-    const now = Date.now()
-
-    if (now - lastTapTimeRef.current < 300) {
-      lastTapTimeRef.current = 0
-      touchStartX.current = null
-      if (zoom > 1) {
-        setZoom(1)
-      } else {
-        const r = lightboxImgRef.current?.getBoundingClientRect()
-        if (r) setLightboxMouseOrigin({ x: ((touch.clientX - r.left) / r.width) * 100, y: ((touch.clientY - r.top) / r.height) * 100 })
-        setZoom(2.5)
-      }
-      return
-    }
-    lastTapTimeRef.current = now
-
-    if (touchStartX.current !== null) {
-      const delta = touch.clientX - touchStartX.current
-      if (zoom === 1 && Math.abs(delta) > 50) delta < 0 ? lightboxNext() : lightboxPrev()
-      touchStartX.current = null
-    }
   }
 
   // ── Color / size → carousel jump ────────────────────────────────────────
@@ -473,7 +285,7 @@ export function ProductMainSection({
           <button
             ref={openerRef}
             type="button"
-            onClick={() => openLightbox(carouselIndex)}
+            onClick={() => { setLightboxOpenAt(carouselIndex); setLightboxOpen(true) }}
             aria-label="View full image"
             className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/90 dark:bg-gray-900/75 border border-gray-200 dark:border-transparent hover:bg-white dark:hover:bg-gray-900 shadow backdrop-blur-sm transition-colors text-gray-600 dark:text-gray-200"
           >
@@ -544,92 +356,14 @@ export function ProductMainSection({
 
       </div>
 
-      {/* ── Lightbox (portal) ── */}
-      {lightboxOpen && createPortal(
-        <div
-          ref={lightboxRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${name}, image ${lightboxIndex + 1} of ${images.length}`}
-          tabIndex={-1}
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center outline-none"
-          onClick={closeLightbox}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
-          {/* Close */}
-          <button
-            onClick={closeLightbox}
-            aria-label="Close"
-            className="absolute top-3 end-3 z-10 p-2 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white hover:bg-black/75 transition-colors"
-          >
-            <XIcon />
-          </button>
-
-          {/* Counter */}
-          {images.length > 1 && (
-            <span className="absolute top-3 start-3 z-10 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white text-sm tabular-nums">
-              <span dir="ltr">{lightboxIndex + 1} / {images.length}</span>
-            </span>
-          )}
-
-          {/* Image */}
-          <div
-            ref={lightboxImgRef}
-            className="relative w-full h-full max-w-5xl max-h-[90vh] mx-2 sm:mx-14"
-            style={{
-              transform: `scale(${zoom})`,
-              transformOrigin: `${lightboxMouseOrigin.x}% ${lightboxMouseOrigin.y}%`,
-              transition: 'transform 0.1s ease',
-              cursor: zoom > 1 ? 'grab' : 'default',
-              userSelect: 'none',
-              touchAction: 'none',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={images[lightboxIndex]}
-              alt={`${name} ${lightboxIndex + 1}`}
-              fill
-              sizes="100vw"
-              className="object-contain"
-              priority
-            />
-          </div>
-
-          {/* Prev / Next — large invisible tap area prevents near-miss dismissals */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={(e) => { e.stopPropagation(); lightboxPrev() }}
-                aria-label="Previous image"
-                className="group absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
-              >
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
-                  <ChevronIcon direction="left" />
-                </span>
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); lightboxNext() }}
-                aria-label="Next image"
-                className="group absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
-              >
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
-                  <ChevronIcon direction="right" />
-                </span>
-              </button>
-            </>
-          )}
-
-          {/* Scroll-to-zoom hint — desktop/mouse only */}
-          <div className="pointer-events-none select-none absolute bottom-5 left-1/2 -translate-x-1/2 hidden [@media(hover:hover)]:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white text-sm">
-            <ScrollWheelIcon />
-            <span>{t('zoomHint')}</span>
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* ── Lightbox ── */}
+      <ProductImageLightbox
+        images={images}
+        name={name}
+        initialIndex={lightboxOpenAt}
+        isOpen={lightboxOpen}
+        onClose={() => { setLightboxOpen(false); openerRef.current?.focus() }}
+      />
 
       {/* ── Partner quick view ── */}
       {qv && (
@@ -645,42 +379,3 @@ export function ProductMainSection({
   )
 }
 
-function ExpandIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="15 3 21 3 21 9" /><polyline points="9 21 3 21 3 15" />
-      <line x1="21" y1="3" x2="14" y2="10" /><line x1="3" y1="21" x2="10" y2="14" />
-    </svg>
-  )
-}
-
-function XIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  )
-}
-
-function ScrollWheelIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="6" y="2" width="12" height="20" rx="6" />
-      <line x1="12" y1="6" x2="12" y2="10" />
-    </svg>
-  )
-}
-
-function ChevronIcon({ direction }: { direction: 'left' | 'right' | 'up' | 'down' }) {
-  const points = {
-    left:  '15 18 9 12 15 6',
-    right: '9 18 15 12 9 6',
-    up:    '18 15 12 9 6 15',
-    down:  '6 9 12 15 18 9',
-  }
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points={points[direction]} />
-    </svg>
-  )
-}

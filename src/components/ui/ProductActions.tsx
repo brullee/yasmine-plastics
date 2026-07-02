@@ -5,6 +5,9 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn, buildWhatsAppUrl, localizedName } from '@/lib/utils'
+import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
+import { BanIcon, SendIcon, WhatsAppIcon, EyeIcon } from '@/components/ui/Icons'
+import { MOQWarning } from '@/components/ui/MOQWarning'
 import type { Product, Locale } from '@/types'
 
 const CUSTOM = '__custom__'
@@ -76,14 +79,14 @@ export function ProductActions({
     `مرحباً، أنا مهتم بـ: ${productName} (${productSlug})`,
     ...(selectedColor ? [`اللون: ${selectedColor === CUSTOM ? 'مخصص' : (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)}`] : []),
     ...(selectedSize ? [`المقاس: ${selectedSize}`] : []),
-    ...(selectedLidName ? [`المرافق: ${selectedLidName}`] : []),
+    ...(selectedLidName ? [`المرافق: ${selectedLidName} (${selectedPartner})`] : []),
     ...(partnerColor ? [`لون المرافق: ${partnerColor === CUSTOM ? 'مخصص' : (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor)}`] : []),
     ...(partnerSize ? [`مقاس المرافق: ${partnerSize}`] : []),
   ] : [
     `Hi, I'm interested in: ${productName} (${productSlug})`,
     ...(selectedColor ? [`Color: ${selectedColor === CUSTOM ? 'Custom' : selectedColor}`] : []),
     ...(selectedSize ? [`Size: ${selectedSize}`] : []),
-    ...(selectedLidName ? [`Paired: ${selectedLidName}`] : []),
+    ...(selectedLidName ? [`Paired: ${selectedLidName} (${selectedPartner})`] : []),
     ...(partnerColor ? [`Paired Color: ${partnerColor === CUSTOM ? 'Custom' : partnerColor}`] : []),
     ...(partnerSize ? [`Paired Size: ${partnerSize}`] : []),
   ]
@@ -96,75 +99,32 @@ export function ProductActions({
   const partnerOptions = selectedPartnerProduct && (partnerColors.length > 0 || partnerSizes.length > 1) ? (
     <div className="mt-3 space-y-4">
       {partnerColors.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-2.5">
-            <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-              {locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
-            </p>
-            {partnerColor && (
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {partnerColor === CUSTOM
-                  ? tOpts('custom')
-                  : locale === 'ar'
-                    ? (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor)
-                    : partnerColor}
-              </span>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {partnerColors.map((color) => (
-              <button
-                key={color.en}
-                onClick={() => setPartnerColor(color.en)}
-                className={cn(
-                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                  partnerColor === color.en
-                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                    : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                )}
-              >
-                {locale === 'ar' ? color.ar : color.en}
-              </button>
-            ))}
-            <button
-              onClick={() => setPartnerColor(CUSTOM)}
-              className={cn(
-                'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                partnerColor === CUSTOM
-                  ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                  : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
-              )}
-            >
-              {tOpts('custom')}
-            </button>
-          </div>
-        </div>
+        <ChipRow
+          label={locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
+          value={partnerColor ? (partnerColor === CUSTOM ? tOpts('custom') : locale === 'ar' ? (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor) : partnerColor) : undefined}
+        >
+          {partnerColors.map((color) => (
+            <ChipButton key={color.en} active={partnerColor === color.en} onClick={() => setPartnerColor(color.en)}>
+              {locale === 'ar' ? color.ar : color.en}
+            </ChipButton>
+          ))}
+          <ChipButton custom active={partnerColor === CUSTOM} onClick={() => setPartnerColor(CUSTOM)}>
+            {tOpts('custom')}
+          </ChipButton>
+        </ChipRow>
       )}
       {partnerSizes.length > 1 && (
-        <div>
-          <div className="flex items-center gap-2 mb-2.5">
-            <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-              {locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
-            </p>
-            {partnerSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{partnerSize}{partnerSizeUnit ?? ''}</span>}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {partnerSizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => setPartnerSize(size)}
-                className={cn(
-                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                  partnerSize === size
-                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                    : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                )}
-              >
-                <span dir="ltr">{size}{partnerSizeUnit ?? ''}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <ChipRow
+          label={locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
+          value={partnerSize ? `${partnerSize}${partnerSizeUnit ?? ''}` : undefined}
+          valueDir="ltr"
+        >
+          {partnerSizes.map((size) => (
+            <ChipButton key={size} active={partnerSize === size} onClick={() => setPartnerSize(size)}>
+              <span dir="ltr">{size}{partnerSizeUnit ?? ''}</span>
+            </ChipButton>
+          ))}
+        </ChipRow>
       )}
     </div>
   ) : null
@@ -205,72 +165,35 @@ export function ProductActions({
           {/* Colors */}
           {colorOptions.length > 0 && (
             <div className={cn(!!(lids?.length || fitsContainers?.length) && 'border-t border-gray-200 dark:border-gray-700 pt-5')}>
-              <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('color')}</p>
-                {selectedColor && (
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {selectedColor === CUSTOM
-                      ? tOpts('custom')
-                      : locale === 'ar'
-                        ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)
-                        : selectedColor}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
+              <ChipRow
+                label={tOpts('color')}
+                value={selectedColor ? (selectedColor === CUSTOM ? tOpts('custom') : locale === 'ar' ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor) : selectedColor) : undefined}
+              >
                 {colorOptions.map((color) => (
-                  <button
-                    key={color.en}
-                    onClick={() => setSelectedColor(color.en)}
-                    className={cn(
-                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      selectedColor === color.en
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
+                  <ChipButton key={color.en} active={selectedColor === color.en} onClick={() => setSelectedColor(color.en)}>
                     {locale === 'ar' ? color.ar : color.en}
-                  </button>
+                  </ChipButton>
                 ))}
-                <button
-                  onClick={() => setSelectedColor(CUSTOM)}
-                  className={cn(
-                    'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                    selectedColor === CUSTOM
-                      ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                      : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
-                  )}
-                >
+                <ChipButton custom active={selectedColor === CUSTOM} onClick={() => setSelectedColor(CUSTOM)}>
                   {tOpts('custom')}
-                </button>
-              </div>
+                </ChipButton>
+              </ChipRow>
             </div>
           )}
 
           {/* Sizes */}
           {sizes && sizes.length > 1 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('size')}</p>
-                {selectedSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{selectedSize}{sizeUnit ?? ''}</span>}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={cn(
-                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
-                      selectedSize === size
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    <span dir="ltr">{size}{sizeUnit ?? ''}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <ChipRow
+              label={tOpts('size')}
+              value={selectedSize ? `${selectedSize}${sizeUnit ?? ''}` : undefined}
+              valueDir="ltr"
+            >
+              {sizes.map((size) => (
+                <ChipButton key={size} active={selectedSize === size} onClick={() => setSelectedSize(size)}>
+                  <span dir="ltr">{size}{sizeUnit ?? ''}</span>
+                </ChipButton>
+              ))}
+            </ChipRow>
           )}
 
         </div>
@@ -278,12 +201,7 @@ export function ProductActions({
 
       {/* MOQ notice — shown once if any custom color is selected */}
       {(selectedColor === CUSTOM || partnerColor === CUSTOM) && (
-        <div className="flex items-start gap-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/70 rounded-lg px-4 py-3">
-          <svg className="mt-0.5 shrink-0 text-amber-700 dark:text-amber-400" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNotice')}</p>
-        </div>
+        <MOQWarning>{tOpts('moqNotice')}</MOQWarning>
       )}
 
       {/* CTA buttons */}
@@ -422,35 +340,3 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
   )
 }
 
-function BanIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-    </svg>
-  )
-}
-
-function SendIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-    </svg>
-  )
-}
-
-function WhatsAppIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-    </svg>
-  )
-}
-
-function EyeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  )
-}

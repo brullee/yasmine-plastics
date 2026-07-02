@@ -6,6 +6,8 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import { useTheme } from 'next-themes'
 import { useContactForm } from '@/hooks/useContactForm'
 import { cn } from '@/lib/utils'
+import { SuccessBox } from '@/components/ui/SuccessBox'
+import { FormField } from '@/components/ui/FormField'
 
 const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy'
 const inputCls = (hasError: boolean | undefined) =>
@@ -19,13 +21,7 @@ export function ContactForm() {
   const { resolvedTheme } = useTheme()
 
   if (submitted) {
-    return (
-      <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-6 text-center">
-        <p className="text-green-800 dark:text-green-300 font-semibold text-lg">
-          {t('success')}
-        </p>
-      </div>
-    )
+    return <SuccessBox>{t('success')}</SuccessBox>
   }
 
   return (
@@ -43,10 +39,7 @@ export function ContactForm() {
       />
       <div className="space-y-5">
 
-      <div>
-        <label htmlFor="contact-fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('fullName')} <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
+      <FormField id="contact-fullName" label={t('fullName')} required error={errors.fullName ? tVal(errors.fullName) : undefined}>
         <input
           id="contact-fullName"
           type="text"
@@ -58,15 +51,9 @@ export function ContactForm() {
           placeholder={t('placeholderName')}
           className={inputCls(!!errors.fullName)}
         />
-        {errors.fullName && (
-          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.fullName)}</p>
-        )}
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('email')} <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
+      <FormField id="contact-email" label={t('email')} required error={errors.email ? tVal(errors.email) : undefined}>
         <input
           id="contact-email"
           type="email"
@@ -78,15 +65,9 @@ export function ContactForm() {
           placeholder={t('placeholderEmail')}
           className={inputCls(!!errors.email)}
         />
-        {errors.email && (
-          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.email)}</p>
-        )}
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="contact-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('phone')}
-        </label>
+      <FormField id="contact-phone" label={t('phone')}>
         <input
           id="contact-phone"
           type="tel"
@@ -100,12 +81,9 @@ export function ContactForm() {
           placeholder={t('placeholderPhone')}
           className={cn(inputCls(false), 'rtl:text-right')}
         />
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="contact-message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('message')} <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
+      <FormField id="contact-message" label={t('message')} required error={errors.message ? tVal(errors.message) : undefined}>
         <textarea
           id="contact-message"
           name="message"
@@ -120,10 +98,7 @@ export function ContactForm() {
             errors.message ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600',
           )}
         />
-        {errors.message && (
-          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.message)}</p>
-        )}
-      </div>
+      </FormField>
 
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}

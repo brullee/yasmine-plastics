@@ -8,6 +8,10 @@ import { useTheme } from 'next-themes'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
+import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
+import { MOQWarning } from '@/components/ui/MOQWarning'
+import { SuccessBox } from '@/components/ui/SuccessBox'
+import { FormField } from '@/components/ui/FormField'
 
 const CUSTOM = '__custom__'
 
@@ -47,6 +51,8 @@ export function QuoteForm({
   const tOpts = useTranslations('product.options')
   const tVal = useTranslations('validation')
   const locale = useLocale() as Locale
+  const [partnerColor, setPartnerColor] = useState(initialPartnerColor)
+  const [partnerSize, setPartnerSize] = useState(initialPartnerSize)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState(
     () => initialCategory || products.find(p => p.slug === initialProduct)?.category || ''
@@ -67,29 +73,33 @@ export function QuoteForm({
   const currentProduct = products.find(p => p.slug === form.product)
   const colorOptions = currentProduct?.options.colors ?? []
   const sizeOptions = currentProduct?.options.sizes ?? []
-  const lidOptions = (currentProduct?.compatibleLids ?? [])
-    .map(slug => {
-      const p = products.find(p => p.slug === slug)
-      return p ? { slug, name: localizedName(p, locale) } : null
-    })
-    .filter((l): l is { slug: string; name: string } => l !== null)
+  const isLid = currentProduct?.category === 'lids' || currentProduct?.category === 'papercup-lids'
+  const lidOptions: { slug: string; name: string }[] = isLid
+    ? products
+        .filter(p => p.compatibleLids?.includes(currentProduct!.slug))
+        .map(p => ({ slug: p.slug, name: localizedName(p, locale) }))
+    : (currentProduct?.compatibleLids ?? [])
+        .map(slug => {
+          const p = products.find(p => p.slug === slug)
+          return p ? { slug, name: localizedName(p, locale) } : null
+        })
+        .filter((l): l is { slug: string; name: string } => l !== null)
+
+  const selectedLidProduct = products.find(p => p.slug === form.lid)
+  const lidColorOptions = selectedLidProduct?.options.colors ?? []
+  const lidSizeOptions = selectedLidProduct?.options.sizes ?? []
+  const lidSizeUnit = selectedLidProduct?.options.sizeUnit ?? ''
 
   if (submitted) {
-    return (
-      <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-8 text-center">
-        <p className="text-green-800 dark:text-green-300 font-semibold text-lg">
-          {t('success')}
-        </p>
-      </div>
-    )
+    return <SuccessBox>{t('success')}</SuccessBox>
   }
 
   return (
     <form onSubmit={(e) => handleSubmit(e, turnstileToken ?? '', {
         productName: currentProduct ? localizedName(currentProduct, locale) : '',
         lidName: lidOptions.find((l) => l.slug === form.lid)?.name ?? '',
-        ...(initialPartnerColor ? { lidColor: initialPartnerColor } : {}),
-        ...(initialPartnerSize  ? { lidSize:  initialPartnerSize  } : {}),
+        ...(partnerColor ? { lidColor: partnerColor } : {}),
+        ...(partnerSize  ? { lidSize:  partnerSize  } : {}),
       })} noValidate className="space-y-5">
       {/* Honeypot */}
       <input
@@ -103,51 +113,21 @@ export function QuoteForm({
         className="absolute opacity-0 h-0 w-0 pointer-events-none"
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div>
-          <label htmlFor="q-firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('firstName')} <span aria-hidden="true" className="text-red-500">*</span>
-          </label>
-          <input
-            id="q-firstName"
-            type="text"
-            name="firstName"
-            required
-            value={form.firstName}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={t('placeholderFirstName')}
-            className={inputCls(!!errors.firstName)}
-          />
-          {errors.firstName && (
-            <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.firstName)}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="q-lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('lastName')} <span aria-hidden="true" className="text-red-500">*</span>
-          </label>
-          <input
-            id="q-lastName"
-            type="text"
-            name="lastName"
-            required
-            value={form.lastName}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={t('placeholderLastName')}
-            className={inputCls(!!errors.lastName)}
-          />
-          {errors.lastName && (
-            <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.lastName)}</p>
-          )}
-        </div>
-      </div>
+      <FormField id="q-fullName" label={t('fullName')} required error={errors.fullName ? tVal(errors.fullName) : undefined}>
+        <input
+          id="q-fullName"
+          type="text"
+          name="fullName"
+          required
+          value={form.fullName}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder={t('placeholderFullName')}
+          className={inputCls(!!errors.fullName)}
+        />
+      </FormField>
 
-      <div>
-        <label htmlFor="q-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('company')}
-        </label>
+      <FormField id="q-company" label={t('company')}>
         <input
           id="q-company"
           type="text"
@@ -157,12 +137,9 @@ export function QuoteForm({
           placeholder={t('placeholderCompany')}
           className={inputCls(false)}
         />
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="q-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('email')} <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
+      <FormField id="q-email" label={t('email')} required error={errors.email ? tVal(errors.email) : undefined}>
         <input
           id="q-email"
           type="email"
@@ -174,15 +151,9 @@ export function QuoteForm({
           placeholder={t('placeholderEmail')}
           className={inputCls(!!errors.email)}
         />
-        {errors.email && (
-          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.email)}</p>
-        )}
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="q-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('phone')} <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
+      <FormField id="q-phone" label={t('phone')} required error={errors.phone ? tVal(errors.phone) : undefined}>
         <input
           id="q-phone"
           type="tel"
@@ -198,16 +169,10 @@ export function QuoteForm({
           placeholder={t('placeholderPhone')}
           className={cn(inputCls(!!errors.phone), 'rtl:text-right')}
         />
-        {errors.phone && (
-          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.phone)}</p>
-        )}
-      </div>
+      </FormField>
 
       {/* Category */}
-      <div>
-        <label htmlFor="q-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('category')}
-        </label>
+      <FormField id="q-category" label={t('category')}>
         <div className="relative">
           <select
             id="q-category"
@@ -230,20 +195,30 @@ export function QuoteForm({
           </select>
           <SelectChevron />
         </div>
-      </div>
+      </FormField>
 
       {/* Product - only shown once a category is picked */}
       {selectedCategory && (
-        <div>
-          <label htmlFor="q-product" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('product')}
-          </label>
+        <FormField id="q-product" label={t('product')}>
           <div className="relative">
             <select
               id="q-product"
               name="product"
               value={form.product}
-              onChange={handleChange}
+              onChange={(e) => {
+                const p = products.find(prod => prod.slug === e.target.value)
+                const isLidProduct = p?.category === 'lids' || p?.category === 'papercup-lids'
+                const partners = isLidProduct
+                  ? products.filter(prod => prod.compatibleLids?.includes(p!.slug))
+                  : (p?.compatibleLids ?? []).map(slug => products.find(prod => prod.slug === slug)).filter((x): x is NonNullable<typeof x> => !!x)
+                const firstPartner = partners[0]
+                setField('product', e.target.value)
+                setField('color', p?.options.colors?.[0]?.en ?? '')
+                setField('size', p?.options.sizes?.[0] ?? '')
+                setField('lid', firstPartner?.slug ?? '')
+                setPartnerColor(firstPartner?.options.colors?.[0]?.en ?? '')
+                setPartnerSize(firstPartner?.options.sizes?.[0] ?? '')
+              }}
               className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
             >
               <option value="">{t('selectProduct')}</option>
@@ -255,127 +230,105 @@ export function QuoteForm({
             </select>
             <SelectChevron />
           </div>
+        </FormField>
+      )}
+
+      {/* Product-specific options */}
+      {(colorOptions.length > 0 || sizeOptions.length > 0) && (
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
+          {colorOptions.length > 0 && (
+            <ChipRow
+              label={tOpts('color')}
+              value={form.color ? (form.color === CUSTOM ? tOpts('custom') : locale === 'ar' ? (colorOptions.find(c => c.en === form.color)?.ar ?? form.color) : form.color) : undefined}
+            >
+              {colorOptions.map((color) => (
+                <ChipButton key={color.en} active={form.color === color.en} onClick={() => setField('color', color.en)}>
+                  {locale === 'ar' ? color.ar : color.en}
+                </ChipButton>
+              ))}
+              <ChipButton custom active={form.color === CUSTOM} onClick={() => setField('color', CUSTOM)}>
+                {tOpts('custom')}
+              </ChipButton>
+            </ChipRow>
+          )}
+          {sizeOptions.length > 0 && (
+            <ChipRow label={tOpts('size')} value={form.size || undefined}>
+              {sizeOptions.map((size) => (
+                <ChipButton key={size} active={form.size === size} onClick={() => setField('size', size)}>
+                  {size}
+                </ChipButton>
+              ))}
+            </ChipRow>
+          )}
         </div>
       )}
 
-      {/* Product-specific options - shown only when the selected product has them */}
-      {(colorOptions.length > 0 || sizeOptions.length > 0 || lidOptions.length > 0) && (
+      {/* Paired product section */}
+      {lidOptions.length > 0 && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
+          <ChipRow
+            label={locale === 'ar' ? 'مرفوق مع' : 'Paired With'}
+            value={form.lid ? lidOptions.find(l => l.slug === form.lid)?.name : undefined}
+          >
+            {lidOptions.map((l) => (
+              <ChipButton
+                key={l.slug}
+                active={form.lid === l.slug}
+                onClick={() => {
+                  setField('lid', l.slug)
+                  const newLid = products.find(p => p.slug === l.slug)
+                  setPartnerColor(newLid?.options.colors?.[0]?.en ?? '')
+                  setPartnerSize(newLid?.options.sizes?.[0] ?? '')
+                }}
+              >
+                {l.name}
+              </ChipButton>
+            ))}
+            <ChipButton custom active={!form.lid} onClick={() => { setField('lid', ''); setPartnerColor(''); setPartnerSize('') }}>
+              {locale === 'ar' ? 'بدون' : 'None'}
+            </ChipButton>
+          </ChipRow>
 
-          {lidOptions.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('lid')}</p>
-                {form.lid && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {lidOptions.find(l => l.slug === form.lid)?.name}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {lidOptions.map((l) => (
-                  <button
-                    key={l.slug}
-                    type="button"
-                    onClick={() => setField('lid', l.slug)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                      form.lid === l.slug
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {l.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {colorOptions.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('color')}</p>
-                {form.color && form.color !== CUSTOM && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {locale === 'ar' ? (colorOptions.find(c => c.en === form.color)?.ar ?? form.color) : form.color}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {colorOptions.map((color) => (
-                  <button
-                    key={color.en}
-                    type="button"
-                    onClick={() => setField('color', color.en)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                      form.color === color.en
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {locale === 'ar' ? color.ar : color.en}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => setField('color', CUSTOM)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                    form.color === CUSTOM
-                      ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                      : 'bg-gray-50 dark:bg-transparent border-dashed border-gray-300 dark:border-gray-500 text-gray-500 dark:text-gray-400 hover:border-gray-500 hover:bg-gray-100 dark:hover:border-gray-300 dark:hover:text-gray-200'
-                  )}
+          {form.lid && (lidColorOptions.length > 0 || lidSizeOptions.length > 1) && (
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-4">
+              {lidColorOptions.length > 0 && (
+                <ChipRow
+                  label={locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
+                  value={partnerColor ? (partnerColor === CUSTOM ? tOpts('custom') : locale === 'ar' ? (lidColorOptions.find(c => c.en === partnerColor)?.ar ?? partnerColor) : partnerColor) : undefined}
                 >
-                  {tOpts('custom')}
-                </button>
-              </div>
-              {form.color === CUSTOM && (
-                <div className="mt-2 flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-3 py-2">
-                  <svg className="mt-0.5 shrink-0 text-amber-500" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNoticeForm')}</p>
-                </div>
+                  {lidColorOptions.map((color) => (
+                    <ChipButton key={color.en} active={partnerColor === color.en} onClick={() => setPartnerColor(color.en)}>
+                      {locale === 'ar' ? color.ar : color.en}
+                    </ChipButton>
+                  ))}
+                  <ChipButton custom active={partnerColor === CUSTOM} onClick={() => setPartnerColor(CUSTOM)}>
+                    {tOpts('custom')}
+                  </ChipButton>
+                </ChipRow>
+              )}
+              {lidSizeOptions.length > 1 && (
+                <ChipRow
+                  label={locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
+                  value={partnerSize ? `${partnerSize}${lidSizeUnit}` : undefined}
+                  valueDir="ltr"
+                >
+                  {lidSizeOptions.map((size) => (
+                    <ChipButton key={size} active={partnerSize === size} onClick={() => setPartnerSize(size)}>
+                      <span dir="ltr">{size}{lidSizeUnit}</span>
+                    </ChipButton>
+                  ))}
+                </ChipRow>
               )}
             </div>
           )}
-
-          {sizeOptions.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('size')}</p>
-                {form.size && <span className="text-sm text-gray-500 dark:text-gray-400">{form.size}</span>}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {sizeOptions.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => setField('size', size)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                      form.size === size
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
-      <div>
-        <label htmlFor="q-delivery" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('delivery')}
-        </label>
+      {(form.color === CUSTOM || partnerColor === CUSTOM) && (
+        <MOQWarning>{tOpts('moqNotice')}</MOQWarning>
+      )}
+
+      <FormField id="q-delivery" label={t('delivery')}>
         <input
           id="q-delivery"
           type="text"
@@ -385,12 +338,9 @@ export function QuoteForm({
           placeholder={t('placeholderDelivery')}
           className={inputCls(false)}
         />
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="q-details" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('details')}
-        </label>
+      <FormField id="q-details" label={t('details')}>
         <textarea
           id="q-details"
           name="details"
@@ -400,7 +350,7 @@ export function QuoteForm({
           placeholder={t('placeholderDetails')}
           className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]"
         />
-      </div>
+      </FormField>
 
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
