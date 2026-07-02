@@ -76,14 +76,14 @@ export function ProductActions({
     `مرحباً، أنا مهتم بـ: ${productName} (${productSlug})`,
     ...(selectedColor ? [`اللون: ${selectedColor === CUSTOM ? 'مخصص' : (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor)}`] : []),
     ...(selectedSize ? [`المقاس: ${selectedSize}`] : []),
-    ...(selectedLidName ? [`المرافق: ${selectedLidName}`] : []),
+    ...(selectedLidName ? [`المرافق: ${selectedLidName} (${selectedPartner})`] : []),
     ...(partnerColor ? [`لون المرافق: ${partnerColor === CUSTOM ? 'مخصص' : (partnerColors.find(c => c.en === partnerColor)?.ar ?? partnerColor)}`] : []),
     ...(partnerSize ? [`مقاس المرافق: ${partnerSize}`] : []),
   ] : [
     `Hi, I'm interested in: ${productName} (${productSlug})`,
     ...(selectedColor ? [`Color: ${selectedColor === CUSTOM ? 'Custom' : selectedColor}`] : []),
     ...(selectedSize ? [`Size: ${selectedSize}`] : []),
-    ...(selectedLidName ? [`Paired: ${selectedLidName}`] : []),
+    ...(selectedLidName ? [`Paired: ${selectedLidName} (${selectedPartner})`] : []),
     ...(partnerColor ? [`Paired Color: ${partnerColor === CUSTOM ? 'Custom' : partnerColor}`] : []),
     ...(partnerSize ? [`Paired Size: ${partnerSize}`] : []),
   ]

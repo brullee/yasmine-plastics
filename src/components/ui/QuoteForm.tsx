@@ -47,6 +47,8 @@ export function QuoteForm({
   const tOpts = useTranslations('product.options')
   const tVal = useTranslations('validation')
   const locale = useLocale() as Locale
+  const [partnerColor, setPartnerColor] = useState(initialPartnerColor)
+  const [partnerSize, setPartnerSize] = useState(initialPartnerSize)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState(
     () => initialCategory || products.find(p => p.slug === initialProduct)?.category || ''
@@ -67,12 +69,22 @@ export function QuoteForm({
   const currentProduct = products.find(p => p.slug === form.product)
   const colorOptions = currentProduct?.options.colors ?? []
   const sizeOptions = currentProduct?.options.sizes ?? []
-  const lidOptions = (currentProduct?.compatibleLids ?? [])
-    .map(slug => {
-      const p = products.find(p => p.slug === slug)
-      return p ? { slug, name: localizedName(p, locale) } : null
-    })
-    .filter((l): l is { slug: string; name: string } => l !== null)
+  const isLid = currentProduct?.category === 'lids' || currentProduct?.category === 'papercup-lids'
+  const lidOptions: { slug: string; name: string }[] = isLid
+    ? products
+        .filter(p => p.compatibleLids?.includes(currentProduct!.slug))
+        .map(p => ({ slug: p.slug, name: localizedName(p, locale) }))
+    : (currentProduct?.compatibleLids ?? [])
+        .map(slug => {
+          const p = products.find(p => p.slug === slug)
+          return p ? { slug, name: localizedName(p, locale) } : null
+        })
+        .filter((l): l is { slug: string; name: string } => l !== null)
+
+  const selectedLidProduct = products.find(p => p.slug === form.lid)
+  const lidColorOptions = selectedLidProduct?.options.colors ?? []
+  const lidSizeOptions = selectedLidProduct?.options.sizes ?? []
+  const lidSizeUnit = selectedLidProduct?.options.sizeUnit ?? ''
 
   if (submitted) {
     return (
@@ -88,8 +100,8 @@ export function QuoteForm({
     <form onSubmit={(e) => handleSubmit(e, turnstileToken ?? '', {
         productName: currentProduct ? localizedName(currentProduct, locale) : '',
         lidName: lidOptions.find((l) => l.slug === form.lid)?.name ?? '',
-        ...(initialPartnerColor ? { lidColor: initialPartnerColor } : {}),
-        ...(initialPartnerSize  ? { lidSize:  initialPartnerSize  } : {}),
+        ...(partnerColor ? { lidColor: partnerColor } : {}),
+        ...(partnerSize  ? { lidSize:  partnerSize  } : {}),
       })} noValidate className="space-y-5">
       {/* Honeypot */}
       <input
@@ -243,7 +255,20 @@ export function QuoteForm({
               id="q-product"
               name="product"
               value={form.product}
-              onChange={handleChange}
+              onChange={(e) => {
+                const p = products.find(prod => prod.slug === e.target.value)
+                const isLidProduct = p?.category === 'lids' || p?.category === 'papercup-lids'
+                const partners = isLidProduct
+                  ? products.filter(prod => prod.compatibleLids?.includes(p!.slug))
+                  : (p?.compatibleLids ?? []).map(slug => products.find(prod => prod.slug === slug)).filter((x): x is NonNullable<typeof x> => !!x)
+                const firstPartner = partners[0]
+                setField('product', e.target.value)
+                setField('color', p?.options.colors?.[0]?.en ?? '')
+                setField('size', p?.options.sizes?.[0] ?? '')
+                setField('lid', firstPartner?.slug ?? '')
+                setPartnerColor(firstPartner?.options.colors?.[0]?.en ?? '')
+                setPartnerSize(firstPartner?.options.sizes?.[0] ?? '')
+              }}
               className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
             >
               <option value="">{t('selectProduct')}</option>
@@ -258,46 +283,16 @@ export function QuoteForm({
         </div>
       )}
 
-      {/* Product-specific options - shown only when the selected product has them */}
-      {(colorOptions.length > 0 || sizeOptions.length > 0 || lidOptions.length > 0) && (
+      {/* Product-specific options */}
+      {(colorOptions.length > 0 || sizeOptions.length > 0) && (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
-
-          {lidOptions.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('lid')}</p>
-                {form.lid && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {lidOptions.find(l => l.slug === form.lid)?.name}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {lidOptions.map((l) => (
-                  <button
-                    key={l.slug}
-                    type="button"
-                    onClick={() => setField('lid', l.slug)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
-                      form.lid === l.slug
-                        ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
-                    )}
-                  >
-                    {l.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {colorOptions.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('color')}</p>
+              <div className="flex items-center gap-2 mb-2.5">
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('color')}</p>
                 {form.color && form.color !== CUSTOM && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     {locale === 'ar' ? (colorOptions.find(c => c.en === form.color)?.ar ?? form.color) : form.color}
                   </span>
                 )}
@@ -309,10 +304,10 @@ export function QuoteForm({
                     type="button"
                     onClick={() => setField('color', color.en)}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
+                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                       form.color === color.en
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
+                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
                     {locale === 'ar' ? color.ar : color.en}
@@ -322,33 +317,23 @@ export function QuoteForm({
                   type="button"
                   onClick={() => setField('color', CUSTOM)}
                   className={cn(
-                    'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
+                    'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                     form.color === CUSTOM
                       ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                      : 'bg-gray-50 dark:bg-transparent border-dashed border-gray-300 dark:border-gray-500 text-gray-500 dark:text-gray-400 hover:border-gray-500 hover:bg-gray-100 dark:hover:border-gray-300 dark:hover:text-gray-200'
+                      : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
                   )}
                 >
                   {tOpts('custom')}
                 </button>
               </div>
-              {form.color === CUSTOM && (
-                <div className="mt-2 flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg px-3 py-2">
-                  <svg className="mt-0.5 shrink-0 text-amber-500" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNoticeForm')}</p>
-                </div>
-              )}
             </div>
           )}
 
           {sizeOptions.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{tOpts('size')}</p>
-                {form.size && <span className="text-sm text-gray-500 dark:text-gray-400">{form.size}</span>}
+              <div className="flex items-center gap-2 mb-2.5">
+                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{tOpts('size')}</p>
+                {form.size && <span className="text-sm text-gray-600 dark:text-gray-400">{form.size}</span>}
               </div>
               <div className="flex flex-wrap gap-2">
                 {sizeOptions.map((size) => (
@@ -357,10 +342,10 @@ export function QuoteForm({
                     type="button"
                     onClick={() => setField('size', size)}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg border text-sm font-medium transition-all',
+                      'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
                       form.size === size
                         ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
-                        : 'bg-gray-50 dark:bg-transparent border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 hover:bg-gray-100 dark:hover:border-gray-400 dark:hover:text-white'
+                        : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
                     )}
                   >
                     {size}
@@ -369,6 +354,142 @@ export function QuoteForm({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Paired product section */}
+      {lidOptions.length > 0 && (
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2.5">
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                {locale === 'ar' ? 'مرفوق مع' : 'Paired With'}
+              </p>
+              {form.lid && (
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {lidOptions.find(l => l.slug === form.lid)?.name}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {lidOptions.map((l) => (
+                <button
+                  key={l.slug}
+                  type="button"
+                  onClick={() => {
+                    setField('lid', l.slug)
+                    const newLid = products.find(p => p.slug === l.slug)
+                    setPartnerColor(newLid?.options.colors?.[0]?.en ?? '')
+                    setPartnerSize(newLid?.options.sizes?.[0] ?? '')
+                  }}
+                  className={cn(
+                    'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                    form.lid === l.slug
+                      ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                      : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                  )}
+                >
+                  {l.name}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => { setField('lid', ''); setPartnerColor(''); setPartnerSize('') }}
+                className={cn(
+                  'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                  !form.lid
+                    ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                    : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
+                )}
+              >
+                {locale === 'ar' ? 'بدون' : 'None'}
+              </button>
+            </div>
+          </div>
+
+          {form.lid && (lidColorOptions.length > 0 || lidSizeOptions.length > 1) && (
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-4">
+              {lidColorOptions.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                      {locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
+                    </p>
+                    {partnerColor && partnerColor !== CUSTOM && (
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {locale === 'ar' ? (lidColorOptions.find(c => c.en === partnerColor)?.ar ?? partnerColor) : partnerColor}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {lidColorOptions.map((color) => (
+                      <button
+                        key={color.en}
+                        type="button"
+                        onClick={() => setPartnerColor(color.en)}
+                        className={cn(
+                          'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                          partnerColor === color.en
+                            ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                            : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                        )}
+                      >
+                        {locale === 'ar' ? color.ar : color.en}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setPartnerColor(CUSTOM)}
+                      className={cn(
+                        'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                        partnerColor === CUSTOM
+                          ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                          : 'bg-gray-100 border-dashed border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-300 dark:hover:text-gray-100'
+                      )}
+                    >
+                      {tOpts('custom')}
+                    </button>
+                  </div>
+                </div>
+              )}
+              {lidSizeOptions.length > 1 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                      {locale === 'ar' ? 'مقاس المرفوق' : 'Paired Size'}
+                    </p>
+                    {partnerSize && <span className="text-sm text-gray-600 dark:text-gray-400" dir="ltr">{partnerSize}{lidSizeUnit}</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {lidSizeOptions.map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => setPartnerSize(size)}
+                        className={cn(
+                          'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
+                          partnerSize === size
+                            ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
+                            : 'bg-gray-100 border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-200 hover:text-gray-900 dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:border-gray-400 dark:hover:text-white'
+                        )}
+                      >
+                        <span dir="ltr">{size}{lidSizeUnit}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {(form.color === CUSTOM || partnerColor === CUSTOM) && (
+        <div className="flex items-start gap-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/70 rounded-lg px-4 py-3">
+          <svg className="mt-0.5 shrink-0 text-amber-700 dark:text-amber-400" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNotice')}</p>
         </div>
       )}
 
