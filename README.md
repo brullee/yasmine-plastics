@@ -23,7 +23,7 @@ A website for my family's plastics manufacturing business. Buyers can browse pro
 
 ## What it does
 
-The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. A dedicated homepage section highlights custom manufacturing capabilities and links to a pre-configured quote flow for custom orders. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, units, and media, including a bulk image upload flow with automatic normalization.
+The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. Container products link to compatible lids and vice versa, with paired color/size selectors and a quick view without leaving the page. A dedicated homepage section highlights custom manufacturing capabilities and links to a pre-configured quote flow for custom orders. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, units, and media, including a bulk image upload flow with automatic normalization.
 
 ## Features
 
@@ -38,6 +38,10 @@ Each gallery image can be tagged with a color and size in the admin. Selecting a
 ### Image Lightbox
 
 Clicking any product image opens a fullscreen lightbox. Supports pinch-to-zoom, double-tap to toggle zoom, touch pan when zoomed in, scroll-wheel zoom with cursor-tracked origin, swipe to navigate between images, and keyboard arrow/escape navigation.
+
+### Paired Product Options
+
+Container product pages show a panel of compatible lids; lid pages show compatible containers. Selecting a paired product reveals its available colors and sizes alongside the main product's options. Both sets of options flow through to the WhatsApp inquiry message and the quote request form URL. A single MOQ notice appears if either product has a custom color selected.
 
 ### Quick View Modal
 
@@ -63,9 +67,13 @@ The media library supports bulk image upload with client-side WebP compression. 
 
 Product capacity is derived automatically from the product's size options. When auto-generation is on (the default), the admin computes a range at save time: one size shows `100ml`, multiple sizes show `100–300ml`. Disabling it reveals a manual text field. Size units (ml, L, g, oz, etc.) are a separate database collection so the admin can add new units without code changes.
 
+### Card Hover Animation
+
+Product and category cards use a background-expand hover effect: a white (or dark) background layer scales outward and a deeper drop shadow fades in via opacity, while the card content scales up slightly. The shadow transition uses two layered divs so the browser composites the fade on the GPU rather than repainting the shadow every frame.
+
 ### SEO
 
-Every page has meta titles, descriptions, Open Graph tags, canonical URLs, and hreflang tags. A default OG image is generated at build time via `opengraph-image.tsx` (navy gradient, brand name, tagline). Product pages include Product schema (JSON-LD). The site generates a `sitemap.xml` and `robots.txt`.
+Every page has meta titles, descriptions, Open Graph tags, canonical URLs, and hreflang tags. OG images are generated at build time: a default image (logo on white) applies to all pages; product pages override it with the product's main image on white. Product pages also include Product schema (JSON-LD). The site generates a `sitemap.xml` and `robots.txt`.
 
 ### Quote Request and Contact Forms
 
