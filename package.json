@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
+    "check": "tsc --noEmit && eslint src/ .",
     "deploy": "next build && git push --follow-tags",
     "deploy:patch": "next build && npm version patch && git push --follow-tags",
     "deploy:minor": "next build && npm version minor && git push --follow-tags",

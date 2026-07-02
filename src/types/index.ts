@@ -64,8 +64,7 @@ export type ContactFormFields = {
 }
 
 export type QuoteFormFields = {
-  firstName: string
-  lastName: string
+  fullName: string
   company: string
   email: string
   phone: string

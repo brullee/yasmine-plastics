@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { Link } from '@/i18n/navigation'
 import { ProductsGrid } from '@/components/ui/ProductsGrid'
 import { ProductMainSection } from '@/components/ui/ProductMainSection'
+import { Breadcrumb } from '@/components/ui/Breadcrumb'
 import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
@@ -114,21 +114,14 @@ export default async function ProductDetailPage({ params }: Props) {
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500 dark:text-gray-400 mb-8 flex items-center gap-1.5">
-          <Link href="/products" className="hover:text-brand-navy dark:hover:text-white transition-colors">
-            {tNav('products')}
-          </Link>
-          <span>›</span>
-          <Link
-            href={`/products?category=${product.category}`}
-            className="hover:text-brand-navy dark:hover:text-white transition-colors"
-          >
-            {categoryName}
-          </Link>
-          <span>›</span>
-          <span className="text-gray-700 dark:text-gray-300">{name}</span>
-        </nav>
+        <Breadcrumb
+          className="mb-8"
+          items={[
+            { label: tNav('products'), href: '/products' },
+            { label: categoryName, href: `/products?category=${product.category}` },
+            { label: name },
+          ]}
+        />
 
         <ProductMainSection
           product={product}

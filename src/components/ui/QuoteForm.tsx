@@ -9,6 +9,9 @@ import { useQuoteForm } from '@/hooks/useQuoteForm'
 import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
 import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
+import { MOQWarning } from '@/components/ui/MOQWarning'
+import { SuccessBox } from '@/components/ui/SuccessBox'
+import { FormField } from '@/components/ui/FormField'
 
 const CUSTOM = '__custom__'
 
@@ -88,13 +91,7 @@ export function QuoteForm({
   const lidSizeUnit = selectedLidProduct?.options.sizeUnit ?? ''
 
   if (submitted) {
-    return (
-      <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-8 text-center">
-        <p className="text-green-800 dark:text-green-300 font-semibold text-lg">
-          {t('success')}
-        </p>
-      </div>
-    )
+    return <SuccessBox>{t('success')}</SuccessBox>
   }
 
   return (
@@ -116,51 +113,21 @@ export function QuoteForm({
         className="absolute opacity-0 h-0 w-0 pointer-events-none"
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div>
-          <label htmlFor="q-firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('firstName')} <span aria-hidden="true" className="text-red-500">*</span>
-          </label>
-          <input
-            id="q-firstName"
-            type="text"
-            name="firstName"
-            required
-            value={form.firstName}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={t('placeholderFirstName')}
-            className={inputCls(!!errors.firstName)}
-          />
-          {errors.firstName && (
-            <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.firstName)}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="q-lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('lastName')} <span aria-hidden="true" className="text-red-500">*</span>
-          </label>
-          <input
-            id="q-lastName"
-            type="text"
-            name="lastName"
-            required
-            value={form.lastName}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={t('placeholderLastName')}
-            className={inputCls(!!errors.lastName)}
-          />
-          {errors.lastName && (
-            <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.lastName)}</p>
-          )}
-        </div>
-      </div>
+      <FormField id="q-fullName" label={t('fullName')} required error={errors.fullName ? tVal(errors.fullName) : undefined}>
+        <input
+          id="q-fullName"
+          type="text"
+          name="fullName"
+          required
+          value={form.fullName}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder={t('placeholderFullName')}
+          className={inputCls(!!errors.fullName)}
+        />
+      </FormField>
 
-      <div>
-        <label htmlFor="q-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('company')}
-        </label>
+      <FormField id="q-company" label={t('company')}>
         <input
           id="q-company"
           type="text"
@@ -170,12 +137,9 @@ export function QuoteForm({
           placeholder={t('placeholderCompany')}
           className={inputCls(false)}
         />
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="q-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('email')} <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
+      <FormField id="q-email" label={t('email')} required error={errors.email ? tVal(errors.email) : undefined}>
         <input
           id="q-email"
           type="email"
@@ -187,15 +151,9 @@ export function QuoteForm({
           placeholder={t('placeholderEmail')}
           className={inputCls(!!errors.email)}
         />
-        {errors.email && (
-          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.email)}</p>
-        )}
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="q-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('phone')} <span aria-hidden="true" className="text-red-500">*</span>
-        </label>
+      <FormField id="q-phone" label={t('phone')} required error={errors.phone ? tVal(errors.phone) : undefined}>
         <input
           id="q-phone"
           type="tel"
@@ -211,16 +169,10 @@ export function QuoteForm({
           placeholder={t('placeholderPhone')}
           className={cn(inputCls(!!errors.phone), 'rtl:text-right')}
         />
-        {errors.phone && (
-          <p className="mt-1 text-xs text-red-500 dark:text-red-400">{tVal(errors.phone)}</p>
-        )}
-      </div>
+      </FormField>
 
       {/* Category */}
-      <div>
-        <label htmlFor="q-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('category')}
-        </label>
+      <FormField id="q-category" label={t('category')}>
         <div className="relative">
           <select
             id="q-category"
@@ -243,14 +195,11 @@ export function QuoteForm({
           </select>
           <SelectChevron />
         </div>
-      </div>
+      </FormField>
 
       {/* Product - only shown once a category is picked */}
       {selectedCategory && (
-        <div>
-          <label htmlFor="q-product" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('product')}
-          </label>
+        <FormField id="q-product" label={t('product')}>
           <div className="relative">
             <select
               id="q-product"
@@ -281,7 +230,7 @@ export function QuoteForm({
             </select>
             <SelectChevron />
           </div>
-        </div>
+        </FormField>
       )}
 
       {/* Product-specific options */}
@@ -376,18 +325,10 @@ export function QuoteForm({
       )}
 
       {(form.color === CUSTOM || partnerColor === CUSTOM) && (
-        <div className="flex items-start gap-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600/70 rounded-lg px-4 py-3">
-          <svg className="mt-0.5 shrink-0 text-amber-700 dark:text-amber-400" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{tOpts('moqNotice')}</p>
-        </div>
+        <MOQWarning>{tOpts('moqNotice')}</MOQWarning>
       )}
 
-      <div>
-        <label htmlFor="q-delivery" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('delivery')}
-        </label>
+      <FormField id="q-delivery" label={t('delivery')}>
         <input
           id="q-delivery"
           type="text"
@@ -397,12 +338,9 @@ export function QuoteForm({
           placeholder={t('placeholderDelivery')}
           className={inputCls(false)}
         />
-      </div>
+      </FormField>
 
-      <div>
-        <label htmlFor="q-details" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {t('details')}
-        </label>
+      <FormField id="q-details" label={t('details')}>
         <textarea
           id="q-details"
           name="details"
@@ -412,7 +350,7 @@ export function QuoteForm({
           placeholder={t('placeholderDetails')}
           className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]"
         />
-      </div>
+      </FormField>
 
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
