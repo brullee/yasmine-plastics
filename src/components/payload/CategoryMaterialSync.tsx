@@ -48,6 +48,7 @@ export function CategoryMaterialSync() {
         if (fallbackId) setMaterial(fallbackId)
       })
       .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId])
 
   return null
