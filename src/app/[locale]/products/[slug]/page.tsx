@@ -115,7 +115,7 @@ export default async function ProductDetailPage({ params }: Props) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-400 dark:text-gray-500 mb-8 flex items-center gap-1.5">
+        <nav className="text-sm text-gray-500 dark:text-gray-400 mb-8 flex items-center gap-1.5">
           <Link href="/products" className="hover:text-brand-navy dark:hover:text-white transition-colors">
             {tNav('products')}
           </Link>
