@@ -6,7 +6,7 @@ import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ProductsGrid } from '@/components/ui/ProductsGrid'
 import { HeroSection } from '@/components/ui/HeroSection'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
-import { CantFindBanner } from '@/components/ui/CantFindBanner'
+import { CantFindBanner } from './CantFindBanner'
 import { localizedName } from '@/lib/utils'
 import type { Product, Category, Locale } from '@/types'
 

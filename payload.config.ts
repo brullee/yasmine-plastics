@@ -8,6 +8,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml } from '@/lib/emailTemplates'
+import { loginRateLimit } from '@/lib/ratelimit'
 
 
 export default buildConfig({
@@ -70,6 +71,18 @@ export default buildConfig({
             return forgotPasswordEmailHtml({ resetURL, userEmail: String((user as { email?: string }).email ?? '') })
           },
         },
+      },
+      hooks: {
+        beforeLogin: [
+          async ({ req }) => {
+            const ip =
+              req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+              req.headers.get('x-real-ip') ??
+              'unknown'
+            const { success } = await loginRateLimit.limit(ip)
+            if (!success) throw new Error('Too many login attempts. Please try again later.')
+          },
+        ],
       },
       admin: { useAsTitle: 'email' },
       fields: [],
@@ -137,10 +150,11 @@ export default buildConfig({
           options: [
             { label: 'Standard (65%)', value: 'standard' },
             { label: 'Spacious (55%)', value: 'gentle' },
+            { label: 'Wide (35%)', value: 'wide' },
           ],
           admin: {
             disableListColumn: true,
-            description: 'How much of the 1400x1400 canvas the product fills. Spacious adds more breathing room around smaller products.',
+            description: 'How much of the 1400x1400 canvas the product fills. Spacious adds breathing room; Wide leaves more canvas around the subject.',
             components: {
               Field: '@/components/payload/ProcessingModeField#ProcessingModeField',
             },

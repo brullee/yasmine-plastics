@@ -78,23 +78,15 @@
   },
   "products": {
     "title": "Our Products",
-    "subtitle": "Browse our full catalogue of plastic products",
     "browseByCategory": "Browse our full range by category",
-    "allCategories": "All Products",
     "viewDetails": "View Details",
-    "viewProducts": "View Products",
     "quickView": "Quick View",
-    "customBanner": {
-      "title": "Need a Custom Order?",
-      "text": "We manufacture to your exact specifications. Contact us to discuss quantities, dimensions, and custom printing."
-    },
     "cantFind": {
       "title": "Can't find what you're looking for?",
       "text": "We carry a wide range of products. Get in touch and we'll help you find the right one.",
       "cta": "Contact Us"
     },
     "notFound": "No products found.",
-    "wipNotice": "This page is still being built, reach us by phone, WhatsApp, or email to explore our full product range.",
     "colorCount": "{count} colors",
     "sizeCount": "{count} sizes"
   },
@@ -193,10 +185,6 @@
     "ourInfo": "Our Information",
     "light": "Light",
     "dark": "Dark"
-  },
-  "wip": {
-    "formNotice": "Our online form is temporarily unavailable.",
-    "formWhatsAppCta": "Message us on WhatsApp in the meantime."
   },
   "validation": {
     "required": "This field is required.",

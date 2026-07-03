@@ -3,7 +3,7 @@ export const revalidate = 3600
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { QuoteForm } from '@/components/ui/QuoteForm'
+import { QuoteForm } from './_components/QuoteForm'
 import { getProducts, getCategories } from '@/lib/payload-data'
 import { pageAlternates, localeUrl, brandName } from '@/lib/seo'
 import type { Locale } from '@/types'

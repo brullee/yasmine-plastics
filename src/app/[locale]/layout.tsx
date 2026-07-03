@@ -74,7 +74,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   setRequestLocale(locale)
-  const messages = await getMessages()
+  const { meta: _meta, ...clientMessages } = await getMessages()
   const isRtl = locale === 'ar'
 
   return (
@@ -86,7 +86,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={clientMessages}>
           <Providers>
             <div className={`flex min-h-screen flex-col ${isRtl ? 'font-arabic' : 'font-sans'}`}>
               <Header />

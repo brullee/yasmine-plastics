@@ -1,6 +1,6 @@
 {
   "name": "yasmine-plastics",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "scripts": {
     "dev": "rm -rf .next && next dev",
@@ -21,6 +21,7 @@
     "@payloadcms/next": "^3.85.1",
     "@payloadcms/richtext-lexical": "^3.85.1",
     "@payloadcms/storage-s3": "^3.85.1",
+    "@sentry/nextjs": "^10.63.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "@vercel/analytics": "^2.0.1",

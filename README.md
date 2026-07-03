@@ -23,7 +23,7 @@ A website for my family's plastics manufacturing business. Buyers can browse pro
 
 ## What it does
 
-The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. A dedicated homepage section highlights custom manufacturing capabilities and links to a pre-configured quote flow for custom orders. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, units, and media, including a bulk image upload flow with automatic normalization.
+The product catalog is browsable by category with a quick view modal and full product detail pages. Each product has an image gallery, color and size options, specs, and a quote request form. Container products link to compatible lids and vice versa, with paired color/size selectors and a quick view without leaving the page. A dedicated homepage section highlights custom manufacturing capabilities and links to a pre-configured quote flow for custom orders. The admin panel at `admin.yasmineplastics.com` handles products, categories, colors, sizes, units, and media, including a bulk image upload flow with automatic normalization.
 
 ## Features
 
@@ -39,6 +39,10 @@ Each gallery image can be tagged with a color and size in the admin. Selecting a
 
 Clicking any product image opens a fullscreen lightbox. Supports pinch-to-zoom, double-tap to toggle zoom, touch pan when zoomed in, scroll-wheel zoom with cursor-tracked origin, swipe to navigate between images, and keyboard arrow/escape navigation.
 
+### Paired Product Options
+
+Container product pages show a panel of compatible lids; lid pages show compatible containers. Selecting a paired product reveals its available colors and sizes alongside the main product's options. Both sets of options flow through to the WhatsApp inquiry message and the quote request form URL. A single MOQ notice appears if either product has a custom color selected.
+
 ### Quick View Modal
 
 Products can be previewed in an animated modal without leaving the catalog page. The modal includes a full image carousel, color/size selectors, and links to the associated lid or container. On product detail pages, an eye icon on the paired product panel opens the same quick view modal in-context, so the user never has to navigate away to check the companion product.
@@ -53,7 +57,7 @@ Uploading a product image through the admin panel triggers an automatic pipeline
 4. Converted to WebP and uploaded directly to Cloudflare R2 from the browser
 5. Admin panel shows a live progress indicator during processing
 
-Two modes are available: Standard (tighter crop, 65% canvas fill) and Gentle (55% fill, for products with fine edges the BG remover clips).
+Three canvas fill modes are available: Standard (65%, default), Spacious (55%, for products with fine edges the BG remover clips), and Wide (35%, for small or flat products like category images and finjans).
 
 ### Bulk Upload with Parallel Compression
 
@@ -63,9 +67,13 @@ The media library supports bulk image upload with client-side WebP compression. 
 
 Product capacity is derived automatically from the product's size options. When auto-generation is on (the default), the admin computes a range at save time: one size shows `100ml`, multiple sizes show `100–300ml`. Disabling it reveals a manual text field. Size units (ml, L, g, oz, etc.) are a separate database collection so the admin can add new units without code changes.
 
+### Card Hover Animation
+
+Product and category cards use a background-expand hover effect: a white (or dark) background layer scales outward and a deeper drop shadow fades in via opacity, while the card content scales up slightly. The shadow transition uses two layered divs so the browser composites the fade on the GPU rather than repainting the shadow every frame.
+
 ### SEO
 
-Every page has meta titles, descriptions, Open Graph tags, canonical URLs, and hreflang tags. A default OG image is generated at build time via `opengraph-image.tsx` (navy gradient, brand name, tagline). Product pages include Product schema (JSON-LD). The site generates a `sitemap.xml` and `robots.txt`.
+Every page has meta titles, descriptions, Open Graph tags, canonical URLs, and hreflang tags. OG images are generated at build time: a default image (logo on white) applies to all pages; product pages override it with the product's main image on white. Product pages also include Product schema (JSON-LD). The site generates a `sitemap.xml` and `robots.txt`.
 
 ### Quote Request and Contact Forms
 
@@ -77,7 +85,7 @@ Product pages are statically rendered at build time and revalidated every hour (
 
 ### Rate Limiting and Security
 
-Form submissions are rate-limited to 3 per 10 minutes per IP via Upstash Redis. Admin login is limited to 5 attempts per 15 minutes, with a progressive warning rendered server-side on the login page as attempts are used up. All external service calls (Upstash, Turnstile, Resend) fail open except email, which returns a 500.
+Form submissions are rate-limited to 3 per 10 minutes per IP via Upstash Redis. Admin login is limited to 5 attempts per 15 minutes via a `beforeLogin` hook, with a progressive warning on the login page as attempts are used up. HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) are set globally. All external service calls (Upstash, Turnstile, Resend) fail open except email, which returns a 500.
 
 ### Dark Mode
 

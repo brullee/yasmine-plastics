@@ -71,7 +71,7 @@ export default async function HomePage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema).replace(/</g, '\\u003c') }}
       />
       {/* Hero */}
       <section className="bg-gradient-to-br from-brand-navy to-brand-navyDark text-white">

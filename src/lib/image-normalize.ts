@@ -5,6 +5,7 @@ import type { BasePayload } from 'payload'
 const TARGET_SIZE     = 1400
 const FILL_STANDARD   = 0.65
 const FILL_SPACIOUS   = 0.55
+const FILL_TINY       = 0.35
 
 function s3Client() {
   return new S3Client({
@@ -92,9 +93,10 @@ export async function normalizeMediaAfterUpload(
   filename: string,
   docId: number | string,
   payload: BasePayload,
-  processingMode: 'standard' | 'gentle' = 'standard',
+  processingMode: 'standard' | 'gentle' | 'wide' = 'standard',
 ) {
-  const gentle = processingMode === 'gentle'
+  const gentle = processingMode !== 'standard'
+  const fillPercent = processingMode === 'gentle' ? FILL_SPACIOUS : processingMode === 'wide' ? FILL_TINY : FILL_STANDARD
   console.log(`[image-normalize] START ${filename} [${processingMode}]`)
 
   const s3     = s3Client()
@@ -116,7 +118,7 @@ export async function normalizeMediaAfterUpload(
   }
 
   const t1 = Date.now()
-  const normalized = await normalizeBuffer(imageBuffer, gentle, gentle ? FILL_SPACIOUS : FILL_STANDARD)
+  const normalized = await normalizeBuffer(imageBuffer, gentle, fillPercent)
   const normMeta = await sharp(normalized).metadata()
   console.log(`[image-normalize] Done in ${Date.now() - t1}ms → ${normMeta.width}x${normMeta.height} (${(normalized.length / 1024).toFixed(0)} KB)`)
 
