@@ -33,12 +33,7 @@
     overflow-x: clip;
   }
 
-  html:lang(ar) {
-    font-size: 1.05em;
-    font-weight: 300;
-  }
-
-  body {
+body {
     @apply text-gray-900 bg-white;
     overflow-x: clip;
   }
