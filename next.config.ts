@@ -17,12 +17,21 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          ...(process.env.VERCEL_ENV !== 'production'
+            ? [{ key: 'X-Robots-Tag', value: 'noindex' }]
+            : []),
         ],
       },
     ]
   },
   async redirects() {
     return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'yasmineplastics.com' }],
+        destination: 'https://www.yasmineplastics.com/:path*',
+        permanent: true,
+      },
       { source: '/admin/en', destination: '/admin', permanent: false },
       { source: '/admin/en/:path*', destination: '/admin/:path*', permanent: false },
       { source: '/admin/ar', destination: '/admin', permanent: false },
