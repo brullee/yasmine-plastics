@@ -17,5 +17,3 @@ __pycache__/
 # Local dev
 scripts/images-*
 PLAN.md
-# Sentry Config File
-.env.sentry-build-plugin

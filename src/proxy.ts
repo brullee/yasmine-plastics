@@ -34,6 +34,15 @@ export default async function proxy(req: NextRequest) {
   }
 
   const pathname = req.nextUrl.pathname
+
+  // /ar/ is the default locale and must never appear in URLs. Redirect unconditionally
+  // so crawlers and users without a cookie both get the canonical unprefixed URL.
+  if (pathname === '/ar' || pathname.startsWith('/ar/')) {
+    const url = req.nextUrl.clone()
+    url.pathname = pathname.slice('/ar'.length) || '/'
+    return NextResponse.redirect(url, { status: 301 })
+  }
+
   const saved = req.cookies.get('NEXT_LOCALE')?.value
   const validLocales = routing.locales as readonly string[]
 
@@ -57,7 +66,7 @@ export default async function proxy(req: NextRequest) {
       url.pathname = saved === defaultLocale
         ? barePath
         : `/${saved}${barePath === '/' ? '' : barePath}`
-      return NextResponse.redirect(url)
+      return NextResponse.redirect(url, { status: 301 })
     }
   }
 
