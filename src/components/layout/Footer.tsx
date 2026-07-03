@@ -1,11 +1,8 @@
 ﻿'use client'
 
-import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import { useTheme } from 'next-themes'
-import { usePathname, useRouter, Link } from '@/i18n/navigation'
+import { Link } from '@/i18n/navigation'
 import { company } from '@/data/company'
-import { SunIcon, MoonIcon } from '@/components/ui/Icons'
 
 type FooterNavKey = 'home' | 'about' | 'products' | 'contact' | 'quote'
 const NAV_LINKS: { key: FooterNavKey; href: string; wip?: boolean }[] = [
@@ -19,25 +16,8 @@ const NAV_LINKS: { key: FooterNavKey; href: string; wip?: boolean }[] = [
 export function Footer() {
   const t = useTranslations()
   const locale = useLocale()
-  const { resolvedTheme, setTheme } = useTheme()
-  const router = useRouter()
-  const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => { setMounted(true) }, [])
 
   const address = locale === 'ar' ? company.addressAr : company.addressEn
-  const isDark = mounted && resolvedTheme === 'dark'
-
-  function toggleLocale() {
-    const newLocale = locale === 'en' ? 'ar' : 'en'
-    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
-    router.replace(`${pathname}${window.location.search}`, { locale: newLocale })
-  }
-
-  function toggleTheme() {
-    setTheme(isDark ? 'light' : 'dark')
-  }
 
   return (
     <footer className="bg-white dark:bg-brand-navyDeep border-t border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400">
@@ -95,32 +75,18 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar - copyright + utility controls */}
+      {/* Bottom bar - copyright + legal + utility controls */}
       <div id="footer-bottom-bar" className="border-t border-gray-100 dark:border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
           <p>{t('footer.copyright')}</p>
 
-          <div className="flex items-center gap-1">
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors"
-            >
-              {isDark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
-              <span className="text-xs font-arabic font-medium">{isDark ? t('footer.light') : t('footer.dark')}</span>
-            </button>
-
-            <span className="text-sm font-sans text-gray-300 dark:text-gray-600 select-none" aria-hidden="true">•</span>
-
-            {/* Language toggle */}
-            <button
-              onClick={toggleLocale}
-              aria-label={locale === 'en' ? 'Switch to Arabic' : 'Switch to English'}
-              className="px-3 py-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors text-xs font-medium font-arabic"
-            >
-              {locale === 'en' ? 'العربية' : 'English'}
-            </button>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
+              {t('footer.privacyPolicy')}
+            </Link>
+            <Link href="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
+              {t('footer.terms')}
+            </Link>
           </div>
         </div>
       </div>

@@ -183,6 +183,9 @@
     "openWhatsApp": "Chat on WhatsApp",
     "links": "Navigation",
     "ourInfo": "Our Information",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms of Service",
     "light": "Light",
     "dark": "Dark"
   },
@@ -208,6 +211,10 @@
     "quoteTitle": "Request a Quote - Yasmine Plastics",
     "quoteDescription": "Request a custom price quote for plastic products. Specify your product, quantity, colours, and delivery location. We reply within 24 hours.",
     "aboutTitle": "About Us - Yasmine Plastics",
-    "aboutDescription": "Founded in Amman in 2008, built on plastics industry experience going back to 1989. We design and manufacture custom molds, shapes, and products to your exact specifications."
+    "aboutDescription": "Founded in Amman in 2008, built on plastics industry experience going back to 1989. We design and manufacture custom molds, shapes, and products to your exact specifications.",
+    "privacyTitle": "Privacy Policy - Yasmine Plastics",
+    "privacyDescription": "How Yasmine Plastics handles the information you submit through our contact and quote forms.",
+    "termsTitle": "Terms of Service - Yasmine Plastics",
+    "termsDescription": "Terms governing use of the Yasmine Plastics website, including quote request terms and intellectual property."
   }
 }
