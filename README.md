@@ -57,7 +57,7 @@ Uploading a product image through the admin panel triggers an automatic pipeline
 4. Converted to WebP and uploaded directly to Cloudflare R2 from the browser
 5. Admin panel shows a live progress indicator during processing
 
-Two modes are available: Standard (tighter crop, 65% canvas fill) and Gentle (55% fill, for products with fine edges the BG remover clips).
+Three canvas fill modes are available: Standard (65%, default), Spacious (55%, for products with fine edges the BG remover clips), and Wide (35%, for small or flat products like category images and finjans).
 
 ### Bulk Upload with Parallel Compression
 
@@ -85,7 +85,7 @@ Product pages are statically rendered at build time and revalidated every hour (
 
 ### Rate Limiting and Security
 
-Form submissions are rate-limited to 3 per 10 minutes per IP via Upstash Redis. Admin login is limited to 5 attempts per 15 minutes, with a progressive warning rendered server-side on the login page as attempts are used up. All external service calls (Upstash, Turnstile, Resend) fail open except email, which returns a 500.
+Form submissions are rate-limited to 3 per 10 minutes per IP via Upstash Redis. Admin login is limited to 5 attempts per 15 minutes via a `beforeLogin` hook, with a progressive warning on the login page as attempts are used up. HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) are set globally. All external service calls (Upstash, Turnstile, Resend) fail open except email, which returns a 500.
 
 ### Dark Mode
 
