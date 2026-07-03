@@ -137,10 +137,11 @@ export default buildConfig({
           options: [
             { label: 'Standard (65%)', value: 'standard' },
             { label: 'Spacious (55%)', value: 'gentle' },
+            { label: 'Wide (35%)', value: 'wide' },
           ],
           admin: {
             disableListColumn: true,
-            description: 'How much of the 1400x1400 canvas the product fills. Spacious adds more breathing room around smaller products.',
+            description: 'How much of the 1400x1400 canvas the product fills. Spacious adds breathing room; Wide leaves more canvas around the subject.',
             components: {
               Field: '@/components/payload/ProcessingModeField#ProcessingModeField',
             },
