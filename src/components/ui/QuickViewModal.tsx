@@ -307,7 +307,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-slate-700 text-sm font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-brand-navy dark:text-gray-300"
+                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-slate-700 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-brand-navy dark:text-gray-300"
               >
                 <WhatsAppIcon size={15} />
                 {t('chatNow')}

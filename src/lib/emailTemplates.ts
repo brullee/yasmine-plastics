@@ -2,11 +2,16 @@ const NAVY = '#005496'
 const NAVY_DARK = '#003d6e'
 const BG = '#f9fafb'
 
+function esc(s: string) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 function row(label: string, value: string | null | undefined, link?: string) {
   if (!value || value === '-') return ''
+  const safe = esc(value)
   const cell = link
-    ? `<a href="${link}" style="color:${NAVY};text-decoration:none;">${value}</a>`
-    : value
+    ? `<a href="${esc(link)}" style="color:${NAVY};text-decoration:none;">${safe}</a>`
+    : safe
   return `
     <tr>
       <td style="padding:12px 16px;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;width:130px;">${label}</td>
@@ -55,7 +60,7 @@ export function contactEmailHtml({ fullName, email, phone, message }: {
 
         <!-- Footer -->
         <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
-          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${fullName}.</p>
+          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${esc(fullName)}.</p>
         </td></tr>
 
       </table>
@@ -189,7 +194,7 @@ export function quoteEmailHtml({ fullName, company, email, phone, productName, p
 
         <!-- Footer -->
         <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
-          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${fullName}.</p>
+          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${esc(fullName)}.</p>
         </td></tr>
 
       </table>
