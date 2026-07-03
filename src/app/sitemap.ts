@@ -12,6 +12,8 @@ const staticPages = [
   { path: '/contact', changeFrequency: 'monthly' as const, priority: 0.7 },
   { path: '/quote', changeFrequency: 'monthly' as const, priority: 0.8 },
   { path: '/about', changeFrequency: 'monthly' as const, priority: 0.6 },
+  { path: '/privacy', changeFrequency: 'yearly' as const, priority: 0.3 },
+  { path: '/terms', changeFrequency: 'yearly' as const, priority: 0.3 },
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
