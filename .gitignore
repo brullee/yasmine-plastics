@@ -8,6 +8,7 @@ tsconfig.tsbuildinfo
 
 # Environment
 .env*
+!.env.example
 
 # Python
 __pycache__/
@@ -16,3 +17,5 @@ __pycache__/
 # Local dev
 scripts/images-*
 PLAN.md
+# Sentry Config File
+.env.sentry-build-plugin
