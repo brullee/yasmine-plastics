@@ -133,7 +133,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
           <Link
             href={`/products/${product.slug}`}
             className={cn(
-              'block text-sm font-medium leading-snug line-clamp-2 transition-colors duration-300',
+              'block text-base font-bold leading-snug line-clamp-2 transition-colors duration-300',
               hovered ? 'text-brand-navy dark:text-sky-300' : 'text-brand-navy dark:text-white'
             )}
           >
@@ -149,12 +149,12 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
               <SpecBadge compact dir="ltr">{derivedCapacity}</SpecBadge>
             )}
             {colorCount > 1 && (
-              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {t('colorCount', { count: colorCount })}
               </span>
             )}
             {sizeCount > 1 && (
-              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {t('sizeCount', { count: sizeCount })}
               </span>
             )}
