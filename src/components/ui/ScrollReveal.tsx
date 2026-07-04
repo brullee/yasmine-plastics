@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useEffect, useRef } from 'react'
+import { prefersReducedMotion } from '@/lib/utils'
 
 interface Props {
   children: React.ReactNode
@@ -22,6 +23,8 @@ export function ScrollReveal({ children, direction = 'up', delay = 0, className 
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    // Reduced motion: skip the reveal/hide-on-scroll-out cycle entirely, not just its animation duration
+    if (prefersReducedMotion()) return
 
     const play = () => {
       el.style.animation = 'none'

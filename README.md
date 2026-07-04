@@ -87,6 +87,10 @@ Product pages are statically rendered at build time and revalidated every hour (
 
 Form submissions are rate-limited to 3 per 10 minutes per IP via Upstash Redis. Admin login is limited to 5 attempts per 15 minutes via a `beforeLogin` hook, with a progressive warning on the login page as attempts are used up. HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) are set globally. All external service calls (Upstash, Turnstile, Resend) fail open except email, which returns a 500.
 
+### Reduced Motion Support
+
+A global `prefers-reduced-motion` rule collapses animation and transition durations across the site. Scroll reveal, card hover, quick view, and the product carousel each have a dedicated fallback rather than an instant snap: scroll reveal leaves content visible instead of animating it in and out, cards drop their scale/translate hover transforms but keep shadow and color feedback, quick view opens and closes instantly, and smooth-scroll calls fall back to instant scrolling.
+
 ### Dark Mode
 
 Full dark/light theme via next-themes, with the admin panel defaulting to dark mode.

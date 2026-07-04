@@ -25,7 +25,7 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
       href={`/products?category=${category.slug}`}
       className={cn(
         'group block',
-        '[@media(hover:hover)]:hover:scale-[1.05]',
+        '[@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:hover:scale-[1.05]',
         'transition-transform duration-500 ease-out',
         className,
       )}
@@ -40,7 +40,7 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
             alt={name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover [@media(hover:hover)]:group-hover:scale-110 transition-transform duration-500 ease-out"
+            className="object-cover [@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:scale-110 transition-transform duration-500 ease-out"
           />
         )}
 
@@ -52,7 +52,7 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
           <h3 className={cn(
             'font-bold text-xl leading-snug',
             'text-brand-navy [@media(hover:hover)]:group-hover:text-white',
-            '[@media(hover:hover)]:translate-y-6 [@media(hover:hover)]:group-hover:translate-y-0',
+            '[@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:translate-y-6 [@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:translate-y-0',
             'transition-[color,transform] duration-500 ease-out',
           )}>
             {name}

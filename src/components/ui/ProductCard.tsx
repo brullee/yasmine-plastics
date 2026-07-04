@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { cn, localizedName, deriveCapacity } from '@/lib/utils'
+import { cn, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
 import { EyeIcon } from '@/components/ui/Icons'
 import { SpecBadge } from '@/components/ui/SpecBadge'
 import type { Product, Locale } from '@/types'
@@ -34,6 +34,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
     if (!window.matchMedia('(hover: hover)').matches) return
     hoveredRef.current = true
     setHovered(true)
+    if (prefersReducedMotion()) return
     const el = cardRef.current
     if (el) setBgScale({ x: (el.offsetWidth + 40) / el.offsetWidth, y: (el.offsetHeight + 40) / el.offsetHeight })
   }
@@ -82,7 +83,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
       {/* ── Inner content — scales with the card expand ─────────────────── */}
       <div
         style={{
-          transform:  hovered ? 'scale(1.07)' : 'scale(1)',
+          transform:  hovered && !prefersReducedMotion() ? 'scale(1.07)' : 'scale(1)',
           transition: `transform ${DUR} ${EASE}`,
         }}
       >
