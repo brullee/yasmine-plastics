@@ -257,9 +257,9 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
       selected
         ? 'border-brand-navy bg-brand-navy/10 dark:border-sky-400 dark:bg-sky-400/15'
         : cn(
-            'bg-gray-100 dark:bg-transparent border-gray-500 dark:border-gray-500',
-            'hover:bg-gray-200 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-blue-400',
-            dashed && 'border-dashed'
+            'bg-gray-500/10 dark:bg-transparent dark:border-gray-500',
+            dashed ? 'border-gray-500 border-dashed' : 'border-gray-500/75',
+            'hover:bg-gray-500/15 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-blue-400',
           )
     )}>
       <button
