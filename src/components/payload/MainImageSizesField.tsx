@@ -31,6 +31,8 @@ export function MainImageSizesField() {
   }, [sizeIds.join(',')])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const selected = value != null ? (options.find(o => o.value === String(value)) ?? undefined) : undefined
+  // Unlike colors, the size chip row is hidden entirely below 2 sizes (ProductActions.tsx), so
+  // tagging a single-size product's image is dead: there's no chip that could ever trigger the jump.
   const disabled = sizeIds.length <= 1
   const placeholder = sizeIds.length === 0 ? 'No sizes on this product' : sizeIds.length === 1 ? 'Only one size' : 'Select a value'
 

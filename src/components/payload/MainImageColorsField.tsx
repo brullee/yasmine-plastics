@@ -31,8 +31,8 @@ export function MainImageColorsField() {
   }, [colorIds.join(',')])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const selected = value != null ? (options.find(o => o.value === String(value)) ?? undefined) : undefined
-  const disabled = colorIds.length <= 1
-  const placeholder = colorIds.length === 0 ? 'No colors on this product' : colorIds.length === 1 ? 'Only one color' : 'Select a value'
+  const disabled = colorIds.length === 0
+  const placeholder = colorIds.length === 0 ? 'No colors on this product' : 'Select a value'
 
   return (
     <div className="field-type relationship" style={disabled ? { opacity: 0.35, pointerEvents: 'none' } : undefined}>

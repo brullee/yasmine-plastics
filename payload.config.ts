@@ -572,7 +572,7 @@ export default buildConfig({
                           label: 'Color shown',
                           admin: {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            condition: (data: any) => (Array.isArray(data.colors) && data.colors.length > 1) || (Array.isArray(data.sizes) && data.sizes.length > 1),
+                            condition: (data: any) => (Array.isArray(data.colors) && data.colors.length > 0) || (Array.isArray(data.sizes) && data.sizes.length > 1),
                             components: {
                               Field: '@/components/payload/LinkedColorsField#LinkedColorsField',
                             },
@@ -585,7 +585,7 @@ export default buildConfig({
                           label: 'Size shown',
                           admin: {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            condition: (data: any) => (Array.isArray(data.colors) && data.colors.length > 1) || (Array.isArray(data.sizes) && data.sizes.length > 1),
+                            condition: (data: any) => (Array.isArray(data.colors) && data.colors.length > 0) || (Array.isArray(data.sizes) && data.sizes.length > 1),
                             components: {
                               Field: '@/components/payload/LinkedSizesField#LinkedSizesField',
                             },

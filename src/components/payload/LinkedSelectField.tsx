@@ -8,13 +8,16 @@ interface Config {
   apiUrl: string
   docLabelKey: string
   displayLabel: string
-  noItemsText: string
-  oneItemText: string
   description?: string
+  // The product page only renders a chip for this option when there's something to disambiguate:
+  // colors always get a chip (even solo, plus the always-present Custom chip), sizes only get one
+  // past 1 value (see ProductActions.tsx). So "disabled" and its placeholder differ per field.
+  isDisabled: (itemCount: number) => boolean
+  placeholderFor: (itemCount: number) => string
 }
 
 export function createLinkedField(config: Config) {
-  const { formField, apiUrl, docLabelKey, displayLabel, noItemsText, oneItemText, description } = config
+  const { formField, apiUrl, docLabelKey, displayLabel, description, isDisabled, placeholderFor } = config
 
   return function LinkedField({ path }: { path: string }) {
     const { value, setValue } = useField<number | null>({ path })
@@ -42,8 +45,8 @@ export function createLinkedField(config: Config) {
     }, [itemIds.join(',')]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const selected = value != null ? (options.find(o => o.value === String(value)) ?? undefined) : undefined
-    const disabled = itemIds.length <= 1
-    const placeholder = itemIds.length === 0 ? noItemsText : itemIds.length === 1 ? oneItemText : 'Select a value'
+    const disabled = isDisabled(itemIds.length)
+    const placeholder = placeholderFor(itemIds.length)
 
     return (
       <div className="field-type relationship" style={disabled ? { opacity: 0.35, pointerEvents: 'none' } : undefined}>
