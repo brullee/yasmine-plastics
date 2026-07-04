@@ -120,7 +120,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
                 if (rect) onQuickView(product, rect)
               }}
             >
-              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-[#0d1b2a] border border-gray-200 dark:border-transparent text-brand-navy dark:text-white text-xs font-semibold rounded-full shadow transition-colors">
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-brand-slate750 border border-gray-200 dark:border-slate-600 text-brand-navy dark:text-white text-xs font-semibold rounded-full shadow transition-colors">
                 <EyeIcon size={12} strokeWidth={2.5} />
                 {t('quickView')}
               </span>

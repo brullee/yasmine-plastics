@@ -24,6 +24,7 @@ const config: Config = {
           blue: '#ed145b',
           blueDeep: '#c4114a',
           sky: '#f5f7fa',
+          slate750: '#293548',
         },
       },
       fontFamily: {
