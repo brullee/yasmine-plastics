@@ -243,6 +243,47 @@ export function ProductActions({
   )
 }
 
+function PartnerCard({ selected, dashed = false, onClick, label, action, children }: {
+  selected: boolean
+  dashed?: boolean
+  onClick: () => void
+  label: string
+  action?: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className={cn(
+      'group flex items-center gap-2 rounded-lg border transition-colors',
+      selected
+        ? 'border-brand-navy bg-brand-navy/10 dark:border-sky-400 dark:bg-sky-400/15'
+        : cn(
+            'bg-gray-100 dark:bg-transparent border-gray-500 dark:border-gray-500',
+            'hover:bg-gray-200 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-blue-400',
+            dashed && 'border-dashed'
+          )
+    )}>
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
+      >
+        <div data-thumb className="relative w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-white flex items-center justify-center text-gray-500">
+          {children}
+        </div>
+        <span className={cn(
+          'text-xs font-medium leading-snug',
+          selected
+            ? 'text-brand-navy dark:text-sky-200'
+            : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-sky-300'
+        )}>
+          {label}
+        </span>
+      </button>
+      {action}
+    </div>
+  )
+}
+
 function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: {
   products: Product[]
   selectedSlug: string | null
@@ -250,44 +291,22 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
   onSelect: (slug: string) => void
   onQuickView?: (slug: string, rect: DOMRect) => void
 }) {
-  const noneSelected = selectedSlug === NONE_PARTNER
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
       {products.map((p) => {
         const name = localizedName(p, locale)
         const isSelected = selectedSlug === p.slug
         return (
-          <div
+          <PartnerCard
             key={p.slug}
-            className={cn(
-              'group flex items-center gap-2 rounded-lg border transition-colors',
-              isSelected
-                ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
-                : 'bg-gray-100 dark:bg-transparent border-gray-400 dark:border-gray-500 hover:border-brand-navy dark:hover:border-blue-400'
-            )}
-          >
-            <button
-              type="button"
-              onClick={() => onSelect(p.slug)}
-              className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
-            >
-              <div data-thumb className="relative w-8 h-8 rounded-md overflow-hidden bg-white flex-shrink-0">
-                <Image src={p.image} alt={name} fill sizes="32px" className="object-contain p-1" />
-              </div>
-              <span className={cn(
-                'text-xs font-medium leading-snug',
-                isSelected
-                  ? 'text-brand-navy dark:text-sky-200'
-                  : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-white'
-              )}>
-                {name}
-              </span>
-            </button>
-            {onQuickView && (
+            selected={isSelected}
+            onClick={() => onSelect(p.slug)}
+            label={name}
+            action={onQuickView && (
               <button
                 type="button"
                 onClick={(e) => {
-                  const thumb = e.currentTarget.closest('div')?.querySelector('[data-thumb]')
+                  const thumb = (e.currentTarget.closest('.group') as Element)?.querySelector('[data-thumb]')
                   const rect = (thumb ?? e.currentTarget).getBoundingClientRect()
                   onQuickView(p.slug, rect)
                 }}
@@ -302,40 +321,19 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
                 <EyeIcon />
               </button>
             )}
-          </div>
+          >
+            <Image src={p.image} alt={name} fill sizes="32px" className="object-contain p-1" />
+          </PartnerCard>
         )
       })}
-      <div
-        className={cn(
-          'flex items-center rounded-lg border transition-colors',
-          noneSelected
-            ? 'border-brand-navy bg-brand-sky dark:border-sky-400 dark:bg-sky-900/30'
-            : 'bg-gray-100 dark:bg-transparent border-dashed border-gray-400 dark:border-gray-500 hover:border-gray-500 dark:hover:border-gray-400'
-        )}
+      <PartnerCard
+        selected={selectedSlug === NONE_PARTNER}
+        dashed
+        onClick={() => onSelect(NONE_PARTNER)}
+        label={locale === 'ar' ? 'بدون' : 'None'}
       >
-        <button
-          type="button"
-          onClick={() => onSelect(NONE_PARTNER)}
-          className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
-        >
-          <div className={cn(
-            'w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0',
-            noneSelected
-              ? 'bg-brand-navy/10 text-brand-navy dark:bg-sky-400/10 dark:text-sky-400'
-              : 'bg-gray-200 text-gray-500 dark:bg-gray-600 dark:text-gray-300'
-          )}>
-            <BanIcon />
-          </div>
-          <span className={cn(
-            'text-xs font-medium',
-            noneSelected
-              ? 'text-brand-navy dark:text-sky-200'
-              : 'text-gray-700 dark:text-gray-300'
-          )}>
-            {locale === 'ar' ? 'بدون' : 'None'}
-          </span>
-        </button>
-      </div>
+        <BanIcon />
+      </PartnerCard>
     </div>
   )
 }
