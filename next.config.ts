@@ -10,6 +10,19 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   async headers() {
+    const csp = [
+      "default-src 'self'",
+      `script-src 'self' 'unsafe-inline'${process.env.VERCEL_ENV !== 'production' ? " 'unsafe-eval' https://va.vercel-scripts.com" : ''} https://challenges.cloudflare.com`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' media.yasmineplastics.com https://www.gravatar.com data: blob:",
+      "font-src 'self'",
+      "connect-src 'self' https://o4511671399415808.ingest.de.sentry.io https://vitals.vercel-insights.com https://*.r2.cloudflarestorage.com",
+      "frame-src https://maps.google.com https://www.google.com https://challenges.cloudflare.com",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join('; ')
+
     return [
       {
         source: '/(.*)',
@@ -17,6 +30,7 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Content-Security-Policy', value: csp },
           ...(process.env.VERCEL_ENV !== 'production'
             ? [{ key: 'X-Robots-Tag', value: 'noindex' }]
             : []),

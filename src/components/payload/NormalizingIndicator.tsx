@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useDocumentInfo, useField } from '@payloadcms/ui'
+import { useDocumentInfo, useField, useForm, useFormModified } from '@payloadcms/ui'
 
 // Patch at module load time — useEffect is too late for hydration warnings
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
@@ -17,6 +17,8 @@ export function NormalizingIndicator() {
   const { value: normalizeImage } = useField<boolean>({ path: 'normalizeImage' })
   const { value: width } = useField<number>({ path: 'width' })
   const { value: height } = useField<number>({ path: 'height' })
+  const { setModified } = useForm()
+  const modified = useFormModified()
 
   const isPending =
     !!id &&
@@ -25,6 +27,7 @@ export function NormalizingIndicator() {
 
   const [done, setDone] = useState(false)
   const [warmingUp, setWarmingUp] = useState(false)
+  const [shouldReload, setShouldReload] = useState(false)
 
   useEffect(() => {
     if (!isPending) return
@@ -34,6 +37,14 @@ export function NormalizingIndicator() {
     }
     localStorage.removeItem('modalWarmingUp')
   }, [isPending])
+
+  // Once shouldReload is set and modified has been cleared, fire the reload.
+  // By the time this effect runs, React's cleanup cycle has already removed
+  // Payload's beforeunload listener (it unregisters when modified becomes false).
+  useEffect(() => {
+    if (!shouldReload || modified) return
+    window.location.reload()
+  }, [shouldReload, modified])
 
   useEffect(() => {
     if (!isPending || !id) return
@@ -48,7 +59,10 @@ export function NormalizingIndicator() {
         if (doc.width === 1400 && doc.height === 1400) {
           clearInterval(interval)
           setDone(true)
-          setTimeout(() => window.location.reload(), 600)
+          setTimeout(() => {
+            setModified(false)
+            setShouldReload(true)
+          }, 600)
         }
       } catch {
         // ignore transient fetch errors
@@ -61,7 +75,7 @@ export function NormalizingIndicator() {
       clearInterval(interval)
       clearTimeout(timeout)
     }
-  }, [isPending, id])
+  }, [isPending, id, setModified])
 
   if (!isPending) return null
 
