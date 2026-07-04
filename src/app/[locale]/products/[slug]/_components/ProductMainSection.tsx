@@ -35,7 +35,8 @@ interface Props {
 export function ProductMainSection({
   product, name, categoryName, compatibleLids, fitsContainers, allProducts, whatsappNumber, locale,
 }: Props) {
-  const t = useTranslations('product')
+  const t     = useTranslations('product')
+  const tA11y = useTranslations('a11y')
 
   const derivedCapacity = deriveCapacity(product)
 
@@ -190,7 +191,7 @@ export function ProductMainSection({
                 <button
                   onClick={() => thumbStripRef.current?.scrollBy({ top: -200, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}
                   className="absolute top-1 p-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-colors"
-                  aria-label="Scroll up"
+                  aria-label={tA11y('scrollUp')}
                 >
                   <ChevronIcon direction="up" />
                 </button>
@@ -214,6 +215,8 @@ export function ProductMainSection({
                     hoverTimerRef.current = setTimeout(() => setCarouselIndex(i), 60)
                   }}
                   onMouseLeave={clearHoverTimer}
+                  aria-current={i === carouselIndex}
+                  aria-label={tA11y('goToImage', { n: i + 1 })}
                   className={cn(
                     'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors',
                     i === carouselIndex
@@ -233,7 +236,7 @@ export function ProductMainSection({
                 <button
                   onClick={() => thumbStripRef.current?.scrollBy({ top: 200, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}
                   className="absolute bottom-1 p-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-colors"
-                  aria-label="Scroll down"
+                  aria-label={tA11y('scrollDown')}
                 >
                   <ChevronIcon direction="down" />
                 </button>
@@ -286,7 +289,7 @@ export function ProductMainSection({
             ref={openerRef}
             type="button"
             onClick={() => { setLightboxOpenAt(carouselIndex); setLightboxOpen(true) }}
-            aria-label="View full image"
+            aria-label={tA11y('viewFullImage')}
             className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/90 dark:bg-gray-900/75 border border-gray-200 dark:border-transparent hover:bg-white dark:hover:bg-gray-900 shadow backdrop-blur-sm transition-colors text-gray-600 dark:text-gray-200"
           >
             <ExpandIcon />

@@ -265,6 +265,7 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
       <button
         type="button"
         onClick={onClick}
+        aria-pressed={selected}
         className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
       >
         <div data-thumb className="relative w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-white flex items-center justify-center text-gray-500">

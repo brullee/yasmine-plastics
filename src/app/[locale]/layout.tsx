@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { Metadata } from 'next'
 import { Inter, Readex_Pro } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages, setRequestLocale } from 'next-intl/server'
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import { Providers } from '@/components/Providers'
@@ -75,6 +75,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   setRequestLocale(locale)
   const { meta: _meta, ...clientMessages } = await getMessages()
+  const t = await getTranslations({ locale, namespace: 'a11y' })
   const isRtl = locale === 'ar'
 
   return (
@@ -88,9 +89,15 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body suppressHydrationWarning>
         <NextIntlClientProvider messages={clientMessages}>
           <Providers>
-            <div className={`flex min-h-screen flex-col ${isRtl ? 'font-arabic' : 'font-sans'}`}>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:start-2 focus:z-[100] focus:bg-white focus:text-brand-navy focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg dark:focus:bg-slate-900 dark:focus:text-white"
+            >
+              {t('skipToContent')}
+            </a>
+            <div id="app-root" className={`flex min-h-screen flex-col ${isRtl ? 'font-arabic' : 'font-sans'}`}>
               <Header />
-              <main className="flex-1">{children}</main>
+              <main id="main-content" className="flex-1">{children}</main>
               <Footer />
               <WhatsAppFAB locale={locale} />
               <BottomFade />

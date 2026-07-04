@@ -21,6 +21,7 @@ const subtleBtn = 'p-2 rounded-md text-gray-400 hover:text-brand-navy dark:text-
 
 export function Header() {
   const t = useTranslations('nav')
+  const tA11y = useTranslations('a11y')
   const [menuOpen, setMenuOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const [themeMounted, setThemeMounted] = useState(false)
@@ -63,7 +64,7 @@ export function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
+          <nav className="hidden md:flex items-center gap-1" aria-label={tA11y('mainNavigation')}>
             {NAV_LINKS.map(({ key, href, wip }) => (
               <Link
                 key={key}
@@ -89,13 +90,13 @@ export function Header() {
           <div className="flex items-center gap-1">
             {/* Theme toggle - rendered only after mount to avoid SSR/client mismatch */}
             {themeMounted && (
-              <button onClick={toggleTheme} aria-label="Toggle theme" className={subtleBtn}>
+              <button onClick={toggleTheme} aria-label={tA11y('toggleTheme')} className={subtleBtn}>
                 {resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}
               </button>
             )}
 
             {/* Language toggle */}
-            <button onClick={toggleLocale} aria-label="Switch language" className={cn(subtleBtn, 'text-xs font-medium tracking-wide')}>
+            <button onClick={toggleLocale} aria-label={tA11y('switchLanguage')} className={cn(subtleBtn, 'text-xs font-medium tracking-wide')}>
               {locale === 'ar' ? 'EN' : 'AR'}
             </button>
 
@@ -111,8 +112,9 @@ export function Header() {
             <button
               className="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors"
               onClick={() => setMenuOpen((o) => !o)}
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-label={menuOpen ? tA11y('closeMenu') : tA11y('openMenu')}
               aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
             >
               {menuOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
@@ -122,12 +124,14 @@ export function Header() {
 
       {/* Mobile dropdown */}
       <div
+        id="mobile-nav"
+        inert={!menuOpen}
         className={cn(
           'md:hidden overflow-hidden transition-all duration-200',
           menuOpen ? 'max-h-80' : 'max-h-0'
         )}
       >
-        <nav className="px-4 pt-2 pb-4 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-1" aria-label="Mobile navigation">
+        <nav className="px-4 pt-2 pb-4 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-1" aria-label={tA11y('mobileNavigation')}>
           {NAV_LINKS.map(({ key, href, wip }) => (
             <Link
               key={key}

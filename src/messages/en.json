@@ -7,6 +7,24 @@
     "quote": "Request a Quote",
     "comingSoon": "Coming Soon"
   },
+  "a11y": {
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation",
+    "toggleTheme": "Toggle theme",
+    "switchLanguage": "Switch language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "close": "Close",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
+    "goToImage": "Go to image {n}",
+    "imageOf": "{name}, image {current} of {total}",
+    "scrollUp": "Scroll up",
+    "scrollDown": "Scroll down",
+    "viewFullImage": "View full image",
+    "breadcrumb": "Breadcrumb"
+  },
   "home": {
     "hero": {
       "title": "Quality Plastics, Built to Your Specifications",
@@ -115,7 +133,7 @@
     },
     "whatsapp": "Contact via WhatsApp",
     "quote": "Get a Quote",
-    "zoomHint": "Scroll to zoom",
+    "zoomHint": "Scroll or ↑ / ↓ to zoom",
     "notFound": "Product not found.",
     "notFoundText": "The product you are looking for does not exist or has been removed."
   },

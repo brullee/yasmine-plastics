@@ -7,6 +7,24 @@
     "quote": "طلب عرض سعر",
     "comingSoon": "قريبًا"
   },
+  "a11y": {
+    "skipToContent": "تخطي إلى المحتوى",
+    "mainNavigation": "التنقل الرئيسي",
+    "mobileNavigation": "قائمة التنقل للجوال",
+    "toggleTheme": "تبديل المظهر",
+    "switchLanguage": "تبديل اللغة",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "close": "إغلاق",
+    "previousImage": "الصورة السابقة",
+    "nextImage": "الصورة التالية",
+    "goToImage": "الانتقال إلى الصورة {n}",
+    "imageOf": "{name}، الصورة {current} من {total}",
+    "scrollUp": "التمرير لأعلى",
+    "scrollDown": "التمرير لأسفل",
+    "viewFullImage": "عرض الصورة كاملة",
+    "breadcrumb": "مسار التصفح"
+  },
   "home": {
     "hero": {
       "title": "بلاستيك عالي الجودة، مصنوع بحسب مواصفاتك",
@@ -115,7 +133,7 @@
     },
     "whatsapp": "تواصل عبر واتساب",
     "quote": "طلب عرض سعر",
-    "zoomHint": "مرّر عجلة الفأرة للتكبير",
+    "zoomHint": "استخدم العجلة أو ↑ / ↓",
     "notFound": "المنتج غير موجود.",
     "notFoundText": "المنتج الذي تبحث عنه غير موجود أو تمت إزالته."
   },

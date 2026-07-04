@@ -27,6 +27,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
   const imgRef     = useRef<HTMLDivElement>(null)
   const hoveredRef = useRef(false)
   const [hovered, setHovered] = useState(false)
+  const [focused, setFocused] = useState(false)
   const [bgScale, setBgScale] = useState({ x: 1, y: 1 })
 
   const onEnter = () => {
@@ -110,12 +111,14 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
           {onQuickView && (
             <button
               type="button"
-              className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap"
+              className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy dark:focus-visible:ring-sky-400 rounded-full"
               style={{
-                opacity:       hovered ? 1 : 0,
-                pointerEvents: hovered ? 'auto' : 'none',
-                transition:    hovered ? `opacity ${DUR} ${EASE}` : 'opacity 80ms ease',
+                opacity:       (hovered || focused) ? 1 : 0,
+                pointerEvents: (hovered || focused) ? 'auto' : 'none',
+                transition:    (hovered || focused) ? `opacity ${DUR} ${EASE}` : 'opacity 80ms ease',
               }}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
               onClick={() => {
                 const rect = imgRef.current?.getBoundingClientRect()
                 if (rect) onQuickView(product, rect)

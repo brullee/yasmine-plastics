@@ -123,6 +123,8 @@ export function QuoteForm({
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={t('placeholderFullName')}
+          aria-invalid={!!errors.fullName}
+          aria-describedby={errors.fullName ? 'q-fullName-error' : undefined}
           className={inputCls(!!errors.fullName)}
         />
       </FormField>
@@ -149,6 +151,8 @@ export function QuoteForm({
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={t('placeholderEmail')}
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? 'q-email-error' : undefined}
           className={inputCls(!!errors.email)}
         />
       </FormField>
@@ -167,6 +171,8 @@ export function QuoteForm({
           }}
           onBlur={handleBlur}
           placeholder={t('placeholderPhone')}
+          aria-invalid={!!errors.phone}
+          aria-describedby={errors.phone ? 'q-phone-error' : undefined}
           className={cn(inputCls(!!errors.phone), 'rtl:text-right')}
         />
       </FormField>

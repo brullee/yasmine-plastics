@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
@@ -44,10 +44,14 @@ interface Props {
 export function QuickViewModal({ product, locale, originRect, onClose, allProducts }: Props) {
   const t         = useTranslations('product')
   const tProducts = useTranslations('products')
+  const tA11y     = useTranslations('a11y')
 
   const [phase, setPhase] = useState<Phase>('placed')
   const [layout]          = useState(() => calcLayout(originRect))
   const [imgIndex, setImgIndex] = useState(0)
+
+  const dialogRef  = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
 
   const images  = [product.image, ...(product.gallery ?? [])]
   const hasMany = images.length > 1
@@ -55,14 +59,39 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
   const prevImg = () => setImgIndex(i => (i - 1 + images.length) % images.length)
   const nextImg = () => setImgIndex(i => (i + 1) % images.length)
 
+  // Focus management: remember opener, move focus in, hide background from AT, restore on close
+  useEffect(() => {
+    triggerRef.current = document.activeElement as HTMLElement | null
+    const root = document.getElementById('app-root')
+    root?.setAttribute('inert', '')
+    dialogRef.current?.focus()
+    return () => {
+      root?.removeAttribute('inert')
+      triggerRef.current?.focus()
+    }
+  }, [])
+
   // Scroll lock + keyboard
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape')     handleClose()
-      if (e.key === 'ArrowLeft')  prevImg()
-      if (e.key === 'ArrowRight') nextImg()
+      if (e.key === 'Escape')     { handleClose(); return }
+      if (e.key === 'ArrowLeft')  { prevImg(); return }
+      if (e.key === 'ArrowRight') { nextImg(); return }
+      if (e.key === 'Tab') {
+        const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], [tabindex]:not([tabindex="-1"])'
+        )
+        if (!focusable?.length) return
+        const first = focusable[0]
+        const last  = focusable[focusable.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus()
+        }
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey) }
@@ -144,7 +173,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
       />
 
       {/* Animated box */}
-      <div style={boxStyle} role="dialog" aria-modal="true" aria-label={name}>
+      <div ref={dialogRef} tabIndex={-1} style={boxStyle} className="outline-none" role="dialog" aria-modal="true" aria-label={name}>
         <div className="flex h-full bg-white dark:bg-slate-900">
 
           {/* Image side — no separate background so there's no visible dividing line */}
@@ -164,11 +193,11 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
             {hasMany && (
               <>
-                <button onClick={prevImg} aria-label="Previous image"
+                <button onClick={prevImg} aria-label={tA11y('previousImage')}
                   className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="left" />
                 </button>
-                <button onClick={nextImg} aria-label="Next image"
+                <button onClick={nextImg} aria-label={tA11y('nextImage')}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="right" />
                 </button>
@@ -178,7 +207,8 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                     <button
                       key={i}
                       onClick={() => setImgIndex(i)}
-                      aria-label={`Image ${i + 1}`}
+                      aria-label={tA11y('goToImage', { n: i + 1 })}
+                      aria-current={i === imgIndex}
                       className={cn(
                         'w-2 h-2 rounded-full transition-colors',
                         i === imgIndex
@@ -206,7 +236,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {/* Close */}
             <button
               onClick={handleClose}
-              aria-label="Close"
+              aria-label={tA11y('close')}
               className="absolute top-3 end-3 z-10 p-2 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-300"
             >
               <XIcon size={16} />

@@ -49,6 +49,8 @@ export function ContactForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={t('placeholderName')}
+          aria-invalid={!!errors.fullName}
+          aria-describedby={errors.fullName ? 'contact-fullName-error' : undefined}
           className={inputCls(!!errors.fullName)}
         />
       </FormField>
@@ -63,6 +65,8 @@ export function ContactForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={t('placeholderEmail')}
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? 'contact-email-error' : undefined}
           className={inputCls(!!errors.email)}
         />
       </FormField>
@@ -93,6 +97,8 @@ export function ContactForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={t('placeholderMessage')}
+          aria-invalid={!!errors.message}
+          aria-describedby={errors.message ? 'contact-message-error' : undefined}
           className={cn(
             'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]',
             errors.message ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600',

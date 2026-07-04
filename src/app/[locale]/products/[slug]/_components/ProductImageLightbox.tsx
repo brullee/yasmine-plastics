@@ -15,7 +15,8 @@ interface Props {
 }
 
 export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClose }: Props) {
-  const t = useTranslations('product')
+  const t     = useTranslations('product')
+  const tA11y = useTranslations('a11y')
 
   const [lightboxIndex, setLightboxIndex] = useState(initialIndex)
   const [zoom, setZoom] = useState(1)
@@ -30,6 +31,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
   const lastTapTimeRef    = useRef<number>(0)
   const isTouchActiveRef  = useRef(false)
   const lastTouchEndRef   = useRef<number>(0)
+  const keyboardZoomRef   = useRef(false)
 
   const lightboxPrev = useCallback(() =>
     setLightboxIndex((i) => (i - 1 + images.length) % images.length), [images.length])
@@ -56,12 +58,15 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
     document.body.style.position = 'fixed'
     document.body.style.top      = `-${scrollY}px`
     document.body.style.width    = '100%'
+    const root = document.getElementById('app-root')
+    root?.setAttribute('inert', '')
     lightboxRef.current?.focus()
     return () => {
       document.body.style.position = ''
       document.body.style.top      = ''
       document.body.style.width    = ''
       window.scrollTo(0, scrollY)
+      root?.removeAttribute('inert')
     }
   }, [isOpen])
 
@@ -72,6 +77,8 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       if (e.key === 'Escape')     { closeLightbox(); return }
       if (e.key === 'ArrowLeft')  { lightboxPrev(); return }
       if (e.key === 'ArrowRight') { lightboxNext(); return }
+      if (e.key === 'ArrowUp')    { e.preventDefault(); keyboardZoomRef.current = true; setLightboxMouseOrigin({ x: 50, y: 50 }); setZoom(z => Math.min(4, z + 0.4)); return }
+      if (e.key === 'ArrowDown')  { e.preventDefault(); keyboardZoomRef.current = true; setLightboxMouseOrigin({ x: 50, y: 50 }); setZoom(z => Math.max(1, z - 0.4)); return }
       if (e.key === 'Home')       { setLightboxIndex(0); return }
       if (e.key === 'End')        { setLightboxIndex(images.length - 1); return }
       if (e.key === 'Tab') {
@@ -100,6 +107,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
     function onWheel(e: WheelEvent) {
       e.preventDefault()
       if (isTouchActiveRef.current) return
+      keyboardZoomRef.current = false
       setZoom((z) => Math.min(4, Math.max(1, z - e.deltaY * 0.002)))
     }
     function onTouchMove(e: TouchEvent) {
@@ -108,6 +116,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
     function onMouseMove(e: MouseEvent) {
       if (isTouchActiveRef.current) return
       if (Date.now() - lastTouchEndRef.current < 500) return
+      if (keyboardZoomRef.current) return
       const r = lightboxImgRef.current?.getBoundingClientRect()
       if (!r) return
       setLightboxMouseOrigin({
@@ -136,6 +145,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
   // ── Touch: swipe, pinch-to-zoom, double-tap ─────────────────────────────
   function onTouchStart(e: React.TouchEvent) {
     isTouchActiveRef.current = true
+    keyboardZoomRef.current = false
     if (lightboxImgRef.current) lightboxImgRef.current.style.transition = 'none'
     if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX
@@ -216,7 +226,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       ref={lightboxRef}
       role="dialog"
       aria-modal="true"
-      aria-label={`${name}, image ${lightboxIndex + 1} of ${images.length}`}
+      aria-label={tA11y('imageOf', { name, current: lightboxIndex + 1, total: images.length })}
       tabIndex={-1}
       className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center outline-none"
       onClick={closeLightbox}
@@ -227,7 +237,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       {/* Close */}
       <button
         onClick={closeLightbox}
-        aria-label="Close"
+        aria-label={tA11y('close')}
         className="absolute top-3 end-3 z-10 p-2 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white hover:bg-black/75 transition-colors"
       >
         <XIcon />
@@ -269,7 +279,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
         <>
           <button
             onClick={(e) => { e.stopPropagation(); lightboxPrev() }}
-            aria-label="Previous image"
+            aria-label={tA11y('previousImage')}
             className="group absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
           >
             <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
@@ -278,7 +288,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); lightboxNext() }}
-            aria-label="Next image"
+            aria-label={tA11y('nextImage')}
             className="group absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
           >
             <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
