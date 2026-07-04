@@ -1,12 +1,14 @@
+export const revalidate = 3600
+
 import type { Metadata } from 'next'
-import { getTranslations, getLocale } from 'next-intl/server'
-import Image from 'next/image'
+import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { CategoryCard } from '@/components/ui/CategoryCard'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MapEmbed } from '@/components/ui/MapEmbed'
 import { company } from '@/data/company'
 import { pageAlternates, localeUrl, BASE_URL, brandName } from '@/lib/seo'
+import { getProducts, getCategories } from '@/lib/payload-data'
 import { ShapesIcon, MoldIcon, ColorsIcon, PrintIcon, ManufacturingIcon, YearsIcon, RangeIcon } from '@/components/ui/Icons'
 import type { Locale } from '@/types'
 
@@ -43,6 +45,7 @@ export default async function HomePage({
   const locale = localeRaw as Locale
   const t = await getTranslations({ locale, namespace: 'home' })
   const tNav = await getTranslations({ locale, namespace: 'nav' })
+  const [products, categories] = await Promise.all([getProducts(), getCategories()])
 
   const orgSchema = {
     '@context': 'https://schema.org',
@@ -172,49 +175,44 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* Product categories grid - hidden until products page is ready */}
-      {/* <section className="py-20">
+      {/* Product categories grid */}
+      <section className="py-20 bg-brand-navy/10 dark:bg-brand-navy/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-blue-300">
-              {t('categories.title')}
-            </h2>
-            <Link
-              href="/products"
-              className="text-sm font-medium text-brand-blue dark:text-blue-300 hover:underline hidden sm:block"
-            >
-              {t('categories.viewAll')} {locale === 'ar' ? '←' : '→'}
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((cat) => (
-              <CategoryCard key={cat.slug} category={cat} locale={locale} />
+          <h2 className="text-3xl font-bold text-center text-brand-navy dark:text-white mb-14">
+            {t('categories.title')}
+          </h2>
+          <div className="flex flex-wrap justify-center gap-5">
+            {categories.map((cat, i) => (
+              <ScrollReveal
+                key={cat.slug}
+                direction="up"
+                delay={i * 80}
+                className="w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(25%-0.9375rem)]"
+              >
+                <CategoryCard
+                  category={cat}
+                  locale={locale}
+                  productCount={products.filter((p) => p.category === cat.slug).length}
+                />
+              </ScrollReveal>
             ))}
           </div>
-          <div className="mt-6 text-center sm:hidden">
-            <Link
-              href="/products"
-              className="text-sm font-medium text-brand-blue dark:text-blue-300 hover:underline"
-            >
-              {t('categories.viewAll')} {locale === 'ar' ? '←' : '→'}
-            </Link>
-          </div>
         </div>
-      </section> */}
+      </section>
 
 {/* Bottom CTA banner */}
-      <section className="py-20 bg-sky-50 dark:bg-brand-navy/40">
+      <section className="py-20 bg-gradient-to-br from-brand-navy to-brand-navyDark">
         <ScrollReveal direction="up">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               {t('cta.headline')}
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-blue-200 text-lg mb-8 max-w-xl mx-auto">
               {t('cta.subtext')}
             </p>
             <Link
               href="/quote"
-              className="inline-flex items-center px-8 py-3.5 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-white dark:text-brand-navy dark:hover:bg-gray-200 transition-colors text-base"
+              className="inline-flex items-center px-8 py-3.5 bg-white text-brand-navy font-semibold rounded-lg hover:bg-gray-200 transition-colors text-base"
             >
               {t('cta.button')}
             </Link>
