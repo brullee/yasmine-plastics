@@ -22,6 +22,10 @@ export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
+export function prefersReducedMotion(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 export function deriveCapacityParts(
   product: Pick<Product, 'capacity' | 'capacityAutoGenerate' | 'options'>
 ): { range: string; unit: string } | undefined {

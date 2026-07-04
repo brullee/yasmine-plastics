@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { cn, buildWhatsAppUrl, localizedName, deriveCapacity } from '@/lib/utils'
+import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
 import { company } from '@/data/company'
 import { ArrowIcon, ChevronIcon, XIcon, WhatsAppIcon } from '@/components/ui/Icons'
 import { SpecBadge } from '@/components/ui/SpecBadge'
@@ -69,6 +69,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (prefersReducedMotion()) { setPhase('open'); return }
     const t1 = setTimeout(() => setPhase('flying'),    16)
     const t2 = setTimeout(() => setPhase('expanding'), 16 + 320)
     const t3 = setTimeout(() => setPhase('open'),      16 + 320 + 370)
@@ -76,6 +77,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleClose() {
+    if (prefersReducedMotion()) { onClose(); return }
     setPhase('closing')
     setTimeout(onClose, 160)
   }

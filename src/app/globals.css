@@ -6,6 +6,20 @@
 @keyframes reveal-right { from { opacity: 0; transform: translateX( 28px); } to { opacity: 1; transform: none; } }
 @keyframes reveal-up    { from { opacity: 0; transform: translateY( 20px); } to { opacity: 1; transform: none; } }
 
+/* Covers scroll reveal, card hover, quick view expand, and carousel/lightbox
+   transitions site-wide, including inline-style transitions (JS-driven durations
+   are overridden by !important). JS-initiated smooth scrolls (scrollIntoView /
+   scrollBy with an explicit behavior option) aren't covered by scroll-behavior
+   and are guarded individually via prefersReducedMotion() in utils.ts. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 
 @layer utilities {
   .scrollbar-none {
