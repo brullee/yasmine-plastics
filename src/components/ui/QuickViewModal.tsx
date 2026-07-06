@@ -9,6 +9,7 @@ import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMoti
 import { company } from '@/data/company'
 import { ArrowIcon, ChevronIcon, XIcon, WhatsAppIcon } from '@/components/ui/Icons'
 import { SpecBadge } from '@/components/ui/SpecBadge'
+import { ValuePill } from '@/components/ui/ValuePill'
 import type { Product, Locale } from '@/types'
 
 const EASE_OPEN  = 'cubic-bezier(0.25,1,0.5,1)'
@@ -256,7 +257,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {(product.material || derivedCapacity || product.piecesPerBox) && (
               <div className="flex flex-wrap gap-2">
                 {product.material && <SpecBadge>{product.material}</SpecBadge>}
-                {derivedCapacity && <SpecBadge plain dir="ltr">{derivedCapacity}</SpecBadge>}
+                {derivedCapacity && <SpecBadge dir="ltr">{derivedCapacity}</SpecBadge>}
                 {product.piecesPerBox && <SpecBadge plain>{product.piecesPerBox} pcs/box</SpecBadge>}
               </div>
             )}
@@ -269,9 +270,9 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {product.options.colors.map((color) => (
-                    <span key={color.en} className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
+                    <ValuePill key={color.en}>
                       {locale === 'ar' ? color.ar : color.en}
-                    </span>
+                    </ValuePill>
                   ))}
                 </div>
               </div>
@@ -285,9 +286,9 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {product.options.sizes.map((size) => (
-                    <span key={size} dir="ltr" className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
+                    <ValuePill key={size} dir="ltr">
                       {size}{product.options.sizeUnit ?? ''}
-                    </span>
+                    </ValuePill>
                   ))}
                 </div>
               </div>
@@ -301,9 +302,9 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {resolvedLids.map((lid) => (
-                    <span key={lid.slug} className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
+                    <ValuePill key={lid.slug}>
                       {localizedName(lid, locale)}
-                    </span>
+                    </ValuePill>
                   ))}
                 </div>
               </div>
@@ -317,9 +318,9 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {fitsContainers.map((container) => (
-                    <span key={container.slug} className="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700">
+                    <ValuePill key={container.slug}>
                       {localizedName(container, locale)}
-                    </span>
+                    </ValuePill>
                   ))}
                 </div>
               </div>
