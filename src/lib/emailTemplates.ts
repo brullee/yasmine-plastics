@@ -1,6 +1,24 @@
+import { BASE_URL } from '@/lib/seo'
+
 const NAVY = '#005496'
 const NAVY_DARK = '#003d6e'
 const BG = '#f9fafb'
+export const LOGO_URL = `${BASE_URL}/logo-email.png`
+
+function logoHeader(title: string) {
+  return `
+        <!-- Header -->
+        <tr><td style="background:${NAVY_DARK};padding:24px 32px;">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td style="padding-right:14px;">
+              <img src="${LOGO_URL}" width="52" height="52" alt="" style="display:block;border:0;">
+            </td>
+            <td style="vertical-align:middle;">
+              <h1 style="margin:0;font-size:22px;color:#ffffff;font-weight:700;">${title}</h1>
+            </td>
+          </tr></table>
+        </td></tr>`
+}
 
 function esc(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -15,12 +33,12 @@ function row(label: string, value: string | null | undefined, link?: string) {
   return `
     <tr>
       <td style="padding:12px 16px;color:#6b7280;font-size:13px;white-space:nowrap;vertical-align:top;width:130px;">${label}</td>
-      <td style="padding:12px 16px;font-size:14px;color:#111827;vertical-align:top;line-height:1.5;">${cell}</td>
+      <td style="padding:12px 16px;font-size:14px;color:#374151;vertical-align:top;line-height:1.5;">${cell}</td>
     </tr>`
 }
 
 function divider() {
-  return `<tr><td colspan="2" style="padding:0 16px;"><hr style="border:none;border-top:1px solid #d1d5db;margin:2px 0;"></td></tr>`
+  return `<tr><td colspan="2" style="padding:0 16px;"><hr style="border:none;border-top:1px solid #e5e7eb;margin:2px 0;"></td></tr>`
 }
 
 export function contactEmailHtml({ fullName, email, phone, message }: {
@@ -37,11 +55,7 @@ export function contactEmailHtml({ fullName, email, phone, message }: {
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
 
-        <!-- Header -->
-        <tr><td style="background:${NAVY_DARK};padding:28px 32px;">
-          <p style="margin:0;font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;">Yasmine Plastics</p>
-          <h1 style="margin:6px 0 0;font-size:22px;color:#ffffff;font-weight:700;">New Contact Message</h1>
-        </td></tr>
+        ${logoHeader('New Contact Message')}
 
         <!-- Sender details -->
         <tr><td style="background:#ffffff;padding:8px 0;">
@@ -55,12 +69,12 @@ export function contactEmailHtml({ fullName, email, phone, message }: {
         <!-- Message -->
         <tr><td style="background:${BG};padding:24px 32px;">
           <p style="margin:0 0 10px;font-size:12px;color:${NAVY};text-transform:uppercase;letter-spacing:1px;font-weight:600;">Message</p>
-          <p style="margin:0;font-size:14px;color:#111827;line-height:1.7;white-space:pre-wrap;">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+          <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
         </td></tr>
 
         <!-- Footer -->
         <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
-          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${esc(fullName)}.</p>
+          <p style="margin:0;font-size:12px;color:#6b7280;">Hit <strong>Reply</strong> to respond directly to ${esc(fullName)}.</p>
         </td></tr>
 
       </table>
@@ -82,11 +96,7 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
 
-        <!-- Header -->
-        <tr><td style="background:${NAVY_DARK};padding:28px 32px;">
-          <p style="margin:0;font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;">Yasmine Plastics</p>
-          <h1 style="margin:6px 0 0;font-size:22px;color:#ffffff;font-weight:700;">Reset Your Password</h1>
-        </td></tr>
+        ${logoHeader('Reset Your Password')}
 
         <!-- Body -->
         <tr><td style="background:#ffffff;padding:32px;">
@@ -106,7 +116,7 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
 
         <!-- Footer -->
         <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
-          <p style="margin:0;font-size:12px;color:#9ca3af;">
+          <p style="margin:0;font-size:12px;color:#6b7280;">
             If the button doesn't work, copy and paste this link into your browser:<br>
             <a href="${resetURL}" style="color:${NAVY};word-break:break-all;">${resetURL}</a>
           </p>
@@ -147,11 +157,7 @@ export function quoteEmailHtml({ fullName, company, email, phone, productName, p
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
 
-        <!-- Header -->
-        <tr><td style="background:${NAVY_DARK};padding:28px 32px;">
-          <p style="margin:0;font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;">Yasmine Plastics</p>
-          <h1 style="margin:6px 0 0;font-size:22px;color:#ffffff;font-weight:700;">New Quote Request</h1>
-        </td></tr>
+        ${logoHeader('New Quote Request')}
 
         <!-- Contact details -->
         <tr><td style="background:#ffffff;padding:4px 0 8px;">
@@ -187,14 +193,14 @@ export function quoteEmailHtml({ fullName, company, email, phone, productName, p
             ${row('Delivery', delivery)}
             ${details ? `<tr><td colspan="2" style="padding:10px 16px;">
               <p style="margin:0 0 6px;font-size:13px;color:${NAVY};font-weight:600;">Notes</p>
-              <p style="margin:0;font-size:14px;color:#111827;line-height:1.7;white-space:pre-wrap;">${details.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+              <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;">${details.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
             </td></tr>` : ''}
           </table>
         </td></tr>` : ''}
 
         <!-- Footer -->
         <tr><td style="background:#ffffff;padding:16px 32px;border-top:1px solid #e5e7eb;">
-          <p style="margin:0;font-size:12px;color:#9ca3af;">Hit <strong>Reply</strong> to respond directly to ${esc(fullName)}.</p>
+          <p style="margin:0;font-size:12px;color:#6b7280;">Hit <strong>Reply</strong> to respond directly to ${esc(fullName)}.</p>
         </td></tr>
 
       </table>
