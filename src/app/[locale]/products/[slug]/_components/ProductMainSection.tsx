@@ -101,6 +101,14 @@ export function ProductMainSection({
     }
   }, [images])
 
+  // Switching images programmatically (color/size/partner change, thumbnail click)
+  // shouldn't carry over a zoom that was mid-flight for the *previous* image — the
+  // cursor isn't necessarily still over the frame, and the next real mousemove will
+  // re-engage zoom near-instantly if it is. Without this, a stale `hoverZoom: true`
+  // could suddenly apply `scale(1.6)` to the freshly swapped-in image, reading as
+  // an unintended swing/jump rather than a deliberate hover.
+  useEffect(() => setHoverZoom(false), [carouselIndex])
+
   const displayImage = images[carouselIndex]
   const currentFailed = failedUrls.has(displayImage)
   const allFailed = images.length > 0 && images.every((url) => failedUrls.has(url))
@@ -146,7 +154,14 @@ export function ProductMainSection({
   }
 
   // ── Color / size → carousel jump ────────────────────────────────────────
+  // Only scroll on the single-column mobile layout (below `lg`), where the image
+  // can be off-screen when a color/size swatch below it is tapped. On the `lg:`
+  // two-column layout the image and the swatches are always both already visible
+  // side by side, so this scrollIntoView had nothing to do — it was still firing
+  // on every change though, and its "nearest" calculation could nudge the page by
+  // a stray pixel or two mid-transition, reading as an unwanted little swing.
   function nudgeToImage() {
+    if (window.matchMedia('(min-width: 1024px)').matches) return
     imageContainerRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' })
   }
 
