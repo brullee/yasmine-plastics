@@ -31,10 +31,10 @@ type SectionKey = 'story' | 'mission' | 'vision' | 'values'
 const sections: SectionKey[] = ['story', 'mission', 'vision', 'values']
 
 const cardStyles: { bg: string; title: string; body: string }[] = [
-  { bg: 'bg-brand-navy',                         title: 'text-white',                      body: 'text-blue-200' },
-  { bg: 'bg-brand-navy/10 dark:bg-[#002952]', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-200' },
-  { bg: 'bg-brand-navy',                         title: 'text-white',                      body: 'text-blue-200' },
-  { bg: 'bg-brand-navy/10 dark:bg-[#002952]', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-200' },
+  { bg: 'bg-gradient-to-br from-brand-navy to-brand-navyDark', title: 'text-white',                      body: 'text-blue-200' },
+  { bg: 'bg-[#d3e2ef] dark:bg-brand-navy/20 shadow-[0_6px_24px_rgba(0,0,0,.15)] dark:shadow-none', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-300' },
+  { bg: 'bg-gradient-to-br from-brand-navy to-brand-navyDark', title: 'text-white',                      body: 'text-blue-200' },
+  { bg: 'bg-[#d3e2ef] dark:bg-brand-navy/20 shadow-[0_6px_24px_rgba(0,0,0,.15)] dark:shadow-none', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-300' },
 ]
 
 export default async function AboutPage({

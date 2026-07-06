@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 interface ChipButtonProps {
@@ -16,6 +16,7 @@ export function ChipButton({ active, custom, onClick, children, type = 'button' 
     <button
       type={type}
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
         'inline-flex items-center px-4 py-2 rounded-lg border text-sm font-medium transition-all',
         active
@@ -38,13 +39,14 @@ interface ChipRowProps {
 }
 
 export function ChipRow({ label, value, valueDir, children }: ChipRowProps) {
+  const labelId = useId()
   return (
     <div>
       <div className="flex items-center gap-2 mb-2.5">
-        <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{label}</p>
+        <p id={labelId} className="text-sm font-semibold text-gray-600 dark:text-gray-300">{label}</p>
         {value && <span className="text-sm text-gray-600 dark:text-gray-400" dir={valueDir}>{value}</span>}
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="group" aria-labelledby={labelId}>
         {children}
       </div>
     </div>

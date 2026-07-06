@@ -13,7 +13,7 @@ export function FormField({ id, label, required, error, children }: FormFieldPro
         {label}{required && <> <span aria-hidden="true" className="text-red-500">*</span></>}
       </label>
       {children}
-      {error && <p className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>}
+      {error && <p id={`${id}-error`} className="mt-1 text-xs text-red-500 dark:text-red-400">{error}</p>}
     </div>
   )
 }

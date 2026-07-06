@@ -139,7 +139,7 @@ export function ProductActions({
             <div>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
                   {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
                 </span>
               </div>
@@ -153,7 +153,7 @@ export function ProductActions({
             <div>
               <div className="flex items-center gap-2 mb-2.5">
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
                   {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
                 </span>
               </div>
@@ -224,7 +224,7 @@ export function ProductActions({
             if (partnerSize) p.set('partnerSize', partnerSize)
             return `/quote?${p.toString()}`
           })()}
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyDark transition-colors"
+          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
         >
           <SendIcon />
           {t('sendInquiry')}
@@ -233,7 +233,7 @@ export function ProductActions({
           href={chatUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white dark:bg-gray-800 text-brand-navy dark:text-white font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-300 dark:border-gray-700"
+          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white dark:bg-gray-800 text-brand-navy dark:text-white font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
         >
           <WhatsAppIcon />
           {t('chatNow')}
@@ -265,6 +265,7 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
       <button
         type="button"
         onClick={onClick}
+        aria-pressed={selected}
         className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
       >
         <div data-thumb className="relative w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-white flex items-center justify-center text-gray-500">

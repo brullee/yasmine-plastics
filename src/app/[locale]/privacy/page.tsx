@@ -46,7 +46,7 @@ export default async function PrivacyPage({
         </span>
       </div>
 
-      <div className="divide-y divide-gray-100 dark:divide-white/10">
+      <div className="divide-y divide-gray-200 dark:divide-white/10">
         {isAr ? (
           <>
             <section className="pb-10">

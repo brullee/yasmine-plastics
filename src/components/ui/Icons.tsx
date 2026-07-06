@@ -195,3 +195,14 @@ export function RangeIcon({ className = 'w-12 h-12' }: { className?: string }) {
     </svg>
   )
 }
+
+export function ImageOffIcon({ className = 'w-10 h-10' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="5" y="9" width="38" height="30" rx="3" />
+      <circle cx="17" cy="20" r="3.5" fill="currentColor" stroke="none" />
+      <path d="M5 32 L17 22 L25 29 L33 21 L43 30" />
+      <line x1="8" y1="6" x2="40" y2="42" strokeWidth="2.5" />
+    </svg>
+  )
+}
