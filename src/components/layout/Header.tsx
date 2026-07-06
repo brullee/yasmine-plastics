@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState, useEffect, useLayoutEffect } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 import { useTranslations, useLocale } from 'next-intl'
@@ -28,6 +28,7 @@ export function Header() {
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
+  const lastLocaleFixRef = useRef<string | null>(null)
 
   const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
   const toggleLocale = () => {
@@ -43,9 +44,20 @@ export function Header() {
   useIsomorphicLayoutEffect(() => {
     const saved = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/)?.[1]
     if (saved && (saved === 'en' || saved === 'ar') && saved !== locale) {
+      const target = `${pathname}${window.location.search}`
+      const fixKey = `${target}->${saved}`
+      // Guard against retrying a correction that didn't converge last time -
+      // without this, a redirect that never settles can re-trigger this effect
+      // synchronously and blow the call stack instead of just failing silently.
+      if (lastLocaleFixRef.current === fixKey) {
+        document.documentElement.style.opacity = ''
+        return
+      }
+      lastLocaleFixRef.current = fixKey
       document.documentElement.style.opacity = '0'
-      router.replace(`${pathname}${window.location.search}`, { locale: saved as 'en' | 'ar' })
+      router.replace(target, { locale: saved as 'en' | 'ar' })
     } else {
+      lastLocaleFixRef.current = null
       document.documentElement.style.opacity = ''
     }
   }, [pathname, locale])
