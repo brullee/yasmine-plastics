@@ -38,7 +38,7 @@
     --card-shadow-hover:  0 50px 95px -15px rgba(0,0,0,.22);
   }
   .dark {
-    --card-shadow-idle:   none;
+    --card-shadow-idle:   0 1px 4px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.25);
     --card-shadow-hover:  0 0 0 1px rgba(255,255,255,.07), 0 25px 60px rgba(0,0,0,.65);
   }
 

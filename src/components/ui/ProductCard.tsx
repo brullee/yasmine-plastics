@@ -1,16 +1,29 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import Image from 'next/image'
+import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
-import { cn, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
+import { cn, localizedName, deriveCapacity } from '@/lib/utils'
 import { EyeIcon } from '@/components/ui/Icons'
 import { SpecBadge } from '@/components/ui/SpecBadge'
+import { ProductImage } from '@/components/ui/ProductImage'
 import type { Product, Locale } from '@/types'
 
-const EASE = 'cubic-bezier(.2,.75,.5,1)'
-const DUR  = '500ms'
+// Same fix as CategoryCard (see its NO_JITTER comment): a scaled/clipped
+// element inside this card can snap slightly at the end of the hover
+// transition unless forced onto a stable GPU layer. Tried stacking more
+// aggressive hacks on top (a permanent sub-pixel rotate, transform-gpu,
+// perspective) — none of them reliably fixed the remaining stutter and one
+// introduced a new edge artifact, so this stays at the two standard,
+// well-understood properties rather than accumulating more speculative ones.
+// Residual jitter in some browser/mode combinations is accepted, not fixed.
+const NO_JITTER = 'will-change-transform [backface-visibility:hidden]'
+
+// Approximates the old JS-computed "grow by a fixed 40px regardless of card
+// size" background bleed ((width+40)/width) with real per-breakpoint ratios
+// from this grid's actual card widths (ProductsGrid: 2/3/4 cols), since a
+// single flat scale reads as noticeably weaker on the smaller card sizes.
+const SHADOW_SCALE = '[@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:scale-[1.23] sm:[@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:scale-[1.17] lg:[@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:scale-[1.14]'
 
 interface Props {
   product: Product
@@ -21,72 +34,47 @@ interface Props {
 
 export function ProductCard({ product, locale, onQuickView, priority = false }: Props) {
   const t    = useTranslations('products')
+  const tCommon = useTranslations('common')
   const name = localizedName(product, locale)
 
-  const cardRef    = useRef<HTMLDivElement>(null)
-  const imgRef     = useRef<HTMLDivElement>(null)
-  const hoveredRef = useRef(false)
-  const [hovered, setHovered] = useState(false)
-  const [focused, setFocused] = useState(false)
-  const [bgScale, setBgScale] = useState({ x: 1, y: 1 })
-
-  const onEnter = () => {
-    if (hoveredRef.current) return
-    if (!window.matchMedia('(hover: hover)').matches) return
-    hoveredRef.current = true
-    setHovered(true)
-    if (prefersReducedMotion()) return
-    const el = cardRef.current
-    if (el) setBgScale({ x: (el.offsetWidth + 40) / el.offsetWidth, y: (el.offsetHeight + 40) / el.offsetHeight })
-  }
-  const onLeave = () => {
-    hoveredRef.current = false
-    setHovered(false)
-    setBgScale({ x: 1, y: 1 })
-  }
-  // Re-triggers card hover after a QuickView modal closes with cursor already over the card
-  const onMove = () => { if (!hoveredRef.current) onEnter() }
+  const imgRef = useRef<HTMLDivElement>(null)
 
   const colorCount    = product.options.colors?.length ?? 0
   const sizeCount     = product.options.sizes?.length ?? 0
   const derivedCapacity = deriveCapacity(product)
 
   return (
-    <div
-      ref={cardRef}
-      className="relative"
-      style={{ zIndex: hovered ? 10 : 0 }}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      onMouseMove={onMove}
-    >
+    <div className="group relative hover:z-10 rounded-xl bg-white dark:bg-slate-800">
       {/* ── Nectar background-color-expand ───────────────────────────────── */}
       {/* Base layer: static idle shadow, only transform animates */}
       <div
-        className="absolute inset-0 rounded-xl bg-white dark:bg-slate-800 pointer-events-none"
-        style={{
-          transform:  `scale(${bgScale.x}, ${bgScale.y})`,
-          boxShadow:  'var(--card-shadow-idle)',
-          transition: `transform ${DUR} ${EASE}`,
-        }}
+        className={cn(
+          'absolute inset-0 rounded-xl bg-white dark:bg-slate-800 pointer-events-none scale-100',
+          SHADOW_SCALE,
+          'transition-transform duration-500 ease-[cubic-bezier(.2,.75,.5,1)]',
+          NO_JITTER,
+        )}
+        style={{ boxShadow: 'var(--card-shadow-idle)' }}
       />
       {/* Hover shadow layer: opacity-only transition avoids per-frame repaint */}
       <div
-        className="absolute inset-0 rounded-xl pointer-events-none"
-        style={{
-          transform:  `scale(${bgScale.x}, ${bgScale.y})`,
-          boxShadow:  'var(--card-shadow-hover)',
-          opacity:    hovered ? 1 : 0,
-          transition: `transform ${DUR} ${EASE}, opacity ${DUR} ${EASE}`,
-        }}
+        className={cn(
+          'absolute inset-0 rounded-xl pointer-events-none scale-100 opacity-0',
+          SHADOW_SCALE,
+          '[@media(hover:hover)]:group-hover:opacity-100',
+          'transition-[transform,opacity] duration-500 ease-[cubic-bezier(.2,.75,.5,1)]',
+          NO_JITTER,
+        )}
+        style={{ boxShadow: 'var(--card-shadow-hover)' }}
       />
 
       {/* ── Inner content — scales with the card expand ─────────────────── */}
       <div
-        style={{
-          transform:  hovered && !prefersReducedMotion() ? 'scale(1.07)' : 'scale(1)',
-          transition: `transform ${DUR} ${EASE}`,
-        }}
+        className={cn(
+          'scale-100 [@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:scale-[1.07]',
+          'transition-transform duration-500 ease-[cubic-bezier(.2,.75,.5,1)]',
+          NO_JITTER,
+        )}
       >
         {/* Image section */}
         <div className="relative">
@@ -96,12 +84,13 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
               ref={imgRef}
               className="relative aspect-square overflow-hidden bg-white dark:bg-slate-800 rounded-xl isolate"
             >
-              <Image
+              <ProductImage
                 src={product.image}
                 alt={name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-contain p-2 rounded-xl"
+                unavailableLabel={tCommon('imageUnavailable')}
                 priority={priority}
               />
             </div>
@@ -111,14 +100,13 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
           {onQuickView && (
             <button
               type="button"
-              className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy dark:focus-visible:ring-sky-400 rounded-full"
-              style={{
-                opacity:       (hovered || focused) ? 1 : 0,
-                pointerEvents: (hovered || focused) ? 'auto' : 'none',
-                transition:    (hovered || focused) ? `opacity ${DUR} ${EASE}` : 'opacity 80ms ease',
-              }}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
+              className={cn(
+                'absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy dark:focus-visible:ring-sky-400 rounded-full',
+                'opacity-0 pointer-events-none transition-opacity duration-75',
+                '[@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:duration-500',
+                'focus:opacity-100 focus:pointer-events-auto focus:duration-500',
+                NO_JITTER,
+              )}
               onClick={() => {
                 const rect = imgRef.current?.getBoundingClientRect()
                 if (rect) onQuickView(product, rect)
@@ -138,7 +126,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
             href={`/products/${product.slug}`}
             className={cn(
               'block text-base font-bold leading-snug line-clamp-2 transition-colors duration-300',
-              hovered ? 'text-brand-navy dark:text-sky-300' : 'text-brand-navy dark:text-white'
+              'text-brand-navy dark:text-white [@media(hover:hover)]:group-hover:dark:text-sky-300',
             )}
           >
             {name}
@@ -168,4 +156,3 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
     </div>
   )
 }
-
