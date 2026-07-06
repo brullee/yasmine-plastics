@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { ProductImage } from '@/components/ui/ProductImage'
 import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { company } from '@/data/company'
 import { ArrowIcon, ChevronIcon, XIcon, WhatsAppIcon } from '@/components/ui/Icons'
 import { SpecBadge } from '@/components/ui/SpecBadge'
@@ -339,7 +340,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
               <Link
                 href={`/products/${product.slug}`}
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+                className={cn('flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-semibold rounded-xl', button.primary)}
               >
                 {tProducts('viewDetails')}
                 <ArrowIcon direction={locale === 'ar' ? 'left' : 'right'} />
@@ -348,7 +349,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-sky-100 dark:bg-sky-900/40 border border-sky-200 dark:border-sky-800 text-sm font-medium rounded-xl hover:bg-[#cdecfe] hover:border-sky-300 dark:hover:bg-sky-900/60 transition-colors text-sky-700 dark:text-sky-300"
+                className={cn('flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl', button.secondaryCta)}
               >
                 <WhatsAppIcon size={15} />
                 {t('chatNow')}

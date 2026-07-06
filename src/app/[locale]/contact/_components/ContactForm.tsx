@@ -6,6 +6,7 @@ import { Turnstile } from '@marsidev/react-turnstile'
 import { useTheme } from 'next-themes'
 import { useContactForm } from '@/hooks/useContactForm'
 import { cn } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { SuccessBox } from '@/components/ui/SuccessBox'
 import { FormField } from '@/components/ui/FormField'
 
@@ -120,7 +121,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={!turnstileToken || !isFormValid || submitting}
-        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className={cn('w-full py-3 px-6 font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed', button.primary)}
       >
         {submitting ? t('submitting') : t('submit')}
       </button>

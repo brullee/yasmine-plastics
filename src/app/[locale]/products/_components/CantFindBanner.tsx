@@ -2,6 +2,8 @@
 
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
+import { button } from '@/lib/theme'
 
 export function CantFindBanner() {
   const t = useTranslations('products')
@@ -13,7 +15,7 @@ export function CantFindBanner() {
       </div>
       <Link
         href="/contact"
-        className="shrink-0 px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+        className={cn('shrink-0 px-5 py-2 text-sm font-semibold rounded-lg', button.primary)}
       >
         {t('cantFind.cta')}
       </Link>

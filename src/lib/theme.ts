@@ -59,13 +59,13 @@ export const border = {
 
 export const button = {
   /** Primary CTA on a neutral page surface. */
-  primary: 'bg-brand-navy text-white hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors',
+  primary: 'bg-brand-navy text-white hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navyHoverDark transition-colors',
   /** Primary CTA on a Deep (always-dark) section backdrop — same in both modes. */
   primaryOnDeep: 'bg-white text-brand-navy hover:bg-gray-300 transition-colors',
   /** Ghost/outline CTA on a Deep backdrop, paired beside primaryOnDeep — darkens on hover like its sibling instead of lightening. */
   ghostOnDeep: 'border-2 border-white text-white hover:bg-black/10 transition-colors',
   /** Secondary action next to a solid Primary (e.g. "Chat Now" beside "Send Inquiry"). Reuses the sky accent rather than introducing a new color. */
-  secondaryCta: 'bg-sky-100 dark:bg-sky-900/40 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 hover:bg-[#cdecfe] hover:border-sky-300 dark:hover:bg-sky-900/60 transition-colors',
+  secondaryCta: 'bg-sky-100 dark:bg-sky-900/40 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 hover:bg-[#cdecfe] hover:border-sky-300 dark:hover:bg-sky-800/60 dark:hover:border-sky-500 transition-colors',
 } as const
 
 export const chrome = {

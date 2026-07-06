@@ -7,6 +7,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { Link, useRouter, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
+import { button, chrome } from '@/lib/theme'
 import { SunIcon, MoonIcon, MenuIcon, CloseIcon } from '@/components/ui/Icons'
 
 type NavKey = 'home' | 'about' | 'products' | 'contact'
@@ -17,7 +18,7 @@ const NAV_LINKS: { key: NavKey; href: string; wip?: boolean }[] = [
   { key: 'contact', href: '/contact' },
 ]
 
-const subtleBtn = 'p-2 rounded-md text-gray-400 hover:text-brand-navy dark:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors'
+const subtleBtn = cn('p-2 rounded-md', chrome.subtleBtn)
 
 export function Header() {
   const t = useTranslations('nav')
@@ -66,7 +67,7 @@ export function Header() {
   useEffect(() => setThemeMounted(true), [])
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-brand-navyDeep border-b border-gray-200 dark:border-white/10 shadow-sm">
+    <header className={cn('sticky top-0 z-50 bg-white dark:bg-brand-navyDeep border-b shadow-sm', chrome.divider)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
           {/* Logo */}
@@ -85,7 +86,7 @@ export function Header() {
                   'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   wip
                     ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark'
+                    : cn(chrome.navLink, 'hover:bg-gray-100 dark:hover:bg-brand-navyDark')
                 )}
               >
                 {t(key)}
@@ -115,7 +116,7 @@ export function Header() {
             {/* CTA button */}
             <Link
               href="/quote"
-              className="hidden sm:inline-flex items-center ms-1 px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+              className={cn('hidden sm:inline-flex items-center ms-1 px-4 py-2 text-sm font-semibold rounded-md', button.primary)}
             >
               {t('quote')}
             </Link>
@@ -143,7 +144,7 @@ export function Header() {
           menuOpen ? 'max-h-80' : 'max-h-0'
         )}
       >
-        <nav className="px-4 pt-2 pb-4 border-t border-gray-200 dark:border-white/10 flex flex-col gap-1" aria-label={tA11y('mobileNavigation')}>
+        <nav className={cn('px-4 pt-2 pb-4 border-t flex flex-col gap-1', chrome.divider)} aria-label={tA11y('mobileNavigation')}>
           {NAV_LINKS.map(({ key, href, wip }) => (
             <Link
               key={key}
@@ -153,7 +154,7 @@ export function Header() {
                 'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                 wip
                   ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark'
+                  : cn(chrome.navLink, 'hover:bg-gray-100 dark:hover:bg-brand-navyDark')
               )}
             >
               {t(key)}
@@ -167,7 +168,7 @@ export function Header() {
           <Link
             href="/quote"
             onClick={() => setMenuOpen(false)}
-            className="mt-2 block text-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+            className={cn('mt-2 block text-center px-4 py-2 text-sm font-semibold rounded-md', button.primary)}
           >
             {t('quote')}
           </Link>

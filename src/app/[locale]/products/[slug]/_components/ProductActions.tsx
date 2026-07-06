@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn, buildWhatsAppUrl, localizedName } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
 import { ProductImage } from '@/components/ui/ProductImage'
 import { BanIcon, SendIcon, WhatsAppIcon, EyeIcon } from '@/components/ui/Icons'
@@ -224,7 +225,7 @@ export function ProductActions({
             if (partnerSize) p.set('partnerSize', partnerSize)
             return `/quote?${p.toString()}`
           })()}
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+          className={cn('flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 font-semibold rounded-xl', button.primary)}
         >
           <SendIcon />
           {t('sendInquiry')}
@@ -233,7 +234,7 @@ export function ProductActions({
           href={chatUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-semibold rounded-xl hover:bg-[#cdecfe] hover:border-sky-300 dark:hover:bg-sky-900/60 transition-colors border border-sky-200 dark:border-sky-800"
+          className={cn('flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 font-semibold rounded-xl', button.secondaryCta)}
         >
           <WhatsAppIcon />
           {t('chatNow')}

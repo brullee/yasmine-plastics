@@ -3,6 +3,8 @@
 import { useTranslations, useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { company } from '@/data/company'
+import { cn } from '@/lib/utils'
+import { chrome } from '@/lib/theme'
 
 type FooterNavKey = 'home' | 'about' | 'products' | 'contact' | 'quote'
 const NAV_LINKS: { key: FooterNavKey; href: string; wip?: boolean }[] = [
@@ -20,7 +22,7 @@ export function Footer() {
   const address = locale === 'ar' ? company.addressAr : company.addressEn
 
   return (
-    <footer className="bg-white dark:bg-brand-navyDeep border-t border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400">
+    <footer className={cn('bg-white dark:bg-brand-navyDeep border-t text-gray-600 dark:text-gray-400', chrome.divider)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Left: contact info */}
@@ -56,11 +58,10 @@ export function Footer() {
                 <Link
                   key={key}
                   href={href}
-                  className={`inline-flex items-center gap-1.5 text-sm transition-colors w-fit ${
-                    wip
-                      ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white'
-                  }`}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 text-sm transition-colors w-fit',
+                    wip ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default' : chrome.footerLink
+                  )}
                 >
                   {t(`nav.${key}`)}
                   {wip && (
@@ -76,15 +77,15 @@ export function Footer() {
       </div>
 
       {/* Bottom bar - copyright + legal + utility controls */}
-      <div id="footer-bottom-bar" className="border-t border-gray-200 dark:border-white/10">
+      <div id="footer-bottom-bar" className={cn('border-t', chrome.divider)}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
           <p>{t('footer.copyright')}</p>
 
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
+            <Link href="/privacy" className={cn('text-sm transition-colors', chrome.footerLink)}>
               {t('footer.privacyPolicy')}
             </Link>
-            <Link href="/terms" className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
+            <Link href="/terms" className={cn('text-sm transition-colors', chrome.footerLink)}>
               {t('footer.terms')}
             </Link>
           </div>

@@ -3,6 +3,8 @@ export const revalidate = 3600
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { CategoryGrid } from '@/components/ui/CategoryGrid'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MapEmbed } from '@/components/ui/MapEmbed'
@@ -88,13 +90,13 @@ export default async function HomePage({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/products"
-              className="px-8 py-3.5 bg-white text-brand-navy font-semibold rounded-lg hover:bg-gray-300 transition-colors text-base"
+              className={cn('px-8 py-3.5 font-semibold rounded-lg text-base', button.primaryOnDeep)}
             >
               {t('hero.browseCta')}
             </Link>
             <Link
               href="/quote"
-              className="px-8 py-3.5 border-2 border-white text-white font-semibold rounded-lg hover:bg-black/10 transition-colors text-base"
+              className={cn('px-8 py-3.5 font-semibold rounded-lg text-base', button.ghostOnDeep)}
             >
               {t('hero.quoteCta')}
             </Link>
@@ -197,7 +199,7 @@ export default async function HomePage({
             </p>
             <Link
               href="/quote"
-              className="inline-flex items-center px-8 py-3.5 bg-white text-brand-navy font-semibold rounded-lg hover:bg-gray-300 transition-colors text-base"
+              className={cn('inline-flex items-center px-8 py-3.5 font-semibold rounded-lg text-base', button.primaryOnDeep)}
             >
               {t('cta.button')}
             </Link>
