@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { ProductImage } from '@/components/ui/ProductImage'
 import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
 import { company } from '@/data/company'
 import { ArrowIcon, ChevronIcon, XIcon, WhatsAppIcon } from '@/components/ui/Icons'
@@ -19,7 +19,7 @@ type Phase = 'placed' | 'flying' | 'expanding' | 'open' | 'closing'
 
 function calcLayout(rect: DOMRect) {
   const vw = window.innerWidth, vh = window.innerHeight
-  const imgSize = Math.min(380, vw * 0.44, vh * 0.6)
+  const imgSize = Math.min(440, vw * 0.46, vh * 0.62)
   // Panel is taller than the image to accommodate many options
   const boxH    = Math.min(Math.max(imgSize + 80, 560), vh * 0.90)
   const panelW  = Math.min(imgSize + 460, vw * 0.92, 900)
@@ -177,18 +177,20 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
       <div ref={dialogRef} tabIndex={-1} style={boxStyle} className="outline-none" role="dialog" aria-modal="true" aria-label={name}>
         <div className="flex h-full bg-white dark:bg-slate-900">
 
-          {/* Image side — no separate background so there's no visible dividing line */}
+          {/* Image side — always white, no dark variant: product photos are shot
+              on a white canvas regardless of site theme, so a dark placeholder
+              background here would contrast against the photo instead of blending. */}
           <div
-            className="relative shrink-0 overflow-hidden bg-gray-50 dark:bg-slate-800"
+            className="relative shrink-0 overflow-hidden bg-white"
             style={{ width: l.imgSize, minWidth: l.imgSize }}
           >
-            <Image
+            <ProductImage
               key={imgIndex}
               src={images[imgIndex]}
               alt={`${name} ${imgIndex + 1}`}
               fill
-              sizes="400px"
-              className="object-contain p-5"
+              sizes="440px"
+              className="object-contain p-2"
               priority
             />
 
@@ -223,8 +225,10 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             )}
           </div>
 
-          {/* Explicit 1px divider — intentional, not an artifact */}
-          <div className="w-px shrink-0 bg-gray-100 dark:bg-slate-800" />
+          {/* Explicit 1px divider — intentional, not an artifact. Light mode gets a
+              subtle shadow instead of relying on the flat line alone, since both
+              sides are white now and a flat gray-100 barely reads as a seam. */}
+          <div className="w-px shrink-0 bg-gray-100 dark:bg-slate-800 shadow-[1px_0_4px_rgba(0,0,0,0.12)] dark:shadow-none" />
 
           {/* Content side */}
           <div

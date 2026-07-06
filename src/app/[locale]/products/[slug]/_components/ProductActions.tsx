@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn, buildWhatsAppUrl, localizedName } from '@/lib/utils'
 import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
+import { ProductImage } from '@/components/ui/ProductImage'
 import { BanIcon, SendIcon, WhatsAppIcon, EyeIcon } from '@/components/ui/Icons'
 import { MOQWarning } from '@/components/ui/MOQWarning'
 import type { Product, Locale } from '@/types'
@@ -259,7 +259,7 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
         : cn(
             'bg-gray-500/10 dark:bg-transparent dark:border-gray-500',
             dashed ? 'border-gray-500 border-dashed' : 'border-gray-500/75',
-            'hover:bg-gray-500/15 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-blue-400',
+            'hover:bg-gray-500/15 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-sky-400',
           )
     )}>
       <button
@@ -268,7 +268,7 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
         aria-pressed={selected}
         className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
       >
-        <div data-thumb className="relative w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-white flex items-center justify-center text-gray-500">
+        <div data-thumb className="relative w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-white dark:bg-slate-800 flex items-center justify-center text-gray-500">
           {children}
         </div>
         <span className={cn(
@@ -316,14 +316,14 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
                   'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
                   isSelected
                     ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
-                    : 'text-gray-400 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
                 )}
               >
                 <EyeIcon />
               </button>
             )}
           >
-            <Image src={p.image} alt={name} fill sizes="32px" className="object-contain p-1" />
+            <ProductImage src={p.image} alt={name} fill sizes="32px" className="object-contain p-1" size="xs" />
           </PartnerCard>
         )
       })}

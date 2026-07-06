@@ -34,7 +34,6 @@ interface Props {
 
 export function ProductCard({ product, locale, onQuickView, priority = false }: Props) {
   const t    = useTranslations('products')
-  const tCommon = useTranslations('common')
   const name = localizedName(product, locale)
 
   const imgRef = useRef<HTMLDivElement>(null)
@@ -90,7 +89,6 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-contain p-2 rounded-xl"
-                unavailableLabel={tCommon('imageUnavailable')}
                 priority={priority}
               />
             </div>

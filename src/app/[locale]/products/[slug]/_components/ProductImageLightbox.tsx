@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ChevronIcon, XIcon, ScrollWheelIcon } from '@/components/ui/Icons'
+import { ProductImage } from '@/components/ui/ProductImage'
 
 interface Props {
   images: string[]
@@ -15,12 +15,14 @@ interface Props {
 }
 
 export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClose }: Props) {
-  const t     = useTranslations('product')
-  const tA11y = useTranslations('a11y')
+  const t       = useTranslations('product')
+  const tA11y   = useTranslations('a11y')
+  const tCommon = useTranslations('common')
 
   const [lightboxIndex, setLightboxIndex] = useState(initialIndex)
   const [zoom, setZoom] = useState(1)
   const [lightboxMouseOrigin, setLightboxMouseOrigin] = useState({ x: 50, y: 50 })
+  const [currentFailed, setCurrentFailed] = useState(false)
 
   const lightboxRef    = useRef<HTMLDivElement>(null)
   const lightboxImgRef = useRef<HTMLDivElement>(null)
@@ -48,8 +50,8 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
   }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
   // initialIndex excluded intentionally: only matters at the moment isOpen flips true
 
-  // Reset zoom on image change
-  useEffect(() => setZoom(1), [lightboxIndex])
+  // Reset zoom and failed-state assumption on image change
+  useEffect(() => { setZoom(1); setCurrentFailed(false) }, [lightboxIndex])
 
   // Scroll lock + focus trap
   useEffect(() => {
@@ -77,8 +79,8 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       if (e.key === 'Escape')     { closeLightbox(); return }
       if (e.key === 'ArrowLeft')  { lightboxPrev(); return }
       if (e.key === 'ArrowRight') { lightboxNext(); return }
-      if (e.key === 'ArrowUp')    { e.preventDefault(); keyboardZoomRef.current = true; setLightboxMouseOrigin({ x: 50, y: 50 }); setZoom(z => Math.min(4, z + 0.4)); return }
-      if (e.key === 'ArrowDown')  { e.preventDefault(); keyboardZoomRef.current = true; setLightboxMouseOrigin({ x: 50, y: 50 }); setZoom(z => Math.max(1, z - 0.4)); return }
+      if (e.key === 'ArrowUp')    { if (currentFailed) return; e.preventDefault(); keyboardZoomRef.current = true; setLightboxMouseOrigin({ x: 50, y: 50 }); setZoom(z => Math.min(4, z + 0.4)); return }
+      if (e.key === 'ArrowDown')  { if (currentFailed) return; e.preventDefault(); keyboardZoomRef.current = true; setLightboxMouseOrigin({ x: 50, y: 50 }); setZoom(z => Math.max(1, z - 0.4)); return }
       if (e.key === 'Home')       { setLightboxIndex(0); return }
       if (e.key === 'End')        { setLightboxIndex(images.length - 1); return }
       if (e.key === 'Tab') {
@@ -97,7 +99,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [isOpen, lightboxPrev, lightboxNext, closeLightbox, images.length])
+  }, [isOpen, lightboxPrev, lightboxNext, closeLightbox, images.length, currentFailed])
 
   // Scroll-wheel zoom + pinch preventDefault + global mouse tracking
   useEffect(() => {
@@ -106,7 +108,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
     if (!el) return
     function onWheel(e: WheelEvent) {
       e.preventDefault()
-      if (isTouchActiveRef.current) return
+      if (isTouchActiveRef.current || currentFailed) return
       keyboardZoomRef.current = false
       setZoom((z) => Math.min(4, Math.max(1, z - e.deltaY * 0.002)))
     }
@@ -132,7 +134,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       el.removeEventListener('touchmove', onTouchMove)
       el.removeEventListener('mousemove', onMouseMove)
     }
-  }, [isOpen])
+  }, [isOpen, currentFailed])
 
   // Preload adjacent images
   useEffect(() => {
@@ -160,6 +162,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
   }
 
   function onTouchMove(e: React.TouchEvent) {
+    if (currentFailed) return
     if (e.touches.length === 2 && pinchStartDistRef.current !== null) {
       const dx = e.touches[0].clientX - e.touches[1].clientX
       const dy = e.touches[0].clientY - e.touches[1].clientY
@@ -201,12 +204,14 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
     if (now - lastTapTimeRef.current < 300) {
       lastTapTimeRef.current = 0
       touchStartX.current = null
-      if (zoom > 1) {
-        setZoom(1)
-      } else {
-        const r = lightboxImgRef.current?.getBoundingClientRect()
-        if (r) setLightboxMouseOrigin({ x: ((touch.clientX - r.left) / r.width) * 100, y: ((touch.clientY - r.top) / r.height) * 100 })
-        setZoom(2.5)
+      if (!currentFailed) {
+        if (zoom > 1) {
+          setZoom(1)
+        } else {
+          const r = lightboxImgRef.current?.getBoundingClientRect()
+          if (r) setLightboxMouseOrigin({ x: ((touch.clientX - r.left) / r.width) * 100, y: ((touch.clientY - r.top) / r.height) * 100 })
+          setZoom(2.5)
+        }
       }
       return
     }
@@ -264,13 +269,17 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <Image
+        <ProductImage
+          key={images[lightboxIndex]}
           src={images[lightboxIndex]}
           alt={`${name} ${lightboxIndex + 1}`}
           fill
           sizes="100vw"
           className="object-contain"
           priority
+          unavailableLabel={tCommon('imageUnavailable')}
+          size="lg"
+          onFail={() => setCurrentFailed(true)}
         />
       </div>
 
@@ -298,11 +307,13 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
         </>
       )}
 
-      {/* Scroll-to-zoom hint — desktop/mouse only */}
-      <div className="pointer-events-none select-none absolute bottom-5 left-1/2 -translate-x-1/2 hidden [@media(hover:hover)]:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white text-sm">
-        <ScrollWheelIcon />
-        <span>{t('zoomHint')}</span>
-      </div>
+      {/* Scroll-to-zoom hint — desktop/mouse only, and only when there's actually something to zoom into */}
+      {!currentFailed && (
+        <div className="pointer-events-none select-none absolute bottom-5 left-1/2 -translate-x-1/2 hidden [@media(hover:hover)]:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white text-sm">
+          <ScrollWheelIcon />
+          <span>{t('zoomHint')}</span>
+        </div>
+      )}
     </div>,
     document.body
   )

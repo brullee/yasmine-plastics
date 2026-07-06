@@ -35,8 +35,6 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
       : productCount === 1 ? '1 product' : `${productCount} products`
     : null
 
-  const unavailableLabel = locale === 'ar' ? 'الصورة غير متاحة' : 'Image unavailable'
-
   return (
     <Link
       href={`/products?category=${category.slug}`}
@@ -69,8 +67,11 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
           style={{ boxShadow: 'var(--card-shadow-hover)' }}
         />
 
-        {/* overflow-hidden + border-radius lives here and never transforms */}
-        <div className="absolute inset-0 rounded-xl overflow-hidden bg-white dark:bg-slate-800">
+        {/* overflow-hidden + border-radius lives here and never transforms.
+            Always white, no dark variant: category photos are shot on a white
+            canvas regardless of site theme, and the title overlay text below
+            reads poorly against a dark placeholder background. */}
+        <div className="absolute inset-0 rounded-xl overflow-hidden bg-white">
 
           {/* Image zooms inside the fixed container */}
           {category.image && (
@@ -85,7 +86,6 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
                 '[@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:scale-110',
                 'transition-transform duration-500 ease-out',
               )}
-              unavailableLabel={unavailableLabel}
             />
           )}
 
