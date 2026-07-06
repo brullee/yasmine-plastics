@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { CategoryCard } from '@/components/ui/CategoryCard'
+import { CategoryGrid } from '@/components/ui/CategoryGrid'
 import { ProductsGrid } from '@/components/ui/ProductsGrid'
 import { HeroSection } from '@/components/ui/HeroSection'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
@@ -33,16 +33,7 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
 
         <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh] flex flex-col">
           <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex flex-col flex-1 gap-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {categories.map((cat) => (
-                <CategoryCard
-                  key={cat.slug}
-                  category={cat}
-                  locale={locale}
-                  productCount={products.filter((p) => p.category === cat.slug).length}
-                />
-              ))}
-            </div>
+            <CategoryGrid categories={categories} products={products} locale={locale} />
             <div className="mt-auto">
               <CantFindBanner />
             </div>

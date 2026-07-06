@@ -3,7 +3,7 @@ export const revalidate = 3600
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
-import { CategoryCard } from '@/components/ui/CategoryCard'
+import { CategoryGrid } from '@/components/ui/CategoryGrid'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MapEmbed } from '@/components/ui/MapEmbed'
 import { company } from '@/data/company'
@@ -181,22 +181,7 @@ export default async function HomePage({
           <h2 className="text-3xl font-bold text-center text-brand-navy dark:text-white mb-14">
             {t('categories.title')}
           </h2>
-          <div className="flex flex-wrap justify-center gap-5">
-            {categories.map((cat, i) => (
-              <ScrollReveal
-                key={cat.slug}
-                direction="up"
-                delay={i * 80}
-                className="w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(25%-0.9375rem)]"
-              >
-                <CategoryCard
-                  category={cat}
-                  locale={locale}
-                  productCount={products.filter((p) => p.category === cat.slug).length}
-                />
-              </ScrollReveal>
-            ))}
-          </div>
+          <CategoryGrid categories={categories} products={products} locale={locale} reveal />
         </div>
       </section>
 
