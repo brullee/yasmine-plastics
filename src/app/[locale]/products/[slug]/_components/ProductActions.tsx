@@ -224,7 +224,7 @@ export function ProductActions({
             if (partnerSize) p.set('partnerSize', partnerSize)
             return `/quote?${p.toString()}`
           })()}
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
         >
           <SendIcon />
           {t('sendInquiry')}
@@ -233,7 +233,7 @@ export function ProductActions({
           href={chatUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white dark:bg-gray-800 text-brand-navy dark:text-white font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
+          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-semibold rounded-xl hover:bg-[#cdecfe] hover:border-sky-300 dark:hover:bg-sky-900/60 transition-colors border border-sky-200 dark:border-sky-800"
         >
           <WhatsAppIcon />
           {t('chatNow')}
@@ -268,7 +268,7 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
         aria-pressed={selected}
         className="flex items-center gap-2 flex-1 min-w-0 p-1.5 text-start"
       >
-        <div data-thumb className="relative w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-white dark:bg-slate-800 flex items-center justify-center text-gray-500">
+        <div data-thumb className="relative w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-white flex items-center justify-center text-gray-500">
           {children}
         </div>
         <span className={cn(
@@ -316,7 +316,7 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
                   'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
                   isSelected
                     ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
-                    : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-500/25 dark:hover:bg-gray-600'
                 )}
               >
                 <EyeIcon />

@@ -60,7 +60,7 @@ export function WhatsAppFAB({ locale }: { locale: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="fixed bottom-4 right-6 rtl:right-auto rtl:left-6 z-50 flex items-center gap-2.5 bg-brand-navy text-white p-3 sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+      className="fixed bottom-4 right-6 rtl:right-auto rtl:left-6 z-50 flex items-center gap-2.5 bg-brand-navy text-white p-3 sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
     >
       <span className="hidden sm:inline text-sm font-semibold">{label}</span>
       <WhatsAppIcon size={20} />

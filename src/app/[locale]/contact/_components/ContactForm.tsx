@@ -120,7 +120,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={!turnstileToken || !isFormValid || submitting}
-        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {submitting ? t('submitting') : t('submit')}
       </button>

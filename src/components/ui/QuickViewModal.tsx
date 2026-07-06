@@ -182,7 +182,11 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
               background here would contrast against the photo instead of blending. */}
           <div
             className="relative shrink-0 overflow-hidden bg-white"
-            style={{ width: l.imgSize, minWidth: l.imgSize }}
+            style={
+              phase === 'placed' || phase === 'flying'
+                ? { width: '100%', minWidth: 0 }
+                : { width: l.imgSize, minWidth: l.imgSize }
+            }
           >
             <ProductImage
               key={imgIndex}
@@ -197,11 +201,11 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {hasMany && (
               <>
                 <button onClick={prevImg} aria-label={tA11y('previousImage')}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow-md dark:shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="left" />
                 </button>
                 <button onClick={nextImg} aria-label={tA11y('nextImage')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow-md dark:shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="right" />
                 </button>
 
@@ -225,14 +229,14 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             )}
           </div>
 
-          {/* Explicit 1px divider — intentional, not an artifact. Light mode gets a
-              subtle shadow instead of relying on the flat line alone, since both
-              sides are white now and a flat gray-100 barely reads as a seam. */}
-          <div className="w-px shrink-0 bg-gray-100 dark:bg-slate-800 shadow-[1px_0_4px_rgba(0,0,0,0.12)] dark:shadow-none" />
+          {/* Explicit 1px divider — intentional, not an artifact. */}
+          <div className="w-px shrink-0 bg-gray-200 dark:bg-slate-800" />
 
-          {/* Content side */}
+          {/* Content side — bg-gray-50 gives it a light-mode tone distinct from
+              the image side's plain white, matching how dark mode already
+              contrasts white image vs slate-900 content. */}
           <div
-            className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto"
+            className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900"
             style={{
               opacity:    contentVisible ? 1 : 0,
               transition: contentVisible ? 'opacity 0.14s ease' : 'none',
@@ -335,7 +339,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
               <Link
                 href={`/products/${product.slug}`}
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
               >
                 {tProducts('viewDetails')}
                 <ArrowIcon direction={locale === 'ar' ? 'left' : 'right'} />
@@ -344,7 +348,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-slate-700 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-brand-navy dark:text-white"
+                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-sky-100 dark:bg-sky-900/40 border border-sky-200 dark:border-sky-800 text-sm font-medium rounded-xl hover:bg-[#cdecfe] hover:border-sky-300 dark:hover:bg-sky-900/60 transition-colors text-sky-700 dark:text-sky-300"
               >
                 <WhatsAppIcon size={15} />
                 {t('chatNow')}

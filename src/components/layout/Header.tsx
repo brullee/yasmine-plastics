@@ -115,7 +115,7 @@ export function Header() {
             {/* CTA button */}
             <Link
               href="/quote"
-              className="hidden sm:inline-flex items-center ms-1 px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+              className="hidden sm:inline-flex items-center ms-1 px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
             >
               {t('quote')}
             </Link>
@@ -167,7 +167,7 @@ export function Header() {
           <Link
             href="/quote"
             onClick={() => setMenuOpen(false)}
-            className="mt-2 block text-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+            className="mt-2 block text-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyHover dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
           >
             {t('quote')}
           </Link>

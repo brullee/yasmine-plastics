@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import type { Category, Locale } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
@@ -28,6 +31,8 @@ const NO_JITTER = 'will-change-transform [backface-visibility:hidden]'
 
 export function CategoryCard({ category, locale, productCount, className }: Props) {
   const name = localizedName(category, locale)
+  const [imageFailed, setImageFailed] = useState(false)
+  const noPhoto = !category.image || imageFailed
 
   const count = productCount !== undefined
     ? locale === 'ar'
@@ -68,10 +73,20 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
         />
 
         {/* overflow-hidden + border-radius lives here and never transforms.
-            Always white, no dark variant: category photos are shot on a white
-            canvas regardless of site theme, and the title overlay text below
-            reads poorly against a dark placeholder background. */}
-        <div className="absolute inset-0 rounded-xl overflow-hidden bg-white">
+            No background of its own when a photo is loaded — the photo covers
+            it completely, so the persistent white base previously here was
+            only ever needed for two failsafe cases: no category.image at all,
+            or the image failing to load. `bg-white` is applied only for those,
+            via `noPhoto`. This also means the corner-rounding artifact
+            described up top (which reveals whatever's underneath the photo
+            for a frame during the hover-scale transition) has nothing but
+            page background to reveal in the normal case — no separate
+            hover-recolor patch needed for it. */}
+        <div className={cn(
+          'absolute inset-0 rounded-xl overflow-hidden',
+          noPhoto && 'bg-white',
+          NO_JITTER,
+        )}>
 
           {/* Image zooms inside the fixed container */}
           {category.image && (
@@ -79,6 +94,7 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
               src={category.image}
               alt={name}
               fill
+              onFail={() => setImageFailed(true)}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className={cn(
                 'object-cover',
