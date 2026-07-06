@@ -13,7 +13,7 @@ export function CantFindBanner() {
       </div>
       <Link
         href="/contact"
-        className="shrink-0 px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark transition-colors"
+        className="shrink-0 px-5 py-2 bg-brand-navy text-white text-sm font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
       >
         {t('cantFind.cta')}
       </Link>

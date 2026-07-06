@@ -137,7 +137,7 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* Related items */}
         {related.length > 0 && (
           <section className="mt-20">
-            <h2 className="text-2xl font-bold text-brand-navy dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="text-2xl font-bold text-brand-navy dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
               {t('relatedItems')}
             </h2>
             <ProductsGrid products={related} allProducts={allProducts} locale={locale} />

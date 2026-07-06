@@ -330,7 +330,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
               <Link
                 href={`/products/${product.slug}`}
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyDark transition-colors"
+                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
               >
                 {tProducts('viewDetails')}
                 <ArrowIcon direction={locale === 'ar' ? 'left' : 'right'} />
@@ -339,7 +339,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-slate-700 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-brand-navy dark:text-gray-300"
+                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-slate-700 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-brand-navy dark:text-white"
               >
                 <WhatsAppIcon size={15} />
                 {t('chatNow')}

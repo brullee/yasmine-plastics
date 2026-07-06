@@ -18,7 +18,7 @@ const CUSTOM = '__custom__'
 function SelectChevron() {
   return (
     <div className="pointer-events-none absolute inset-y-0 end-3 flex items-center">
-      <svg className="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
         <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
       </svg>
     </div>
@@ -296,7 +296,7 @@ export function QuoteForm({
           </ChipRow>
 
           {form.lid && (lidColorOptions.length > 0 || lidSizeOptions.length > 1) && (
-            <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-4">
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
               {lidColorOptions.length > 0 && (
                 <ChipRow
                   label={locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}

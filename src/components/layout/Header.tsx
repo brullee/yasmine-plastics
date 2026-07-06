@@ -122,7 +122,7 @@ export function Header() {
 
             {/* Mobile burger */}
             <button
-              className="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-brand-navyDark transition-colors"
+              className={cn(subtleBtn, 'md:hidden')}
               onClick={() => setMenuOpen((o) => !o)}
               aria-label={menuOpen ? tA11y('closeMenu') : tA11y('openMenu')}
               aria-expanded={menuOpen}
@@ -143,7 +143,7 @@ export function Header() {
           menuOpen ? 'max-h-80' : 'max-h-0'
         )}
       >
-        <nav className="px-4 pt-2 pb-4 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-1" aria-label={tA11y('mobileNavigation')}>
+        <nav className="px-4 pt-2 pb-4 border-t border-gray-200 dark:border-white/10 flex flex-col gap-1" aria-label={tA11y('mobileNavigation')}>
           {NAV_LINKS.map(({ key, href, wip }) => (
             <Link
               key={key}
@@ -152,7 +152,7 @@ export function Header() {
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                 wip
-                  ? 'text-gray-500 dark:text-gray-500 pointer-events-none cursor-default'
+                  ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
                   : 'text-gray-700 dark:text-gray-300 hover:text-brand-navy dark:hover:text-white hover:bg-gray-100 dark:hover:bg-brand-navyDark'
               )}
             >
@@ -167,7 +167,7 @@ export function Header() {
           <Link
             href="/quote"
             onClick={() => setMenuOpen(false)}
-            className="mt-2 block text-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark transition-colors"
+            className="mt-2 block text-center px-4 py-2 bg-brand-navy text-white text-sm font-semibold rounded-md hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
           >
             {t('quote')}
           </Link>

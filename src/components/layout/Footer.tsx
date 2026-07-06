@@ -76,7 +76,7 @@ export function Footer() {
       </div>
 
       {/* Bottom bar - copyright + legal + utility controls */}
-      <div id="footer-bottom-bar" className="border-t border-gray-100 dark:border-white/10">
+      <div id="footer-bottom-bar" className="border-t border-gray-200 dark:border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
           <p>{t('footer.copyright')}</p>
 

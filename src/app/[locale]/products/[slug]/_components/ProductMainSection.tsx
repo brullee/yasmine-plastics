@@ -187,7 +187,7 @@ export function ProductMainSection({
             {/* Up arrow + fade */}
             {thumbCanScrollUp && (
               <div className="absolute top-0 inset-x-0 z-10 flex flex-col items-center">
-                <div className="w-full h-10 bg-gradient-to-b from-white dark:from-[#0d1b2a] to-transparent" />
+                <div className="w-full h-10 bg-gradient-to-b from-white dark:from-brand-navyDeep to-transparent" />
                 <button
                   onClick={() => thumbStripRef.current?.scrollBy({ top: -200, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}
                   className="absolute top-1 p-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-colors"
@@ -232,7 +232,7 @@ export function ProductMainSection({
             {/* Down arrow + fade */}
             {thumbCanScrollDown && (
               <div className="absolute bottom-0 inset-x-0 z-10 flex flex-col items-center">
-                <div className="w-full h-10 bg-gradient-to-t from-white dark:from-[#0d1b2a] to-transparent" />
+                <div className="w-full h-10 bg-gradient-to-t from-white dark:from-brand-navyDeep to-transparent" />
                 <button
                   onClick={() => thumbStripRef.current?.scrollBy({ top: 200, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}
                   className="absolute bottom-1 p-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-colors"
