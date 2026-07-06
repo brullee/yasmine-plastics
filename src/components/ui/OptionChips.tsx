@@ -22,8 +22,8 @@ export function ChipButton({ active, custom, onClick, children, type = 'button' 
         active
           ? 'border-brand-navy bg-brand-navy/10 text-brand-navy dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-200'
           : custom
-            ? 'bg-gray-500/10 border-dashed border-gray-500 text-gray-700 hover:bg-gray-500/15 hover:border-brand-navy hover:text-brand-navy dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-blue-400 dark:hover:text-sky-300'
-            : 'bg-gray-500/10 border-gray-500/75 text-gray-700 hover:bg-gray-500/15 hover:border-brand-navy hover:text-brand-navy dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-blue-400 dark:hover:text-sky-300'
+            ? 'bg-gray-500/10 border-dashed border-gray-500 text-gray-700 hover:bg-gray-500/15 hover:border-brand-navy hover:text-brand-navy dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-sky-400 dark:hover:text-sky-300'
+            : 'bg-gray-500/10 border-gray-500/75 text-gray-700 hover:bg-gray-500/15 hover:border-brand-navy hover:text-brand-navy dark:bg-transparent dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-sky-400 dark:hover:text-sky-300'
       )}
     >
       {children}

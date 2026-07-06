@@ -1,6 +1,6 @@
 {
   "name": "yasmine-plastics",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "private": true,
   "scripts": {
     "dev": "rm -rf .next && next dev",

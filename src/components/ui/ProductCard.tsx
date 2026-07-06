@@ -34,7 +34,6 @@ interface Props {
 
 export function ProductCard({ product, locale, onQuickView, priority = false }: Props) {
   const t    = useTranslations('products')
-  const tCommon = useTranslations('common')
   const name = localizedName(product, locale)
 
   const imgRef = useRef<HTMLDivElement>(null)
@@ -90,7 +89,6 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-contain p-2 rounded-xl"
-                unavailableLabel={tCommon('imageUnavailable')}
                 priority={priority}
               />
             </div>
@@ -104,7 +102,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
                 'absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy dark:focus-visible:ring-sky-400 rounded-full',
                 'opacity-0 pointer-events-none transition-opacity duration-75',
                 '[@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:duration-500',
-                'focus:opacity-100 focus:pointer-events-auto focus:duration-500',
+                'focus-visible:opacity-100 focus-visible:pointer-events-auto focus-visible:duration-500',
                 NO_JITTER,
               )}
               onClick={() => {

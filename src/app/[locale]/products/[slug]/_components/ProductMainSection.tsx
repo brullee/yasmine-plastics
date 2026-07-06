@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ProductActions } from './ProductActions'
 import { QuickViewModal } from '@/components/ui/QuickViewModal'
 import { ProductImageLightbox } from './ProductImageLightbox'
+import { ProductImage } from '@/components/ui/ProductImage'
 import { cn, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
 import { ChevronIcon, ExpandIcon } from '@/components/ui/Icons'
 import type { Product, Locale } from '@/types'
@@ -35,8 +35,9 @@ interface Props {
 export function ProductMainSection({
   product, name, categoryName, compatibleLids, fitsContainers, allProducts, whatsappNumber, locale,
 }: Props) {
-  const t     = useTranslations('product')
-  const tA11y = useTranslations('a11y')
+  const t       = useTranslations('product')
+  const tA11y   = useTranslations('a11y')
+  const tCommon = useTranslations('common')
 
   const derivedCapacity = deriveCapacity(product)
 
@@ -69,6 +70,11 @@ export function ProductMainSection({
   const [hoverOrigin, setHoverOrigin] = useState({ x: 50, y: 50 })
   const [thumbCanScrollUp, setThumbCanScrollUp]     = useState(false)
   const [thumbCanScrollDown, setThumbCanScrollDown] = useState(false)
+  const [failedUrls, setFailedUrls] = useState<ReadonlySet<string>>(() => new Set())
+
+  function markFailed(url: string) {
+    setFailedUrls((prev) => (prev.has(url) ? prev : new Set(prev).add(url)))
+  }
 
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const openerRef         = useRef<HTMLButtonElement>(null)
@@ -95,7 +101,17 @@ export function ProductMainSection({
     }
   }, [images])
 
+  // Switching images programmatically (color/size/partner change, thumbnail click)
+  // shouldn't carry over a zoom that was mid-flight for the *previous* image — the
+  // cursor isn't necessarily still over the frame, and the next real mousemove will
+  // re-engage zoom near-instantly if it is. Without this, a stale `hoverZoom: true`
+  // could suddenly apply `scale(1.6)` to the freshly swapped-in image, reading as
+  // an unintended swing/jump rather than a deliberate hover.
+  useEffect(() => setHoverZoom(false), [carouselIndex])
+
   const displayImage = images[carouselIndex]
+  const currentFailed = failedUrls.has(displayImage)
+  const allFailed = images.length > 0 && images.every((url) => failedUrls.has(url))
 
   function stopThumbScroll() {
     scrollSpeedRef.current = 0
@@ -138,7 +154,14 @@ export function ProductMainSection({
   }
 
   // ── Color / size → carousel jump ────────────────────────────────────────
+  // Only scroll on the single-column mobile layout (below `lg`), where the image
+  // can be off-screen when a color/size swatch below it is tapped. On the `lg:`
+  // two-column layout the image and the swatches are always both already visible
+  // side by side, so this scrollIntoView had nothing to do — it was still firing
+  // on every change though, and its "nearest" calculation could nudge the page by
+  // a stray pixel or two mid-transition, reading as an unwanted little swing.
   function nudgeToImage() {
+    if (window.matchMedia('(min-width: 1024px)').matches) return
     imageContainerRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' })
   }
 
@@ -218,13 +241,20 @@ export function ProductMainSection({
                   aria-current={i === carouselIndex}
                   aria-label={tA11y('goToImage', { n: i + 1 })}
                   className={cn(
-                    'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors',
+                    'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 bg-gray-100 dark:bg-gray-800 transition-colors',
                     i === carouselIndex
                       ? 'border-brand-navy dark:border-sky-400'
                       : 'border-transparent hover:border-gray-300 dark:hover:border-gray-500'
                   )}
                 >
-                  <Image src={src} alt={`${name} ${i + 1}`} fill sizes="64px" className="object-cover" />
+                  <ProductImage
+                    src={src}
+                    alt={`${name} ${i + 1}`}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                    onFail={() => markFailed(src)}
+                  />
                 </button>
               ))}
             </div>
@@ -253,7 +283,7 @@ export function ProductMainSection({
           )}
           style={{ cursor: 'default' }}
           onMouseMove={(e) => {
-            if (!window.matchMedia('(hover: hover)').matches) return
+            if (!window.matchMedia('(hover: hover)').matches || currentFailed) return
             const r = e.currentTarget.getBoundingClientRect()
             const x = ((e.clientX - r.left) / r.width) * 100
             const y = ((e.clientY - r.top) / r.height) * 100
@@ -266,7 +296,7 @@ export function ProductMainSection({
           <div
             className="absolute inset-0"
             style={{
-              transform: hoverZoom ? 'scale(1.6)' : 'scale(1)',
+              transform: hoverZoom && !currentFailed ? 'scale(1.6)' : 'scale(1)',
               transformOrigin: `${hoverOrigin.x}% ${hoverOrigin.y}%`,
               transition: hoverZoom
                 ? 'transform 180ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
@@ -274,26 +304,32 @@ export function ProductMainSection({
               willChange: 'transform',
             }}
           >
-            <Image
+            <ProductImage
+              key={displayImage}
               src={displayImage}
               alt={name}
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"
               className="object-cover transition-opacity duration-200"
               priority
+              unavailableLabel={tCommon('imageUnavailable')}
+              size="lg"
+              onFail={() => markFailed(displayImage)}
             />
           </div>
 
-          {/* Expand button */}
-          <button
-            ref={openerRef}
-            type="button"
-            onClick={() => { setLightboxOpenAt(carouselIndex); setLightboxOpen(true) }}
-            aria-label={tA11y('viewFullImage')}
-            className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/90 dark:bg-gray-900/75 border border-gray-200 dark:border-transparent hover:bg-white dark:hover:bg-gray-900 shadow backdrop-blur-sm transition-colors text-gray-600 dark:text-gray-200"
-          >
-            <ExpandIcon />
-          </button>
+          {/* Expand button — hidden once every image in the gallery has failed, since there'd be nothing to see in the lightbox either */}
+          {!allFailed && (
+            <button
+              ref={openerRef}
+              type="button"
+              onClick={() => { setLightboxOpenAt(carouselIndex); setLightboxOpen(true) }}
+              aria-label={tA11y('viewFullImage')}
+              className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/90 dark:bg-gray-900/75 border border-gray-200 dark:border-transparent hover:bg-white dark:hover:bg-gray-900 shadow backdrop-blur-sm transition-colors text-gray-600 dark:text-white"
+            >
+              <ExpandIcon />
+            </button>
+          )}
         </div>
       </div>
 

@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { ProductImage } from '@/components/ui/ProductImage'
 import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { company } from '@/data/company'
 import { ArrowIcon, ChevronIcon, XIcon, WhatsAppIcon } from '@/components/ui/Icons'
 import { SpecBadge } from '@/components/ui/SpecBadge'
@@ -19,7 +20,7 @@ type Phase = 'placed' | 'flying' | 'expanding' | 'open' | 'closing'
 
 function calcLayout(rect: DOMRect) {
   const vw = window.innerWidth, vh = window.innerHeight
-  const imgSize = Math.min(380, vw * 0.44, vh * 0.6)
+  const imgSize = Math.min(440, vw * 0.46, vh * 0.62)
   // Panel is taller than the image to accommodate many options
   const boxH    = Math.min(Math.max(imgSize + 80, 560), vh * 0.90)
   const panelW  = Math.min(imgSize + 460, vw * 0.92, 900)
@@ -177,29 +178,35 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
       <div ref={dialogRef} tabIndex={-1} style={boxStyle} className="outline-none" role="dialog" aria-modal="true" aria-label={name}>
         <div className="flex h-full bg-white dark:bg-slate-900">
 
-          {/* Image side — no separate background so there's no visible dividing line */}
+          {/* Image side — always white, no dark variant: product photos are shot
+              on a white canvas regardless of site theme, so a dark placeholder
+              background here would contrast against the photo instead of blending. */}
           <div
-            className="relative shrink-0 overflow-hidden bg-gray-50 dark:bg-slate-800"
-            style={{ width: l.imgSize, minWidth: l.imgSize }}
+            className="relative shrink-0 overflow-hidden bg-white"
+            style={
+              phase === 'placed' || phase === 'flying'
+                ? { width: '100%', minWidth: 0 }
+                : { width: l.imgSize, minWidth: l.imgSize }
+            }
           >
-            <Image
+            <ProductImage
               key={imgIndex}
               src={images[imgIndex]}
               alt={`${name} ${imgIndex + 1}`}
               fill
-              sizes="400px"
-              className="object-contain p-5"
+              sizes="440px"
+              className="object-contain p-2"
               priority
             />
 
             {hasMany && (
               <>
                 <button onClick={prevImg} aria-label={tA11y('previousImage')}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow-md dark:shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="left" />
                 </button>
                 <button onClick={nextImg} aria-label={tA11y('nextImage')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow-md dark:shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="right" />
                 </button>
 
@@ -223,12 +230,14 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             )}
           </div>
 
-          {/* Explicit 1px divider — intentional, not an artifact */}
-          <div className="w-px shrink-0 bg-gray-100 dark:bg-slate-800" />
+          {/* Explicit 1px divider — intentional, not an artifact. */}
+          <div className="w-px shrink-0 bg-gray-200 dark:bg-slate-800" />
 
-          {/* Content side */}
+          {/* Content side — bg-gray-50 gives it a light-mode tone distinct from
+              the image side's plain white, matching how dark mode already
+              contrasts white image vs slate-900 content. */}
           <div
-            className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto"
+            className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900"
             style={{
               opacity:    contentVisible ? 1 : 0,
               transition: contentVisible ? 'opacity 0.14s ease' : 'none',
@@ -331,7 +340,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
               <Link
                 href={`/products/${product.slug}`}
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-navy text-white text-sm font-semibold rounded-xl hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+                className={cn('flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-semibold rounded-xl', button.primary)}
               >
                 {tProducts('viewDetails')}
                 <ArrowIcon direction={locale === 'ar' ? 'left' : 'right'} />
@@ -340,7 +349,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 dark:border-slate-700 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-brand-navy dark:text-white"
+                className={cn('flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl', button.secondaryCta)}
               >
                 <WhatsAppIcon size={15} />
                 {t('chatNow')}

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 import { company } from '@/data/company'
-import { buildWhatsAppUrl } from '@/lib/utils'
+import { cn, buildWhatsAppUrl } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { WhatsAppIcon } from '@/components/ui/Icons'
 
 const labels: Record<string, string> = {
@@ -60,7 +61,7 @@ export function WhatsAppFAB({ locale }: { locale: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="fixed bottom-4 right-6 rtl:right-auto rtl:left-6 z-50 flex items-center gap-2.5 bg-brand-navy text-white p-3 sm:px-5 sm:py-3 rounded-full shadow-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+      className={cn('fixed bottom-4 right-6 rtl:right-auto rtl:left-6 z-50 flex items-center gap-2.5 p-3 sm:px-5 sm:py-3 rounded-full shadow-lg', button.primary)}
     >
       <span className="hidden sm:inline text-sm font-semibold">{label}</span>
       <WhatsAppIcon size={20} />

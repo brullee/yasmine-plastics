@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
 import { MOQWarning } from '@/components/ui/MOQWarning'
 import { SuccessBox } from '@/components/ui/SuccessBox'
@@ -296,7 +297,7 @@ export function QuoteForm({
           </ChipRow>
 
           {form.lid && (lidColorOptions.length > 0 || lidSizeOptions.length > 1) && (
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+            <div className="space-y-4">
               {lidColorOptions.length > 0 && (
                 <ChipRow
                   label={locale === 'ar' ? 'لون المرفوق' : 'Paired Color'}
@@ -372,7 +373,7 @@ export function QuoteForm({
       <button
         type="submit"
         disabled={!turnstileToken || !isFormValid || submitting}
-        className="w-full py-3 px-6 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className={cn('w-full py-3 px-6 font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed', button.primary)}
       >
         {submitting ? t('submitting') : t('submit')}
       </button>

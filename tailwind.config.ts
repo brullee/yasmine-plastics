@@ -5,6 +5,7 @@ const config: Config = {
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   darkMode: 'class',
   theme: {
@@ -19,7 +20,9 @@ const config: Config = {
       colors: {
         brand: {
           navy: '#005496',
+          navyHover: '#004378',
           navyDark: '#003d6e',
+          navyHoverDark: '#004982',
           navyDeep: '#0d1b2a',
           blue: '#ed145b',
           blueDeep: '#c4114a',

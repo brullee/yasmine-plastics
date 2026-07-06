@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn, buildWhatsAppUrl, localizedName } from '@/lib/utils'
+import { button } from '@/lib/theme'
 import { ChipButton, ChipRow } from '@/components/ui/OptionChips'
+import { ProductImage } from '@/components/ui/ProductImage'
 import { BanIcon, SendIcon, WhatsAppIcon, EyeIcon } from '@/components/ui/Icons'
 import { MOQWarning } from '@/components/ui/MOQWarning'
 import type { Product, Locale } from '@/types'
@@ -224,7 +225,7 @@ export function ProductActions({
             if (partnerSize) p.set('partnerSize', partnerSize)
             return `/quote?${p.toString()}`
           })()}
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-navy text-white font-semibold rounded-xl hover:bg-brand-navyDark dark:bg-brand-navyDark dark:hover:bg-brand-navy transition-colors"
+          className={cn('flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 font-semibold rounded-xl', button.primary)}
         >
           <SendIcon />
           {t('sendInquiry')}
@@ -233,7 +234,7 @@ export function ProductActions({
           href={chatUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 bg-white dark:bg-gray-800 text-brand-navy dark:text-white font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
+          className={cn('flex-1 flex items-center justify-center gap-2.5 py-3.5 px-5 font-semibold rounded-xl', button.secondaryCta)}
         >
           <WhatsAppIcon />
           {t('chatNow')}
@@ -259,7 +260,7 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
         : cn(
             'bg-gray-500/10 dark:bg-transparent dark:border-gray-500',
             dashed ? 'border-gray-500 border-dashed' : 'border-gray-500/75',
-            'hover:bg-gray-500/15 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-blue-400',
+            'hover:bg-gray-500/15 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-sky-400',
           )
     )}>
       <button
@@ -316,14 +317,14 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
                   'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
                   isSelected
                     ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
-                    : 'text-gray-400 dark:text-gray-400 hover:text-brand-navy dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-500/25 dark:hover:bg-gray-600'
                 )}
               >
                 <EyeIcon />
               </button>
             )}
           >
-            <Image src={p.image} alt={name} fill sizes="32px" className="object-contain p-1" />
+            <ProductImage src={p.image} alt={name} fill sizes="32px" className="object-contain p-1" size="xs" />
           </PartnerCard>
         )
       })}
