@@ -51,7 +51,7 @@ export default async function QuotePage({ params }: Props) {
           <div className="mb-10">
             <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">{t('title')}</h1>
             <p className="text-gray-500 dark:text-gray-400 mb-2">{t('subtitle')}</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500">{t('priceNote')}</p>
+            <p className="text-sm text-gray-400 dark:text-gray-400">{t('priceNote')}</p>
           </div>
           <Suspense>
             <QuoteForm products={products} categories={categories} />

@@ -29,7 +29,7 @@ export function ProductImage({ unavailableLabel, className, size = 'sm', onFail,
 
   if (failed) {
     return (
-      <div className={cn('absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 will-change-transform', GAP_SIZE[size], className)}>
+      <div className={cn('absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-gray-400 will-change-transform', GAP_SIZE[size], className)}>
         <ImageOffIcon className={ICON_SIZE[size]} />
         {unavailableLabel && <span className={size === 'lg' ? 'text-sm' : 'text-xs'}>{unavailableLabel}</span>}
       </div>

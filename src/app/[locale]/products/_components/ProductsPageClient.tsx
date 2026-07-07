@@ -33,6 +33,7 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
 
         <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh] flex flex-col">
           <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex flex-col flex-1 gap-10">
+            <h2 className="sr-only">{t('browseByCategory')}</h2>
             <CategoryGrid categories={categories} products={products} locale={locale} />
             <div className="mt-auto">
               <CantFindBanner />
@@ -62,7 +63,7 @@ export function ProductsPageClient({ products, categories, locale }: Props) {
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-1 gap-6">
           {filtered.length > 0
             ? <ProductsGrid products={filtered} allProducts={products} locale={locale} />
-            : <div className="text-center py-20 text-gray-400 dark:text-gray-500">{t('notFound')}</div>
+            : <div className="text-center py-20 text-gray-400 dark:text-gray-400">{t('notFound')}</div>
           }
 
           <div className="mt-auto pt-6">
