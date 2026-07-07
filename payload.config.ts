@@ -121,6 +121,7 @@ export default buildConfig({
               // within the validation window) can't be replayed — e.g. to immediately
               // disable 2FA right after using it to log in (see /api/2fa/disable).
               await req.payload.update({
+                req,
                 collection: 'users',
                 id: u.id as string,
                 data: { twoFactorLastUsedStep: matchedStep },
@@ -136,6 +137,7 @@ export default buildConfig({
             // Consume the recovery code so it can't be reused.
             const remaining = recoveryCodes.filter((_, i) => i !== matchIndex)
             await req.payload.update({
+              req,
               collection: 'users',
               id: u.id as string,
               data: { twoFactorRecoveryCodes: remaining },
