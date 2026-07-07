@@ -51,6 +51,8 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
   const [phase, setPhase] = useState<Phase>('placed')
   const [layout]          = useState(() => calcLayout(originRect))
   const [imgIndex, setImgIndex] = useState(0)
+  const [boxCleared, setBoxCleared] = useState(false)
+  const [contentReady, setContentReady] = useState(false)
 
   const dialogRef  = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
@@ -75,8 +77,19 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
   // Scroll lock + keyboard
   useEffect(() => {
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    // Plain overflow:hidden used to be here, but it let the header's position:sticky
+    // detach — same fixed-position/scroll-restore trick ProductImageLightbox already
+    // uses for its own scroll lock. html's global `scroll-behavior: smooth` (globals.css)
+    // animates the browser's own scrollTop-clamp when body leaves the flow, which reads
+    // as the page sailing up to the top instead of staying put — suspended for the
+    // duration of the lock so the position swap and restore are both instant.
+    const scrollY = window.scrollY
+    const htmlEl = document.documentElement
+    const prevScrollBehavior = htmlEl.style.scrollBehavior
+    htmlEl.style.scrollBehavior = 'auto'
+    document.body.style.position = 'fixed'
+    document.body.style.top      = `-${scrollY}px`
+    document.body.style.width    = '100%'
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape')     { handleClose(); return }
       if (e.key === 'ArrowLeft')  { prevImg(); return }
@@ -96,15 +109,34 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
       }
     }
     window.addEventListener('keydown', onKey)
-    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey) }
+    return () => {
+      document.body.style.position = ''
+      document.body.style.top      = ''
+      document.body.style.width    = ''
+      window.scrollTo(0, scrollY)
+      htmlEl.style.scrollBehavior = prevScrollBehavior
+      window.removeEventListener('keydown', onKey)
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (prefersReducedMotion()) { setPhase('open'); return }
+    if (prefersReducedMotion()) { setPhase('open'); setContentReady(true); return }
     const t1 = setTimeout(() => setPhase('flying'),    16)
     const t2 = setTimeout(() => setPhase('expanding'), 16 + 320)
     const t3 = setTimeout(() => setPhase('open'),      16 + 320 + 370)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    // Promotes the box above chrome partway through the 320ms flying transition instead of
+    // waiting for expanding to start — EASE_OPEN front-loads most of the vertical motion, so
+    // the box has typically cleared the header well before flying's own timer ends. Tune
+    // this number by eye: too low and the box pops in front of the header before it's
+    // actually clear of it; too high and it's back to waiting the full flying duration.
+    const t1b = setTimeout(() => setBoxCleared(true), 16 + 130)
+    // Content used to wait for the full 706ms sequence (flying + all of expanding) before
+    // showing at all — reveals it before expanding's own 370ms timer ends instead, once the
+    // box's fast-out easing (cubic-bezier(0.2,0,0,1)) has it close enough to its final panel
+    // size. 150ms in (vs expanding's 370ms) still had visible resize left — buttons/text were
+    // reflowing to catch up, reading as premature.
+    const t2b = setTimeout(() => setContentReady(true), 16 + 320 + 180)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t1b); clearTimeout(t2b) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleClose() {
@@ -138,11 +170,17 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
       borderRadius: 16, overflow: 'hidden',
       boxShadow: '0 32px 64px -12px rgba(0,0,0,0.4)',
     }
+    // Header and backdrop both stay a constant z-50 (see backdrop below) — no double-dimming,
+    // no side effect on other z-50 chrome like WhatsAppFAB. Only the box dips below the header
+    // (z-45) while placed/flying-and-not-yet-cleared, so a card that started tucked behind the
+    // sticky header stays that way instead of popping in front of it. `boxCleared` promotes it
+    // early, partway through the flying transition, instead of waiting for expanding to start.
+    const boxZIndex = phase === 'placed' || (phase === 'flying' && !boxCleared) ? 45 : 61
     switch (phase) {
       case 'placed':
-        return { ...base, top: l.placed.top, left: l.placed.left, width: l.placed.width, height: l.placed.height, boxShadow: 'none', transition: 'none' }
+        return { ...base, zIndex: boxZIndex, top: l.placed.top, left: l.placed.left, width: l.placed.width, height: l.placed.height, boxShadow: 'none', transition: 'none' }
       case 'flying':
-        return { ...base, top: l.image.top, left: l.image.left, width: l.image.width, height: l.image.height,
+        return { ...base, zIndex: boxZIndex, top: l.image.top, left: l.image.left, width: l.image.width, height: l.image.height,
           transition: `top 320ms ${EASE_OPEN}, left 320ms ${EASE_OPEN}, width 320ms ${EASE_OPEN}, height 320ms ${EASE_OPEN}` }
       case 'expanding':
         return { ...base, top: l.panel.top, left: l.panel.left, width: l.panel.width, height: l.panel.height,
@@ -156,8 +194,11 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
     }
   })()
 
-  const backdropOpacity = phase === 'placed' || phase === 'closing' ? 0 : 0.6
-  const contentVisible  = phase === 'open'
+  // Linked to the same boundary as the box's own z-45 → z-61 jump above (boxCleared or past
+  // flying): the backdrop only has any business dimming things once the box has priority
+  // over it, otherwise it dims the box itself right along with the page behind it.
+  const backdropOpacity = boxCleared || phase === 'expanding' || phase === 'open' ? 0.6 : 0
+  const contentVisible  = contentReady && phase !== 'closing'
 
   return createPortal(
     <>
@@ -202,11 +243,11 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {hasMany && (
               <>
                 <button onClick={prevImg} aria-label={tA11y('previousImage')}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow-md dark:shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 flex items-center justify-center rounded-full bg-white dark:bg-slate-900/80 border border-gray-200 dark:border-transparent shadow text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="left" />
                 </button>
                 <button onClick={nextImg} aria-label={tA11y('nextImage')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 shadow-md dark:shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 flex items-center justify-center rounded-full bg-white dark:bg-slate-900/80 border border-gray-200 dark:border-transparent shadow text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-900 transition-colors">
                   <ChevronIcon direction="right" />
                 </button>
 
@@ -247,12 +288,13 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             <button
               onClick={handleClose}
               aria-label={tA11y('close')}
-              className="absolute top-3 end-3 z-10 p-2 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-300"
+              className="absolute top-3 end-3 z-10 p-2 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-transparent hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-300"
             >
               <XIcon size={16} />
             </button>
 
-            {/* Category pill */}
+            {/* Category pill — static label, not a selection/hover state, so it doesn't
+                need to match the sky-400/300/200 selected-accent scale used elsewhere. */}
             <span className="self-start text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/40 px-2.5 py-1 rounded-full uppercase tracking-wide">
               {product.category}
             </span>

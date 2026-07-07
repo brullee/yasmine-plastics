@@ -94,7 +94,10 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
             </div>
           </Link>
 
-          {/* Quick View pill — OUTSIDE the Link so clicking it never navigates */}
+          {/* Quick View pill — OUTSIDE the Link so clicking it never navigates.
+              Ring deliberately breaks from the map's dark:ring-brand-navy default: this pill
+              sits on the product-photo slate-800 surface, and navy-on-slate contrasts under 2:1
+              (fails the 3:1 UI-component minimum) — sky-400 clears ~7:1 there. */}
           {onQuickView && (
             <button
               type="button"
@@ -110,7 +113,7 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
                 if (rect) onQuickView(product, rect)
               }}
             >
-              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-brand-slate750 border border-gray-200 dark:border-slate-600 text-brand-navy dark:text-white text-xs font-semibold rounded-full shadow transition-colors">
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 hover:bg-gray-200 dark:bg-brand-slate750 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 text-brand-navy dark:text-white text-xs font-semibold rounded-full shadow transition-colors">
                 <EyeIcon size={12} strokeWidth={2.5} />
                 {t('quickView')}
               </span>

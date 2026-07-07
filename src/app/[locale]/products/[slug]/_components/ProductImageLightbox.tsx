@@ -5,6 +5,34 @@ import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { ChevronIcon, XIcon, ScrollWheelIcon } from '@/components/ui/Icons'
 import { ProductImage } from '@/components/ui/ProductImage'
+import { cn } from '@/lib/utils'
+
+// Shared "dark glass" pill treatment for the lightbox's own controls (close, prev, next):
+// idle bg-black/55 + ring, inverts to solid white/black on hover. `pillClassName` sizes the
+// visible circle — `p-2` for the close button (tap area == visible pill), `w-10 h-10` for the
+// chevrons (a larger invisible `p-4` tap area on the button prevents near-miss dismissals).
+function LightboxIconButton({
+  onClick, ariaLabel, className, pillClassName, children,
+}: {
+  onClick: (e: React.MouseEvent) => void
+  ariaLabel: string
+  className: string
+  pillClassName: string
+  children: React.ReactNode
+}) {
+  return (
+    <button onClick={onClick} aria-label={ariaLabel} className={cn('group z-10 text-white', className)}>
+      <span
+        className={cn(
+          'flex items-center justify-center rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-white group-hover:text-black transition-colors',
+          pillClassName,
+        )}
+      >
+        {children}
+      </span>
+    </button>
+  )
+}
 
 interface Props {
   images: string[]
@@ -56,7 +84,14 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
   // Scroll lock + focus trap
   useEffect(() => {
     if (!isOpen) return
+    // html's global `scroll-behavior: smooth` (globals.css) animates the browser's own
+    // scrollTop-clamp when body leaves the flow here, which reads as the page sailing up
+    // to the top instead of staying put — suspended for the lock's duration so the
+    // position swap and restore are both instant.
     const scrollY = window.scrollY
+    const htmlEl = document.documentElement
+    const prevScrollBehavior = htmlEl.style.scrollBehavior
+    htmlEl.style.scrollBehavior = 'auto'
     document.body.style.position = 'fixed'
     document.body.style.top      = `-${scrollY}px`
     document.body.style.width    = '100%'
@@ -68,6 +103,7 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       document.body.style.top      = ''
       document.body.style.width    = ''
       window.scrollTo(0, scrollY)
+      htmlEl.style.scrollBehavior = prevScrollBehavior
       root?.removeAttribute('inert')
     }
   }, [isOpen])
@@ -240,13 +276,14 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       onTouchEnd={onTouchEnd}
     >
       {/* Close */}
-      <button
+      <LightboxIconButton
         onClick={closeLightbox}
-        aria-label={tA11y('close')}
-        className="absolute top-3 end-3 z-10 p-2 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 text-white hover:bg-black/75 transition-colors"
+        ariaLabel={tA11y('close')}
+        className="absolute top-3 end-3"
+        pillClassName="p-2"
       >
         <XIcon />
-      </button>
+      </LightboxIconButton>
 
       {/* Counter */}
       {images.length > 1 && (
@@ -286,24 +323,22 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
       {/* Prev / Next — large invisible tap area prevents near-miss dismissals */}
       {images.length > 1 && (
         <>
-          <button
+          <LightboxIconButton
             onClick={(e) => { e.stopPropagation(); lightboxPrev() }}
-            aria-label={tA11y('previousImage')}
-            className="group absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
+            ariaLabel={tA11y('previousImage')}
+            className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 p-4"
+            pillClassName="w-10 h-10"
           >
-            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
-              <ChevronIcon direction="left" />
-            </span>
-          </button>
-          <button
+            <ChevronIcon direction="left" />
+          </LightboxIconButton>
+          <LightboxIconButton
             onClick={(e) => { e.stopPropagation(); lightboxNext() }}
-            aria-label={tA11y('nextImage')}
-            className="group absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-10 p-4 text-white"
+            ariaLabel={tA11y('nextImage')}
+            className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 p-4"
+            pillClassName="w-10 h-10"
           >
-            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/15 group-hover:bg-black/75 transition-colors">
-              <ChevronIcon direction="right" />
-            </span>
-          </button>
+            <ChevronIcon direction="right" />
+          </LightboxIconButton>
         </>
       )}
 

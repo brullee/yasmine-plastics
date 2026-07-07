@@ -12,8 +12,16 @@ export default async function proxy(req: NextRequest) {
 
   const host = req.headers.get('host') ?? ''
 
-  const authPaths = ['/api/users/login', '/api/users/forgot-password']
-  if (authPaths.includes(req.nextUrl.pathname)) {
+  // Login itself is rate-limited in the users collection's beforeLogin hook instead — that
+  // one only counts genuine failures (wrong/missing 2FA code), not every request, which this
+  // blanket per-request check would otherwise undermine by consuming a hit regardless of
+  // outcome. forgot-password has no such per-outcome hook, so it stays limited here. Both
+  // paths still need to short-circuit before the i18n routing below, which isn't meant for
+  // API routes at all.
+  if (req.nextUrl.pathname === '/api/users/login') {
+    return NextResponse.next()
+  }
+  if (req.nextUrl.pathname === '/api/users/forgot-password') {
     if (req.method === 'POST') {
       const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? req.headers.get('x-real-ip') ?? 'unknown'
       const { success } = await loginRateLimit.limit(ip)

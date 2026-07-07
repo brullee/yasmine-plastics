@@ -1,7 +1,7 @@
 import path from 'path'
 import { after } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { buildConfig } from 'payload'
+import { APIError, buildConfig } from 'payload'
 import { normalizeMediaAfterUpload } from '@/lib/image-normalize'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -9,6 +9,7 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml } from '@/lib/emailTemplates'
 import { loginRateLimit } from '@/lib/ratelimit'
+import { verifyRecoveryCode, verifyTotpCode } from '@/lib/totp'
 
 
 export default buildConfig({
@@ -28,6 +29,9 @@ export default buildConfig({
   admin: {
     user: 'users',
     theme: 'dark',
+    avatar: {
+      Component: '@/components/payload/AdminAvatar#AdminAvatar',
+    },
     components: {
       providers: [
         '@/components/payload/ClientImageCompressor#ClientImageCompressorProvider',
@@ -35,6 +39,11 @@ export default buildConfig({
       beforeLogin: [
         '@/components/payload/LoginRateWarning#LoginRateWarning',
       ],
+      views: {
+        login: {
+          Component: '@/components/payload/LoginView#LoginView',
+        },
+      },
     },
   },
   plugins: [
@@ -74,18 +83,94 @@ export default buildConfig({
       },
       hooks: {
         beforeLogin: [
-          async ({ req }) => {
+          async ({ req, user }) => {
             const ip =
               req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
               req.headers.get('x-real-ip') ??
               'unknown'
-            const { success } = await loginRateLimit.limit(ip)
-            if (!success) throw new Error('Too many login attempts. Please try again later.')
+
+            // Rate-limit only genuine failures (wrong/missing 2FA code below), not every
+            // request — a successful login, and the expected first step of a 2FA login
+            // (password correct, code not sent yet), aren't attacks and shouldn't burn
+            // through the same budget as an actual bad guess.
+            // Plain `Error` is treated as an unexpected server crash (500, logged with a full
+            // stack trace) — these are expected, routine rejections (every 2FA login hits
+            // "code required" once by design), so use Payload's own APIError with a real 4xx
+            // status instead.
+            const fail = async (message: string): Promise<never> => {
+              const { success } = await loginRateLimit.limit(ip)
+              if (!success) throw new APIError('Too many login attempts. Please try again later.', 429)
+              throw new APIError(message, 401)
+            }
+
+            const u = user as Record<string, unknown>
+            if (!u.twoFactorEnabled) return
+
+            // Submitted by the custom login view (src/components/payload/LoginView.tsx)
+            // alongside email/password — this hook runs after password verification
+            // succeeds but before a token is issued, so this is the right place to gate
+            // on it.
+            const code = (req.data as Record<string, unknown> | undefined)?.twoFactorCode as string | undefined
+            if (!code) throw new APIError('Two-factor code required', 401)
+
+            const encryptedSecret = u.twoFactorSecret as string | undefined
+            const validTotp = !!encryptedSecret && verifyTotpCode(encryptedSecret, code)
+            if (validTotp) return
+
+            const recoveryCodes = (u.twoFactorRecoveryCodes ?? []) as { hash: string; id?: string }[]
+            const matchIndex = recoveryCodes.findIndex((r) => verifyRecoveryCode(code, r.hash))
+            if (matchIndex === -1) await fail('Invalid two-factor code')
+
+            // Consume the recovery code so it can't be reused.
+            const remaining = recoveryCodes.filter((_, i) => i !== matchIndex)
+            await req.payload.update({
+              collection: 'users',
+              id: u.id as string,
+              data: { twoFactorRecoveryCodes: remaining },
+              overrideAccess: true,
+            })
           },
         ],
       },
       admin: { useAsTitle: 'email' },
-      fields: [],
+      fields: [
+        {
+          name: 'twoFactorEnabled',
+          type: 'checkbox',
+          defaultValue: false,
+          // Hidden — TwoFactorSetup (below) is the single status/toggle UI for this;
+          // showing the raw checkbox too was a redundant second indicator of the same state.
+          // `hidden` only affects the edit form — `disableListColumn` is the separate switch
+          // for the collection's list-view table, which otherwise shows every field by default.
+          admin: { readOnly: true, hidden: true, disableListColumn: true },
+        },
+        {
+          name: 'twoFactorSecret',
+          type: 'text',
+          admin: { hidden: true, disableListColumn: true },
+          access: { read: () => false },
+        },
+        {
+          name: 'twoFactorRecoveryCodes',
+          type: 'array',
+          admin: { hidden: true, disableListColumn: true },
+          access: { read: () => false },
+          fields: [
+            { name: 'hash', type: 'text' },
+          ],
+        },
+        {
+          name: 'twoFactorSetup',
+          label: 'Two-Factor Authentication',
+          type: 'ui',
+          admin: {
+            disableListColumn: true,
+            components: {
+              Field: '@/components/payload/TwoFactorSetup#TwoFactorSetup',
+            },
+          },
+        },
+      ],
     },
     {
       slug: 'media',

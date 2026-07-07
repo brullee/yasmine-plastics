@@ -244,7 +244,7 @@ export function ProductMainSection({
                     'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 bg-gray-100 dark:bg-gray-800 transition-colors',
                     i === carouselIndex
                       ? 'border-brand-navy dark:border-sky-400'
-                      : 'border-transparent hover:border-gray-300 dark:hover:border-gray-500'
+                      : 'border-transparent hover:border-brand-navy dark:hover:border-sky-400'
                   )}
                 >
                   <ProductImage
@@ -325,7 +325,7 @@ export function ProductMainSection({
               type="button"
               onClick={() => { setLightboxOpenAt(carouselIndex); setLightboxOpen(true) }}
               aria-label={tA11y('viewFullImage')}
-              className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-white/90 dark:bg-gray-900/75 border border-gray-200 dark:border-transparent hover:bg-white dark:hover:bg-gray-900 shadow backdrop-blur-sm transition-colors text-gray-600 dark:text-white"
+              className="absolute top-3 right-3 z-10 p-1.5 flex items-center justify-center rounded-lg bg-white dark:bg-gray-900/75 border border-gray-200 dark:border-transparent hover:bg-gray-100 dark:hover:bg-gray-900 shadow transition-colors text-gray-600 dark:text-white"
             >
               <ExpandIcon />
             </button>
