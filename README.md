@@ -65,7 +65,7 @@ The media library supports bulk image upload with client-side WebP compression. 
 
 ### Capacity Auto-generation
 
-Product capacity is derived automatically from the product's size options. When auto-generation is on (the default), the admin computes a range at save time: one size shows `100ml`, multiple sizes show `100–300ml`. Disabling it reveals a manual text field. Size units (ml, L, g, oz, etc.) are a separate database collection so the admin can add new units without code changes.
+Product capacity is derived automatically from the product's size options. When auto-generation is on (the default), the admin computes a range at save time: one size shows `100ml`, multiple sizes show `100-300ml`. Disabling it reveals a manual text field. Size units (ml, L, g, oz, etc.) are a separate database collection so the admin can add new units without code changes.
 
 ### Card Hover Animation
 
@@ -83,9 +83,17 @@ Both forms send to the business via Resend and are protected by Cloudflare Turns
 
 Product pages are statically rendered at build time and revalidated every hour (`revalidate = 3600`).
 
-### Rate Limiting and Security
+### Two-Factor Authentication (Admin)
 
-Form submissions are rate-limited to 3 per 10 minutes per IP via Upstash Redis. Admin login is limited to 5 attempts per 15 minutes via a `beforeLogin` hook, with a progressive warning on the login page as attempts are used up. HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) are set globally. All external service calls (Upstash, Turnstile, Resend) fail open except email, which returns a 500.
+Admin login supports optional TOTP two-factor authentication, hand-built with `otpauth` rather than a third-party plugin. The secret is stored encrypted (AES-256-GCM) and only ever decrypted server-side to check a code. Setup shows a QR code and a set of one-time recovery codes (stored as hashes, downloadable once). A used code cannot be replayed, whether that's a retry or an attempt to immediately disable 2FA right after using a code to log in.
+
+### Security
+
+Form submissions are rate-limited to 3 per 10 minutes per IP via Upstash Redis. Admin login is limited to 5 attempts per 15 minutes via a `beforeLogin` hook, with a progressive warning on the login page as attempts are used up. A Content Security Policy and other HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`) are set globally. JSON-LD structured data is escaped against injection, and every user-submitted field is HTML-escaped before it reaches an outgoing email. All external service calls (Upstash, Turnstile, Resend) fail open except email, which returns a 500. Dependencies are tracked against known CVEs.
+
+### Accessibility
+
+Skip-to-content link, real keyboard focus traps for the quick view modal and image lightbox (initial focus on open, restored to the trigger on close), background content marked `inert` while a modal is open, and ARIA labels translated per locale instead of hardcoded in English. Form fields carry `aria-invalid`/`aria-describedby` on validation errors. Color contrast is checked against WCAG AA in both light and dark mode.
 
 ### Reduced Motion Support
 
@@ -109,6 +117,7 @@ Full dark/light theme via next-themes, with the admin panel defaulting to dark m
 | Email | Resend |
 | Bot protection | Cloudflare Turnstile |
 | Rate limiting | Upstash Redis |
+| Error monitoring | Sentry |
 | i18n | next-intl (AR default, EN secondary) |
 | DNS / CDN | Cloudflare |
 | Hosting | Vercel |
@@ -125,3 +134,5 @@ Full dark/light theme via next-themes, with the admin panel defaulting to dark m
 - Arabic locale has no URL prefix; `/ar/*` URLs redirect to `/*` via the next-intl middleware
 - Size units (ml, L, g, oz, etc.) are a Payload collection; `sizeUnit` on products is a relationship, not a hardcoded select
 - Capacity is auto-derived from size options via `deriveCapacity()` in `src/lib/utils.ts`; the DB field is written by a `beforeChange` hook
+- GitHub Actions runs type-check and lint (`npm run check`) on every push to `main`/`dev` and on pull requests, separate from and faster than Vercel's own build-time checks
+- Core Web Vitals audited with Lighthouse against a production build (not `next dev`); found and fixed a real LCP issue on product pages (`fetchPriority="high"` needed alongside `priority` on the main image), plus contrast and heading-order issues
