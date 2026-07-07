@@ -142,12 +142,12 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
               <SpecBadge compact dir="ltr">{derivedCapacity}</SpecBadge>
             )}
             {colorCount > 1 && (
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <span className="text-xs text-gray-400 dark:text-gray-400">
                 {t('colorCount', { count: colorCount })}
               </span>
             )}
             {sizeCount > 1 && (
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <span className="text-xs text-gray-400 dark:text-gray-400">
                 {t('sizeCount', { count: sizeCount })}
               </span>
             )}

@@ -64,7 +64,7 @@ export default async function ContactPage({ params }: Props) {
           {t('title')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">{t('subtitle')}</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500">{t('priceNote')}</p>
+        <p className="text-sm text-gray-400 dark:text-gray-400">{t('priceNote')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">

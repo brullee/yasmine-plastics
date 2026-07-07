@@ -312,6 +312,7 @@ export function ProductMainSection({
               sizes="(max-width: 1024px) 100vw, 45vw"
               className="object-cover transition-opacity duration-200"
               priority
+              fetchPriority="high"
               unavailableLabel={tCommon('imageUnavailable')}
               size="lg"
               onFail={() => markFailed(displayImage)}

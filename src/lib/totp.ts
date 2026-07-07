@@ -55,8 +55,18 @@ export function generateTotpSecret(email: string) {
 }
 
 // `encryptedSecret` is the value already stored on the user doc (via encryptSecret).
-export function verifyTotpCode(encryptedSecret: string, code: string): boolean {
+// Returns the matched time-step counter on success, or null if the code is wrong.
+// `lastUsedStep` (the step persisted from the previous successful verification, if any)
+// makes this replay-proof: a captured code is only valid once, even within its ~90s
+// window — a second use (whether that's a retry, or someone using it to also disable
+// 2FA right after login) matches the same or an earlier step and is rejected. Callers
+// that accept success must persist the returned step as the new `lastUsedStep`.
+export function verifyTotpCode(encryptedSecret: string, code: string, lastUsedStep?: number | null): number | null {
   const base32 = decryptSecret(encryptedSecret)
   const totp = new TOTP({ issuer: ISSUER, algorithm: 'SHA1', digits: 6, period: 30, secret: Secret.fromBase32(base32) })
-  return totp.validate({ token: code, window: 1 }) !== null
+  const delta = totp.validate({ token: code, window: 1 })
+  if (delta === null) return null
+  const step = Math.floor(Date.now() / 1000 / totp.period) + delta
+  if (lastUsedStep != null && step <= lastUsedStep) return null
+  return step
 }
