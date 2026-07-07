@@ -22,7 +22,7 @@ export function Footer() {
   const address = locale === 'ar' ? company.addressAr : company.addressEn
 
   return (
-    <footer className={cn('bg-white dark:bg-brand-navyDeep border-t text-gray-600 dark:text-gray-400', chrome.divider)}>
+    <footer className={cn('bg-white dark:bg-brand-navyDeep border-t text-gray-600 dark:text-gray-300', chrome.divider)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Left: contact info */}

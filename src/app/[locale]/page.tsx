@@ -116,7 +116,7 @@ export default async function HomePage({
                 <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-5 leading-tight">
                   {t('custom.headline')}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed mb-8">
+                <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8">
                   {t('custom.body')}
                 </p>
                 <Link
@@ -169,7 +169,7 @@ export default async function HomePage({
                     {icon}
                   </div>
                   <h3 className="text-xl font-semibold text-brand-navy dark:text-white">{title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{text}</p>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{text}</p>
                 </div>
               </ScrollReveal>
             ))}
