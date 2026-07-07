@@ -114,8 +114,20 @@ export default buildConfig({
             if (!code) throw new APIError('Two-factor code required', 401)
 
             const encryptedSecret = u.twoFactorSecret as string | undefined
-            const validTotp = !!encryptedSecret && verifyTotpCode(encryptedSecret, code)
-            if (validTotp) return
+            const lastUsedStep = (u.twoFactorLastUsedStep ?? null) as number | null
+            const matchedStep = encryptedSecret ? verifyTotpCode(encryptedSecret, code, lastUsedStep) : null
+            if (matchedStep !== null) {
+              // Persist the step this code matched so the same code (or an earlier one,
+              // within the validation window) can't be replayed — e.g. to immediately
+              // disable 2FA right after using it to log in (see /api/2fa/disable).
+              await req.payload.update({
+                collection: 'users',
+                id: u.id as string,
+                data: { twoFactorLastUsedStep: matchedStep },
+                overrideAccess: true,
+              })
+              return
+            }
 
             const recoveryCodes = (u.twoFactorRecoveryCodes ?? []) as { hash: string; id?: string }[]
             const matchIndex = recoveryCodes.findIndex((r) => verifyRecoveryCode(code, r.hash))
@@ -158,6 +170,15 @@ export default buildConfig({
           fields: [
             { name: 'hash', type: 'text' },
           ],
+        },
+        {
+          name: 'twoFactorLastUsedStep',
+          label: 'Two-Factor Last Used Step',
+          type: 'number',
+          // The TOTP time-step counter last accepted for this user (login or disable) —
+          // replay protection, not a user-facing setting. See src/lib/totp.ts.
+          admin: { hidden: true, disableListColumn: true },
+          access: { read: () => false },
         },
         {
           name: 'twoFactorSetup',

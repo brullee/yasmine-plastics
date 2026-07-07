@@ -16,7 +16,8 @@ export async function POST(req: Request) {
     const encryptedSecret = (fullUser as Record<string, unknown>).twoFactorSecret as string | undefined
     if (!encryptedSecret) return NextResponse.json({ error: 'Setup not started' }, { status: 400 })
 
-    if (!verifyTotpCode(encryptedSecret, code))
+    const matchedStep = verifyTotpCode(encryptedSecret, code)
+    if (matchedStep === null)
       return NextResponse.json({ error: 'Invalid code' }, { status: 400 })
 
     const recoveryCodes = generateRecoveryCodes()
@@ -26,6 +27,9 @@ export async function POST(req: Request) {
       data: {
         twoFactorEnabled: true,
         twoFactorRecoveryCodes: recoveryCodes.map((c) => ({ hash: hashRecoveryCode(c) })),
+        // Record the setup-confirmation code's step so it can't immediately be replayed
+        // to log in again with the same code.
+        twoFactorLastUsedStep: matchedStep,
       },
       overrideAccess: true,
     })

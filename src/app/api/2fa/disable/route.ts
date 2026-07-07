@@ -15,8 +15,13 @@ export async function POST(req: Request) {
     const fullUser = await payload.findByID({ collection: 'users', id: user.id, overrideAccess: true })
     const encryptedSecret = (fullUser as Record<string, unknown>).twoFactorSecret as string | undefined
     const recoveryCodes = ((fullUser as Record<string, unknown>).twoFactorRecoveryCodes ?? []) as { hash: string }[]
+    const lastUsedStep = ((fullUser as Record<string, unknown>).twoFactorLastUsedStep ?? null) as number | null
 
-    const validTotp = !!encryptedSecret && verifyTotpCode(encryptedSecret, code)
+    // Reusing the last time-step accepted at login (or a prior disable attempt) is
+    // rejected here just like it would be on a second login — otherwise a single
+    // captured code could log an attacker in AND immediately disable 2FA on the account.
+    // A fresh code (next ~30s time-step) or a recovery code is required.
+    const validTotp = !!encryptedSecret && verifyTotpCode(encryptedSecret, code, lastUsedStep) !== null
     const validRecovery = recoveryCodes.some((r) => verifyRecoveryCode(code, r.hash))
 
     if (!validTotp && !validRecovery)
@@ -25,7 +30,12 @@ export async function POST(req: Request) {
     await payload.update({
       collection: 'users',
       id: user.id,
-      data: { twoFactorEnabled: false, twoFactorSecret: null, twoFactorRecoveryCodes: [] },
+      data: {
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        twoFactorRecoveryCodes: [],
+        twoFactorLastUsedStep: null,
+      },
       overrideAccess: true,
     })
 
