@@ -31,6 +31,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+// `QuoteForm` reads `?product=`/`?color=`/etc. via `useSearchParams()` to pre-fill from a
+// product page's "Get a Quote" link, which forces this Suspense boundary to bail to
+// client-side rendering on this statically-generated page (see PLAN.md Pending). Reserving
+// roughly the form's height here keeps the swap-in from jumping the page below it. Sized for
+// the fixed fields every visit shows (name/company/email/phone/category/delivery/details);
+// a pre-filled visit that also reveals the product/color/size chips still grows a bit more.
+// Label bar widths approximate each real field's label length (Full Name, Company /
+// Business Name, Email Address, Phone / WhatsApp Number, Category, Delivery Location /
+// City) so the skeleton reads as a real form instead of one row repeated six times.
+const LABEL_WIDTHS = ['w-20', 'w-44', 'w-28', 'w-44', 'w-20', 'w-36']
+
+function QuoteFormSkeleton() {
+  return (
+    <div className="space-y-5 animate-pulse">
+      {LABEL_WIDTHS.map((labelWidth, i) => (
+        <div key={i} className="space-y-1.5">
+          <div className={`h-4 ${labelWidth} rounded bg-gray-200 dark:bg-gray-700`} />
+          <div className="h-[42px] rounded-lg bg-gray-100 dark:bg-gray-800" />
+        </div>
+      ))}
+      <div className="space-y-1.5">
+        <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-[120px] rounded-lg bg-gray-100 dark:bg-gray-800" />
+      </div>
+      <div className="h-[65px] rounded-lg bg-gray-100 dark:bg-gray-800" />
+      <div className="h-12 rounded-lg bg-gray-200 dark:bg-gray-700" />
+    </div>
+  )
+}
+
 export default async function QuotePage({ params }: Props) {
   const { locale: localeRaw } = await params
   const locale = localeRaw as Locale
@@ -53,7 +83,7 @@ export default async function QuotePage({ params }: Props) {
             <p className="text-gray-500 dark:text-gray-400 mb-2">{t('subtitle')}</p>
             <p className="text-sm text-gray-400 dark:text-gray-400">{t('priceNote')}</p>
           </div>
-          <Suspense>
+          <Suspense fallback={<QuoteFormSkeleton />}>
             <QuoteForm products={products} categories={categories} />
           </Suspense>
         </div>
