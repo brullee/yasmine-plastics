@@ -18,10 +18,6 @@ export function buildWhatsAppUrl(phone: string, message?: string): string {
   return `https://wa.me/${clean}${encoded}`
 }
 
-export function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
 export function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
