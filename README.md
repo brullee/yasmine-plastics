@@ -118,6 +118,7 @@ Full dark/light theme via next-themes, with the admin panel defaulting to dark m
 | Bot protection | Cloudflare Turnstile |
 | Rate limiting | Upstash Redis |
 | Error monitoring | Sentry |
+| Two-factor auth | otpauth (TOTP) |
 | i18n | next-intl (AR default, EN secondary) |
 | DNS / CDN | Cloudflare |
 | Hosting | Vercel |
