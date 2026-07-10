@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { generateRecoveryCodes, hashRecoveryCode, verifyTotpCode } from '@/lib/totp'
+import { generateRecoveryCodes, hashToken, verifyTotpCode } from '@/lib/totp'
 
 export async function POST(req: Request) {
   try {
@@ -26,10 +26,15 @@ export async function POST(req: Request) {
       id: user.id,
       data: {
         twoFactorEnabled: true,
-        twoFactorRecoveryCodes: recoveryCodes.map((c) => ({ hash: hashRecoveryCode(c) })),
+        twoFactorRecoveryCodes: recoveryCodes.map((c) => ({ hash: hashToken(c) })),
         // Record the setup-confirmation code's step so it can't immediately be replayed
         // to log in again with the same code.
         twoFactorLastUsedStep: matchedStep,
+        // /api/2fa/trust-device only requires an authenticated session, not
+        // twoFactorEnabled, so a trust entry could in principle be written before 2FA is
+        // turned on. Wipe the array here so enabling 2FA always starts from zero trust,
+        // symmetric with /api/2fa/disable clearing it when 2FA is torn down.
+        twoFactorTrustedDevices: [],
       },
       overrideAccess: true,
     })

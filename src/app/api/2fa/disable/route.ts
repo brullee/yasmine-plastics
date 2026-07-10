@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { verifyRecoveryCode, verifyTotpCode } from '@/lib/totp'
+import { verifyToken, verifyTotpCode } from '@/lib/totp'
 
 export async function POST(req: Request) {
   try {
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     // captured code could log an attacker in AND immediately disable 2FA on the account.
     // A fresh code (next ~30s time-step) or a recovery code is required.
     const validTotp = !!encryptedSecret && verifyTotpCode(encryptedSecret, code, lastUsedStep) !== null
-    const validRecovery = recoveryCodes.some((r) => verifyRecoveryCode(code, r.hash))
+    const validRecovery = recoveryCodes.some((r) => verifyToken(code, r.hash))
 
     if (!validTotp && !validRecovery)
       return NextResponse.json({ error: 'Invalid code' }, { status: 400 })
@@ -35,6 +35,9 @@ export async function POST(req: Request) {
         twoFactorSecret: null,
         twoFactorRecoveryCodes: [],
         twoFactorLastUsedStep: null,
+        // Trust only ever means "skip the code prompt for this 2FA setup" — stale once
+        // 2FA itself is torn down, and re-enabling later should start from zero trust.
+        twoFactorTrustedDevices: [],
       },
       overrideAccess: true,
     })

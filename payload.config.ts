@@ -7,10 +7,27 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
-import { forgotPasswordEmailHtml } from '@/lib/emailTemplates'
-import { loginRateLimit } from '@/lib/ratelimit'
-import { verifyRecoveryCode, verifyTotpCode } from '@/lib/totp'
+import { forgotPasswordEmailHtml, newDeviceSignInEmailHtml } from '@/lib/emailTemplates'
+import { sendMail } from '@/lib/mailer'
+import { loginRateLimit, newDeviceAlertRateLimit } from '@/lib/ratelimit'
+import { TRUST_COOKIE_NAME, verifyToken, verifyTotpCode } from '@/lib/totp'
+import { parseCookies } from 'payload/shared'
 
+// Fire-and-forget security notice sent the moment a correct password is used from a
+// device/browser this account has never completed 2FA on — see the beforeLogin hook
+// below. Never throws: a failed send must not block or fail the login attempt itself.
+async function notifyNewDevice({ to, ip, userAgent }: { to: string; ip: string; userAgent: string }) {
+  try {
+    await sendMail({
+      to,
+      subject: 'New sign-in attempt on your Yasmine Plastics account',
+      html: newDeviceSignInEmailHtml({ userEmail: to, ip, userAgent, time: new Date().toUTCString() }),
+      text: `The correct password for ${to} was just used to sign in to the Yasmine Plastics admin panel from a device we haven't seen before. A two-factor code is being requested before access is granted.\n\nIP Address: ${ip}\nDevice: ${userAgent}\nTime (UTC): ${new Date().toUTCString()}\n\nIf this was you, no action is needed. If you don't recognize this activity, change your password and make sure to keep two-factor authentication enabled.`,
+    })
+  } catch (err) {
+    console.error('[2fa] new-device alert email failed:', err)
+  }
+}
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
@@ -106,12 +123,44 @@ export default buildConfig({
             const u = user as Record<string, unknown>
             if (!u.twoFactorEnabled) return
 
+            // A device that already completed the 2FA challenge once carries a remember
+            // cookie (set client-side via /api/2fa/trust-device right after that success)
+            // good for TRUST_DEVICE_DAYS — skip the code prompt entirely while it's still
+            // valid, the same "remember this device for 30 days" pattern every major
+            // provider uses. Anything else (new browser, cleared cookies, expired trust)
+            // falls through to the normal prompt below.
+            const trustToken = parseCookies(req.headers).get(TRUST_COOKIE_NAME)
+            const trustedDevices = (u.twoFactorTrustedDevices ?? []) as { hash: string; expiresAt: string }[]
+            const isTrustedDevice = !!trustToken && trustedDevices.some(
+              (d) => new Date(d.expiresAt).getTime() > Date.now() && verifyToken(trustToken, d.hash)
+            )
+            if (isTrustedDevice) return
+
             // Submitted by the custom login view (src/components/payload/LoginView.tsx)
             // alongside email/password — this hook runs after password verification
             // succeeds but before a token is issued, so this is the right place to gate
             // on it.
             const code = (req.data as Record<string, unknown> | undefined)?.twoFactorCode as string | undefined
-            if (!code) throw new APIError('Two-factor code required', 401)
+            if (!code) {
+              // The password was correct but this device has never passed 2FA on this
+              // account — let the account holder know, in case it wasn't them. Scheduled
+              // via after() so the send survives past the response below (which returns
+              // immediately, same reasoning as the media collection's afterChange hook
+              // above), and capped to once per 15 min per account via
+              // newDeviceAlertRateLimit so someone retrying this same "code required"
+              // step (which is deliberately not rate-limited as a login failure — see
+              // fail() above) can't trigger unlimited emails.
+              const userAgent = req.headers.get('user-agent') ?? 'unknown'
+              after(async () => {
+                try {
+                  const { success } = await newDeviceAlertRateLimit.limit(u.id as string)
+                  if (success) await notifyNewDevice({ to: u.email as string, ip, userAgent })
+                } catch (err) {
+                  console.error('[2fa] new-device alert rate-limit check failed:', err)
+                }
+              })
+              throw new APIError('Two-factor code required', 401)
+            }
 
             const encryptedSecret = u.twoFactorSecret as string | undefined
             const lastUsedStep = (u.twoFactorLastUsedStep ?? null) as number | null
@@ -131,7 +180,7 @@ export default buildConfig({
             }
 
             const recoveryCodes = (u.twoFactorRecoveryCodes ?? []) as { hash: string; id?: string }[]
-            const matchIndex = recoveryCodes.findIndex((r) => verifyRecoveryCode(code, r.hash))
+            const matchIndex = recoveryCodes.findIndex((r) => verifyToken(code, r.hash))
             if (matchIndex === -1) await fail('Invalid two-factor code')
 
             // Consume the recovery code so it can't be reused.
@@ -181,6 +230,20 @@ export default buildConfig({
           // replay protection, not a user-facing setting. See src/lib/totp.ts.
           admin: { hidden: true, disableListColumn: true },
           access: { read: () => false },
+        },
+        {
+          name: 'twoFactorTrustedDevices',
+          label: 'Two-Factor Trusted Devices',
+          type: 'array',
+          // Lets a device that already passed the 2FA challenge once skip the code prompt
+          // for TRUST_DEVICE_DAYS (see src/lib/totp.ts and /api/2fa/trust-device) — not a
+          // user-facing setting. Cleared whenever 2FA is disabled (see /api/2fa/disable).
+          admin: { hidden: true, disableListColumn: true },
+          access: { read: () => false },
+          fields: [
+            { name: 'hash', type: 'text' },
+            { name: 'expiresAt', type: 'date' },
+          ],
         },
         {
           name: 'twoFactorSetup',

@@ -20,6 +20,16 @@ export const loginRateLimit = new Ratelimit({
   prefix:  'rl:login',
 })
 
+// 1 per 15 minutes, keyed by user id — caps the new-device sign-in alert email. Someone
+// who already has a valid password but not the 2FA device can otherwise retrigger this
+// email on every attempt (the "code required" step is deliberately not rate-limited like
+// a real failure is, since it's the expected first step of every 2FA login).
+export const newDeviceAlertRateLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(1, '15 m'),
+  prefix:  'rl:2fa-alert',
+})
+
 export function getIP(req: Request): string {
   return (
     req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??

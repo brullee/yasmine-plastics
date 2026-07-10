@@ -129,6 +129,55 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
 </html>`
 }
 
+export function newDeviceSignInEmailHtml({ userEmail, ip, userAgent, time }: {
+  userEmail: string
+  ip: string
+  userAgent: string
+  time: string
+}) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+
+        ${logoHeader('New Sign-In Attempt')}
+
+        <!-- Body -->
+        <tr><td style="background:#ffffff;padding:32px 32px 8px;">
+          <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.6;">
+            The correct password for <strong>${esc(userEmail)}</strong> was just used to sign in to the
+            Yasmine Plastics admin panel from a device we haven't seen before. A two-factor code is
+            being requested before access is granted.
+          </p>
+        </td></tr>
+
+        <!-- Details -->
+        <tr><td style="background:#ffffff;padding:8px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            ${row('IP Address', ip)}
+            ${row('Device', userAgent)}
+            ${row('Time (UTC)', time)}
+          </table>
+        </td></tr>
+
+        <!-- Guidance -->
+        <tr><td style="background:${BG};padding:20px 32px;">
+          <p style="margin:0 0 8px;font-size:13px;color:#374151;line-height:1.6;">
+            If this was you, no action is needed. If you don't recognize this activity, change your
+            password and make sure to keep two-factor authentication enabled.
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+}
+
 export function quoteEmailHtml({ fullName, company, email, phone, productName, productSlug, color, size, lidName, lidSlug, lidColor, lidSize, delivery, details }: {
   fullName: string
   company?: string

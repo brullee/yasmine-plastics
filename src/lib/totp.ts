@@ -29,14 +29,15 @@ export function decryptSecret(stored: string): string {
   return plain.toString('utf8')
 }
 
-// Recovery codes are high-entropy random strings we generate ourselves, not user-chosen
-// passwords, so a plain fast hash is fine — no need for a slow KDF like bcrypt/argon2 here.
-export function hashRecoveryCode(code: string): string {
-  return createHash('sha256').update(code).digest('hex')
+// Recovery codes and trust-device tokens are both high-entropy random strings we generate
+// ourselves, not user-chosen passwords, so a plain fast hash is fine — no need for a slow
+// KDF like bcrypt/argon2 here.
+export function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex')
 }
 
-export function verifyRecoveryCode(code: string, hash: string): boolean {
-  const candidate = Buffer.from(hashRecoveryCode(code), 'hex')
+export function verifyToken(token: string, hash: string): boolean {
+  const candidate = Buffer.from(hashToken(token), 'hex')
   const stored = Buffer.from(hash, 'hex')
   if (candidate.length !== stored.length) return false
   return timingSafeEqual(candidate, stored)
@@ -44,6 +45,17 @@ export function verifyRecoveryCode(code: string, hash: string): boolean {
 
 export function generateRecoveryCodes(count = 10): string[] {
   return Array.from({ length: count }, () => randomBytes(5).toString('hex'))
+}
+
+// "Remember this device" support — a device that already passed a 2FA challenge once
+// gets a remember-token (see /api/2fa/trust-device) so it can skip the code prompt for
+// TRUST_DEVICE_DAYS, matching the standard "remember this device for 30 days" pattern
+// used by Google/GitHub/etc. Only the hash is ever persisted (see hashToken above).
+export const TRUST_COOKIE_NAME = 'yp-2fa-trust'
+export const TRUST_DEVICE_DAYS = 30
+
+export function generateTrustToken(): string {
+  return randomBytes(32).toString('hex')
 }
 
 // Generates a fresh secret for account setup — not persisted by this function, the caller
