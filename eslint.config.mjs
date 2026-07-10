@@ -5,9 +5,12 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   globalIgnores([
     '.next/**',
+    '.next-e2e/**',
     'out/**',
     'build/**',
     'next-env.d.ts',
+    'playwright-report/**',
+    'test-results/**',
   ]),
   {
     linterOptions: {
