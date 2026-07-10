@@ -6,6 +6,10 @@ import { withPayload } from '@payloadcms/next/withPayload'
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
+  // Isolated build/cache dir for the Playwright e2e server (see playwright.config.ts),
+  // so running e2e tests never touches the regular `.next` a `next dev`/`next build`
+  // in this same repo is using.
+  ...(process.env.E2E_DIST_DIR ? { distDir: process.env.E2E_DIST_DIR } : {}),
   images: {
     unoptimized: true,
   },
