@@ -22,5 +22,5 @@ __pycache__/
 *.pyc
 
 # Local dev
-scripts/images-*
+scripts/readme-screenshots.js
 PLAN.md
