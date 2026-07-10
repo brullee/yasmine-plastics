@@ -31,14 +31,12 @@ export function LoginRateWarningClient({
   if (state.remaining > 2) return null
 
   let msg: string
-  let hint = false
   if (state.remaining <= 0) {
     msg = 'Too many failed attempts. Please try again later.'
   } else if (state.remaining === 1) {
     msg = "One more failed attempt and you'll be temporarily locked out."
   } else {
     msg = '2 attempts left before a temporary lockout. Try resetting your password.'
-    hint = true
   }
 
   const isLocked = state.remaining <= 0

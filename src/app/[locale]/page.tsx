@@ -46,7 +46,6 @@ export default async function HomePage({
   const { locale: localeRaw } = await params
   const locale = localeRaw as Locale
   const t = await getTranslations({ locale, namespace: 'home' })
-  const tNav = await getTranslations({ locale, namespace: 'nav' })
   const [products, categories] = await Promise.all([getProducts(), getCategories()])
 
   const orgSchema = {

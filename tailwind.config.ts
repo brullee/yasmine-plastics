@@ -26,7 +26,6 @@ const config: Config = {
           navyDeep: '#0d1b2a',
           blue: '#ed145b',
           blueDeep: '#c4114a',
-          sky: '#f5f7fa',
           slate750: '#293548',
         },
       },

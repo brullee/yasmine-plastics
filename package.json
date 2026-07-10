@@ -1,6 +1,6 @@
 {
   "name": "yasmine-plastics",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "scripts": {
     "dev": "rm -rf .next && next dev",
@@ -13,7 +13,7 @@
     "deploy:patch": "next build && npm version patch && git push --follow-tags",
     "deploy:minor": "next build && npm version minor && git push --follow-tags",
     "deploy:major": "next build && npm version major && git push --follow-tags",
-    "sync:dev": "git checkout dev && git fetch origin && git merge --ff-only origin/main"
+    "sync": "git fetch origin && git merge --ff-only origin/main"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.5.2",

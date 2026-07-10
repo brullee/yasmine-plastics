@@ -31,6 +31,11 @@ export function LoginViewForm({ searchParams }: { searchParams?: Record<string, 
   const [busy, setBusy] = useState(false)
 
   async function submitLogin(codeValue: string) {
+    // Guards against a double submit (e.g. the 6-digit auto-submit below firing while a
+    // manual Enter/click is also in flight) sending two concurrent login requests — which
+    // among other things could race two /api/2fa/trust-device calls into clobbering one
+    // another's write (see src/app/api/2fa/trust-device/route.ts).
+    if (busy) return
     setBusy(true)
     setError('')
     try {
@@ -53,6 +58,15 @@ export function LoginViewForm({ searchParams }: { searchParams?: Record<string, 
       }
 
       setUser(data)
+      if (needsCode) {
+        // Best-effort only — remembers this device so future logins can skip the code
+        // prompt (see /api/2fa/trust-device). A failed call here must never block login.
+        try {
+          await fetch('/api/2fa/trust-device', { method: 'POST', credentials: 'include' })
+        } catch {
+          // ignore — device just won't be remembered next time
+        }
+      }
       window.location.href = getSafeRedirect({ fallbackTo: adminRoute, redirectTo: searchParams?.redirect ?? '' })
     } catch {
       setError('Login failed')

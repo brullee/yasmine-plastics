@@ -110,7 +110,6 @@
   "product": {
     "category": "Category",
     "keyAttributes": "Specifications",
-    "artCode": "ART",
     "material": "Material",
     "capacity": "Capacity",
     "piecesPerBox": "Pcs / Box",
@@ -127,14 +126,11 @@
       "size": "Size",
       "lid": "Lid",
       "custom": "Custom",
-      "moqNotice": "Custom colours require a minimum order quantity (MOQ). Contact us to discuss your order.",
-      "moqNoticeForm": "Custom colours require a minimum order quantity (MOQ)."
+      "moqNotice": "Custom colours require a minimum order quantity (MOQ). Contact us to discuss your order."
     },
-    "whatsapp": "Contact via WhatsApp",
     "quote": "Get a Quote",
     "zoomHint": "Scroll or ↑ / ↓ to zoom",
-    "notFound": "Product not found.",
-    "notFoundText": "The product you are looking for does not exist or has been removed."
+    "notFound": "Product not found."
   },
   "contact": {
     "title": "Contact Us",
@@ -142,11 +138,9 @@
     "priceNote": "All pricing is on request. We don't sell online.",
     "info": {
       "phone": "Phone",
-      "whatsapp": "WhatsApp",
       "email": "Email",
       "address": "Address",
-      "hours": "Working Hours",
-      "openInMaps": "Open in Google Maps"
+      "hours": "Working Hours"
     },
     "form": {
       "title": "Send us a Message",
@@ -197,10 +191,8 @@
   },
   "footer": {
     "copyright": "© 2026 Yasmine Co. for Plastic Products. All rights reserved.",
-    "openWhatsApp": "Chat on WhatsApp",
     "links": "Navigation",
     "ourInfo": "Our Information",
-    "legal": "Legal",
     "privacyPolicy": "Privacy Policy",
     "terms": "Terms of Service",
     "light": "Light",
@@ -212,11 +204,7 @@
     "invalidPhone": "Please enter a valid phone number."
   },
   "common": {
-    "loading": "Loading...",
     "error": "Something went wrong. Please try again.",
-    "backToProducts": "Back to Products",
-    "learnMore": "Learn More",
-    "contactUs": "Contact Us",
     "imageUnavailable": "Image unavailable"
   },
   "meta": {
