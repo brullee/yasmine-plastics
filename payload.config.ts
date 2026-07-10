@@ -8,7 +8,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml, newDeviceSignInEmailHtml } from '@/lib/emailTemplates'
-import { sendMail } from '@/lib/mailer'
+import { MAIL_FROM_NOREPLY, sendMail } from '@/lib/mailer'
 import { loginRateLimit, newDeviceAlertRateLimit } from '@/lib/ratelimit'
 import { TRUST_COOKIE_NAME, verifyToken, verifyTotpCode } from '@/lib/totp'
 import { parseCookies } from 'payload/shared'
@@ -20,6 +20,7 @@ async function notifyNewDevice({ to, ip, userAgent }: { to: string; ip: string; 
   try {
     await sendMail({
       to,
+      from: MAIL_FROM_NOREPLY,
       subject: 'New sign-in attempt on your Yasmine Plastics account',
       html: newDeviceSignInEmailHtml({ userEmail: to, ip, userAgent, time: new Date().toUTCString() }),
       text: `The correct password for ${to} was just used to sign in to the Yasmine Plastics admin panel from a device we haven't seen before. A two-factor code is being requested before access is granted.\n\nIP Address: ${ip}\nDevice: ${userAgent}\nTime (UTC): ${new Date().toUTCString()}\n\nIf this was you, no action is needed. If you don't recognize this activity, change your password and make sure to keep two-factor authentication enabled.`,
