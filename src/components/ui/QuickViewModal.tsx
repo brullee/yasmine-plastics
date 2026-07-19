@@ -57,7 +57,20 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
   const dialogRef  = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
 
-  const images  = [product.image, ...(product.gallery ?? [])]
+  // A lid (the "child" side of a pairing) has no pairing photos of its own — those
+  // combined container+lid photos live on the container's gallery, keyed by lid slug
+  // (see payload-data.ts). Pull them in here the same way the full product page does
+  // (ProductMainSection.tsx's pairingSlides), so a lid's Quick View isn't stuck with
+  // only its own solo product shot.
+  const fitsContainers = allProducts && (product.category === 'lids' || product.category === 'papercup-lids')
+    ? allProducts.filter(p => p.compatibleLids?.includes(product.slug))
+    : []
+
+  const ownImages = [product.image, ...(product.gallery ?? [])]
+  const pairingImages = fitsContainers.flatMap(c =>
+    (c.pairingImages?.[product.slug] ?? []).filter(url => !ownImages.includes(url))
+  )
+  const images  = [...ownImages, ...pairingImages]
   const hasMany = images.length > 1
 
   const prevImg = () => setImgIndex(i => (i - 1 + images.length) % images.length)
@@ -149,10 +162,6 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
     ? (product.compatibleLids ?? [])
         .map(s => allProducts.find(p => p.slug === s) ?? null)
         .filter((p): p is Product => p !== null)
-    : []
-
-  const fitsContainers = allProducts && (product.category === 'lids' || product.category === 'papercup-lids')
-    ? allProducts.filter(p => p.compatibleLids?.includes(product.slug))
     : []
 
   const name           = localizedName(product, locale)
