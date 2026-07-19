@@ -664,6 +664,28 @@ export default buildConfig({
                   },
                   admin: { hidden: true },
                 },
+                {
+                  name: 'compatibleLidOptions',
+                  type: 'relationship',
+                  relationTo: 'products',
+                  hasMany: true,
+                  label: 'Compatible Lids',
+                  admin: {
+                    condition: (data) => !!data.hasCompatibleLids,
+                    description: 'Marks these lids as compatible without needing a paired photo. Add a gallery image with "Paired with lid" set instead/as well if you have a combined product photo for a given lid.',
+                    components: {
+                      Field: '@/components/payload/PairedLidField#CompatibleLidsField',
+                    },
+                  },
+                  filterOptions: {
+                    or: [
+                      { 'category.slug': { equals: 'lids' } },
+                      { 'category.slug': { equals: 'lid' } },
+                      { 'category.slug': { equals: 'papercup-lids' } },
+                      { 'category.slug': { equals: 'papercup-lid' } },
+                    ],
+                  },
+                },
               ],
             },
             {
@@ -715,6 +737,9 @@ export default buildConfig({
                       label: 'Paired with lid',
                       admin: {
                         condition: (data) => !!data.hasCompatibleLids,
+                        components: {
+                          Field: '@/components/payload/PairedLidField#PairedLidField',
+                        },
                       },
                       filterOptions: {
                         or: [

@@ -47,6 +47,13 @@ function transformProduct(doc: any): Product {
 
   const compatibleLids: string[] = []
   const pairingImages: Record<string, string[]> = {}
+
+  // Declared directly on the product (Options tab) — no paired photo required.
+  for (const lid of doc.compatibleLidOptions ?? []) {
+    const lidSlug = typeof lid === 'object' ? lid?.slug : null
+    if (lidSlug && !compatibleLids.includes(lidSlug)) compatibleLids.push(lidSlug)
+  }
+
   for (const g of doc.gallery ?? []) {
     const lidSlug = typeof g.pairedLid === 'object' ? g.pairedLid?.slug : null
     if (!lidSlug) continue
