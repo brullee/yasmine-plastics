@@ -268,10 +268,11 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                       aria-label={tA11y('goToImage', { n: i + 1 })}
                       aria-current={i === imgIndex}
                       className={cn(
+                        // Image panel is always white regardless of theme (see comment
+                        // above), so these dots stay in their light-mode colors too —
+                        // a dark: swap here would render white-on-white and vanish.
                         'w-2 h-2 rounded-full transition-colors',
-                        i === imgIndex
-                          ? 'bg-brand-navy dark:bg-white'
-                          : 'bg-black/25 dark:bg-white/40'
+                        i === imgIndex ? 'bg-brand-navy' : 'bg-black/25'
                       )}
                     />
                   ))}
