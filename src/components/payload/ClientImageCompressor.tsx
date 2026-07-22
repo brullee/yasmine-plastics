@@ -226,7 +226,8 @@ async function dispatchCompressed(input: HTMLInputElement, files: File[]) {
 
 async function interceptChange(e: Event) {
   try {
-    const input = e.target as HTMLInputElement
+    const input = e.target
+    if (!(input instanceof HTMLInputElement) || input.type !== 'file') return
     if (compressing.has(input)) return
     const files = Array.from(input.files ?? []).filter(f => f.type.startsWith('image/'))
     if (!files.length) return
@@ -240,9 +241,11 @@ async function interceptChange(e: Event) {
 
 async function interceptDrop(e: DragEvent) {
   try {
+    const dropzone = (e.target as HTMLElement | null)?.closest?.('.dropzone')
+    if (!dropzone) return
     const files = Array.from(e.dataTransfer?.files ?? []).filter(f => f.type.startsWith('image/'))
     if (!files.length) return
-    const input = (e.currentTarget as HTMLElement).querySelector<HTMLInputElement>('input[type="file"]')
+    const input = dropzone.querySelector<HTMLInputElement>('input[type="file"]')
     if (!input) return
     e.stopImmediatePropagation()
     e.preventDefault()
@@ -255,26 +258,22 @@ async function interceptDrop(e: DragEvent) {
 
 export function ClientImageCompressorProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const attachedInputs    = new WeakSet<HTMLInputElement>()
-    const attachedDropzones = new WeakSet<HTMLElement>()
-
-    function attach() {
-      document.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach(input => {
-        if (attachedInputs.has(input)) return
-        input.addEventListener('change', interceptChange, { capture: true })
-        attachedInputs.add(input)
-      })
-      document.querySelectorAll<HTMLElement>('.dropzone').forEach(div => {
-        if (attachedDropzones.has(div)) return
-        div.addEventListener('drop', interceptDrop, { capture: true })
-        attachedDropzones.add(div)
-      })
+    // Capture-phase listeners on `document` itself, rather than on each dropzone/input
+    // element directly. Payload's own Dropzone component attaches its native `drop`
+    // listener straight onto the same dropzone <div> we used to target — and when two
+    // listeners sit on the exact same element, the capture flag doesn't decide order,
+    // they fire in registration order. Whichever of our effect vs. Payload's attached
+    // first won the race, which is what let raw (uncompressed) drops slip through
+    // intermittently. A capture listener on `document` (an ancestor of every dropzone)
+    // always fires before any listener on a descendant target, drop or change, no
+    // matter which one mounts first — and it also covers drawers that don't exist yet
+    // at mount, so no MutationObserver rescan is needed either.
+    document.addEventListener('change', interceptChange, { capture: true })
+    document.addEventListener('drop', interceptDrop, { capture: true })
+    return () => {
+      document.removeEventListener('change', interceptChange, { capture: true })
+      document.removeEventListener('drop', interceptDrop, { capture: true })
     }
-
-    attach()
-    const observer = new MutationObserver(attach)
-    observer.observe(document.body, { childList: true, subtree: true })
-    return () => observer.disconnect()
   }, [])
 
   return <>{children}</>

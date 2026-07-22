@@ -306,7 +306,6 @@ export default buildConfig({
         },
         { name: 'filesize', type: 'number', admin: { readOnly: true, components: { Cell: '@/components/payload/FileSizeCell#FileSizeCell' } } },
         { name: 'url', type: 'text', admin: { readOnly: true, components: { Cell: '@/components/payload/UrlCell#UrlCell' } } },
-        { name: 'alt', label: 'Image Description', type: 'text', admin: { description: 'Describe the image briefly. E.g. "White 250ml plastic cup".' } },
         {
           name: 'normalizeImage',
           type: 'checkbox',
@@ -466,13 +465,46 @@ export default buildConfig({
           },
         ],
         afterChange: [
-          ({ doc }) => {
+          async ({ doc, previousDoc, req }) => {
             if (doc.slug) {
               revalidatePath(`/products/${doc.slug}`)
               revalidatePath(`/en/products/${doc.slug}`)
             }
             revalidatePath('/products')
             revalidatePath('/en/products')
+
+            // A container's paired/compatible lids each show this product's photos and
+            // "fits these containers" info on their OWN page — that page is a separate
+            // ISR route and doesn't get touched by the revalidation above. Re-derive the
+            // set of affected lid ids from both the new and previous doc (so removing a
+            // pairing revalidates the lid that just lost it, not just the one just added)
+            // and revalidate each of their pages too.
+            const lidIds = new Set<number>()
+            const collect = (document: Record<string, unknown> | undefined) => {
+              if (!document) return
+              for (const lid of (document.compatibleLidOptions as unknown[]) ?? []) {
+                const id = typeof lid === 'object' && lid !== null ? (lid as { id?: number }).id : lid
+                if (typeof id === 'number') lidIds.add(id)
+              }
+              for (const row of (document.gallery as Record<string, unknown>[]) ?? []) {
+                const lid = row?.pairedLid
+                const id = typeof lid === 'object' && lid !== null ? (lid as { id?: number }).id : lid
+                if (typeof id === 'number') lidIds.add(id)
+              }
+            }
+            collect(doc)
+            collect(previousDoc)
+
+            await Promise.all(
+              Array.from(lidIds).map(async (id) => {
+                try {
+                  const lid = await req.payload.findByID({ collection: 'products', id, depth: 0 })
+                  if (!lid?.slug) return
+                  revalidatePath(`/products/${lid.slug}`)
+                  revalidatePath(`/en/products/${lid.slug}`)
+                } catch {}
+              })
+            )
           },
         ],
       },

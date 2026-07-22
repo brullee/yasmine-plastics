@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactSelect, useField } from '@payloadcms/ui'
+import { ReactSelect, useField, useFormFields } from '@payloadcms/ui'
 import { useEffect, useState } from 'react'
 
 type ProductDoc = {
@@ -24,7 +24,11 @@ function formatLabel(doc: ProductDoc): string {
   return doc.artCode ? `${primary} · art ${doc.artCode}` : primary
 }
 
-function useLidOptions() {
+// `allowedIds`, when passed, restricts the fetched lids down to that set (used by
+// PairedLidField to only offer lids already declared compatible on the Options tab).
+// `undefined` means "no restriction" — CompatibleLidsField itself is the source of
+// truth and must always list every lid to choose from.
+function useLidOptions(allowedIds?: number[]) {
   const [options, setOptions] = useState<Option[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
@@ -46,13 +50,23 @@ function useLidOptions() {
       .finally(() => setIsLoading(false))
   }, [])
 
-  return { options, isLoading }
+  const filtered = allowedIds
+    ? options.filter(o => allowedIds.includes(Number(o.value)))
+    : options
+
+  return { options: filtered, isLoading }
 }
 
-// Gallery-row field: pairs one lid to a specific combined product photo.
+// Gallery-row field: pairs one lid to a specific combined product photo. Restricted
+// to the lids already declared compatible on this product's Options tab
+// (`compatibleLidOptions`) — otherwise every lid in the catalog showed up here,
+// regardless of whether it actually fits this product.
 export function PairedLidField({ path }: { path: string }) {
   const { value, setValue } = useField<number | null>({ path })
-  const { options, isLoading } = useLidOptions()
+  const compatibleLidIds = useFormFields(([fields]) => fields.compatibleLidOptions?.value) as
+    | number[]
+    | undefined
+  const { options, isLoading } = useLidOptions(compatibleLidIds ?? [])
 
   const selected = value != null ? (options.find(o => o.value === String(value)) ?? undefined) : undefined
 
@@ -66,9 +80,9 @@ export function PairedLidField({ path }: { path: string }) {
         isClearable
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onChange={(next: any) => setValue(next ? Number(next.value) : null)}
-        placeholder="Select a lid"
+        placeholder={options.length ? 'Select a lid' : 'Add compatible lids on the Options tab first'}
       />
-      <p className="field-description">Shown as internal name + art code so similarly-named lids aren&apos;t mixed up.</p>
+      <p className="field-description">Only lids marked compatible on the Options tab are listed here, shown as internal name + art code so similarly-named lids aren&apos;t mixed up.</p>
     </div>
   )
 }
