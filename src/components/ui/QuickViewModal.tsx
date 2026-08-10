@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
@@ -62,15 +62,23 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
   // (see payload-data.ts). Pull them in here the same way the full product page does
   // (ProductMainSection.tsx's pairingSlides), so a lid's Quick View isn't stuck with
   // only its own solo product shot.
-  const fitsContainers = allProducts && (product.category === 'lids' || product.category === 'papercup-lids')
-    ? allProducts.filter(p => p.compatibleLids?.includes(product.slug))
-    : []
+  // fitsContainers/images/resolvedLids all derive only from product+allProducts, which
+  // are fixed for this modal's whole lifetime — but phase/imgIndex/boxCleared/contentReady
+  // re-render it constantly during the open animation and image nav. Memoized so those
+  // unrelated state changes don't re-run a filter/find pass over the full catalog every time.
+  const fitsContainers = useMemo(() => (
+    allProducts && (product.category === 'lids' || product.category === 'papercup-lids')
+      ? allProducts.filter(p => p.compatibleLids?.includes(product.slug))
+      : []
+  ), [allProducts, product])
 
-  const ownImages = [product.image, ...(product.gallery ?? [])]
-  const pairingImages = fitsContainers.flatMap(c =>
-    (c.pairingImages?.[product.slug] ?? []).filter(url => !ownImages.includes(url))
-  )
-  const images  = [...ownImages, ...pairingImages]
+  const images = useMemo(() => {
+    const ownImages = [product.image, ...(product.gallery ?? [])]
+    const pairingImages = fitsContainers.flatMap(c =>
+      (c.pairingImages?.[product.slug] ?? []).filter(url => !ownImages.includes(url))
+    )
+    return [...ownImages, ...pairingImages]
+  }, [product, fitsContainers])
   const hasMany = images.length > 1
 
   const prevImg = () => setImgIndex(i => (i - 1 + images.length) % images.length)
@@ -158,11 +166,13 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
     setTimeout(onClose, 160)
   }
 
-  const resolvedLids = allProducts && product.category !== 'cups'
-    ? (product.compatibleLids ?? [])
-        .map(s => allProducts.find(p => p.slug === s) ?? null)
-        .filter((p): p is Product => p !== null)
-    : []
+  const resolvedLids = useMemo(() => (
+    allProducts && product.category !== 'cups'
+      ? (product.compatibleLids ?? [])
+          .map(s => allProducts.find(p => p.slug === s) ?? null)
+          .filter((p): p is Product => p !== null)
+      : []
+  ), [allProducts, product])
 
   const name           = localizedName(product, locale)
   const derivedCapacity = deriveCapacity(product)

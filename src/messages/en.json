@@ -207,6 +207,17 @@
     "error": "Something went wrong. Please try again.",
     "imageUnavailable": "Image unavailable"
   },
+  "error": {
+    "heading": "Something went wrong",
+    "message": "This part of the page hit an error. You can try again or head back home.",
+    "retry": "Try again",
+    "home": "Go home"
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "message": "The page you're looking for doesn't exist or may have moved.",
+    "home": "Go home"
+  },
   "meta": {
     "homeTitle": "Yasmine Plastics - Custom Plastic Manufacturer in Jordan",
     "homeDescription": "Custom plastic manufacturer in Jordan. We build to your exact specifications: shapes, molds, colours, and print. Established in 2008, backed by plastics industry experience since 1989. Serving businesses across the Arab world.",
