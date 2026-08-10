@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { memo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { cn, localizedName, deriveCapacity } from '@/lib/utils'
@@ -32,7 +32,7 @@ interface Props {
   priority?: boolean
 }
 
-export function ProductCard({ product, locale, onQuickView, priority = false }: Props) {
+export const ProductCard = memo(function ProductCard({ product, locale, onQuickView, priority = false }: Props) {
   const t    = useTranslations('products')
   const name = localizedName(product, locale)
 
@@ -156,4 +156,4 @@ export function ProductCard({ product, locale, onQuickView, priority = false }: 
       </div>
     </div>
   )
-}
+})
