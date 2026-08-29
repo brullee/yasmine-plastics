@@ -8,10 +8,10 @@ import { button } from '@/lib/theme'
 export function CantFindBanner() {
   const t = useTranslations('products')
   return (
-    <div className="rounded-xl border-2 border-dashed border-brand-navy/40 dark:border-slate-500 bg-blue-50 dark:bg-slate-800 px-6 py-5 flex items-end justify-between gap-6">
+    <div className="rounded-xl border-2 border-dashed border-brand-navy/40 bg-blue-50 px-6 py-5 flex items-end justify-between gap-6">
       <div>
-        <p className="font-semibold text-brand-navy dark:text-white text-sm mb-1">{t('cantFind.title')}</p>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{t('cantFind.text')}</p>
+        <p className="font-semibold text-brand-navy text-sm mb-1">{t('cantFind.title')}</p>
+        <p className="text-sm text-gray-600">{t('cantFind.text')}</p>
       </div>
       <Link
         href="/contact"

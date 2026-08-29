@@ -133,14 +133,14 @@ export function ProductActions({
   return (
     <>
       {hasOptions && (
-        <div className="rounded-xl bg-white dark:bg-gray-800 p-5 space-y-5 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-xl bg-white p-5 space-y-5 border border-gray-200">
 
           {/* Compatible containers (shown on lid pages) */}
           {fitsContainers && fitsContainers.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
-                <span className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm font-semibold text-gray-600">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
+                <span className="text-sm text-gray-600">
                   {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
                 </span>
               </div>
@@ -153,8 +153,8 @@ export function ProductActions({
           {lids && lids.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2.5">
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
-                <span className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm font-semibold text-gray-600">{locale === 'ar' ? 'مرفوق مع' : 'Paired With'}</p>
+                <span className="text-sm text-gray-600">
                   {selectedPartner === NONE_PARTNER ? (locale === 'ar' ? 'بدون' : 'None') : selectedLidName}
                 </span>
               </div>
@@ -165,7 +165,7 @@ export function ProductActions({
 
           {/* Colors */}
           {colorOptions.length > 0 && (
-            <div className={cn(!!(lids?.length || fitsContainers?.length) && 'border-t border-gray-200 dark:border-gray-700 pt-5')}>
+            <div className={cn(!!(lids?.length || fitsContainers?.length) && 'border-t border-gray-200 pt-5')}>
               <ChipRow
                 label={tOpts('color')}
                 value={selectedColor ? (selectedColor === CUSTOM ? tOpts('custom') : locale === 'ar' ? (colorOptions.find(c => c.en === selectedColor)?.ar ?? selectedColor) : selectedColor) : undefined}
@@ -256,11 +256,11 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
     <div className={cn(
       'group flex items-center gap-2 rounded-lg border transition-colors',
       selected
-        ? 'border-brand-navy bg-brand-navy/10 dark:border-sky-400 dark:bg-sky-400/15'
+        ? 'border-brand-navy bg-brand-navy/10'
         : cn(
-            'bg-gray-500/10 dark:bg-transparent dark:border-gray-500',
+            'bg-gray-500/10',
             dashed ? 'border-gray-500 border-dashed' : 'border-gray-500/75',
-            'hover:bg-gray-500/15 hover:border-brand-navy dark:hover:bg-gray-700 dark:hover:border-sky-400',
+            'hover:bg-gray-500/15 hover:border-brand-navy',
           )
     )}>
       <button
@@ -275,8 +275,8 @@ function PartnerCard({ selected, dashed = false, onClick, label, action, childre
         <span className={cn(
           'text-xs font-medium leading-snug',
           selected
-            ? 'text-brand-navy dark:text-sky-200'
-            : 'text-gray-700 dark:text-gray-300 group-hover:text-brand-navy dark:group-hover:text-sky-300'
+            ? 'text-brand-navy'
+            : 'text-gray-700 group-hover:text-brand-navy'
         )}>
           {label}
         </span>
@@ -316,8 +316,8 @@ function PartnerGrid({ products, selectedSlug, locale, onSelect, onQuickView }: 
                 className={cn(
                   'flex-shrink-0 p-2 me-1.5 rounded-md transition-colors',
                   isSelected
-                    ? 'text-brand-navy dark:text-sky-400 hover:bg-brand-navy/10 dark:hover:bg-sky-400/10'
-                    : 'text-gray-400 dark:text-gray-500 hover:text-brand-navy dark:hover:text-white hover:bg-gray-500/25 dark:hover:bg-gray-600'
+                    ? 'text-brand-navy hover:bg-brand-navy/10'
+                    : 'text-gray-400 hover:text-brand-navy hover:bg-gray-500/25'
                 )}
               >
                 <EyeIcon />

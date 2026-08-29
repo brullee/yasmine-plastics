@@ -7,7 +7,7 @@ export function ValuePill({ children, dir }: ValuePillProps) {
   return (
     <span
       dir={dir}
-      className="text-xs font-semibold px-2.5 py-1 bg-white dark:bg-slate-800 rounded-lg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700"
+      className="text-xs font-semibold px-2.5 py-1 bg-white rounded-lg text-gray-700 border border-gray-200"
     >
       {children}
     </span>

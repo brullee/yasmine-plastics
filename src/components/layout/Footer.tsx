@@ -22,35 +22,35 @@ export function Footer() {
   const address = locale === 'ar' ? company.addressAr : company.addressEn
 
   return (
-    <footer className={cn('bg-white dark:bg-brand-navyDeep border-t text-gray-600 dark:text-gray-300', chrome.divider)}>
+    <footer className={cn('bg-white border-t text-gray-600', chrome.divider)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Left: contact info */}
           <div className="space-y-4">
-            <p className="text-brand-navy dark:text-white font-semibold text-sm uppercase tracking-widest mb-4">{t('footer.ourInfo')}</p>
+            <p className="text-brand-navy font-semibold text-sm uppercase tracking-widest mb-4">{t('footer.ourInfo')}</p>
 
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-1">
-                <span className="text-gray-500 dark:text-gray-400 shrink-0">{t('contact.info.phone')}: </span>
+                <span className="text-gray-500 shrink-0">{t('contact.info.phone')}: </span>
                 <div className="flex flex-col gap-1">
-                  <a href={`tel:${company.phone}`} dir="ltr" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{company.phone}</a>
-                  <a href={`tel:${company.phone2}`} dir="ltr" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{company.phone2}</a>
+                  <a href={`tel:${company.phone}`} dir="ltr" className="hover:text-brand-navy transition-colors">{company.phone}</a>
+                  <a href={`tel:${company.phone2}`} dir="ltr" className="hover:text-brand-navy transition-colors">{company.phone2}</a>
                 </div>
               </div>
               <p>
-                <span className="text-gray-500 dark:text-gray-400">{t('contact.info.email')}: </span>
-                <a href={`mailto:${company.email}`} dir="ltr" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{company.email}</a>
+                <span className="text-gray-500">{t('contact.info.email')}: </span>
+                <a href={`mailto:${company.email}`} dir="ltr" className="hover:text-brand-navy transition-colors">{company.email}</a>
               </p>
               <div className="max-w-[22rem]">
-                <span className="text-gray-500 dark:text-gray-400">{t('contact.info.address')}: </span>
-                <a href={company.mapShareUrl} target="_blank" rel="noopener noreferrer" className="dark:text-gray-300 hover:text-brand-navy dark:hover:text-white transition-colors">{address}</a>
+                <span className="text-gray-500">{t('contact.info.address')}: </span>
+                <a href={company.mapShareUrl} target="_blank" rel="noopener noreferrer" className="hover:text-brand-navy transition-colors">{address}</a>
               </div>
             </div>
           </div>
 
           {/* Right: navigation */}
           <div>
-            <p className="text-brand-navy dark:text-white font-semibold text-sm uppercase tracking-widest mb-4">
+            <p className="text-brand-navy font-semibold text-sm uppercase tracking-widest mb-4">
               {t('footer.links')}
             </p>
             <nav className="flex flex-col gap-2" aria-label="Footer navigation">
@@ -60,12 +60,12 @@ export function Footer() {
                   href={href}
                   className={cn(
                     'inline-flex items-center gap-1.5 text-sm transition-colors w-fit',
-                    wip ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default' : chrome.footerLink
+                    wip ? 'text-gray-500 pointer-events-none cursor-default' : chrome.footerLink
                   )}
                 >
                   {t(`nav.${key}`)}
                   {wip && (
-                    <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">
+                    <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
                       {t('nav.comingSoon')}
                     </span>
                   )}
@@ -78,7 +78,7 @@ export function Footer() {
 
       {/* Bottom bar - copyright + legal + utility controls */}
       <div id="footer-bottom-bar" className={cn('border-t', chrome.divider)}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500 dark:text-gray-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
           <p>{t('footer.copyright')}</p>
 
           <div className="flex items-center gap-4">

@@ -43,12 +43,12 @@ export const ProductCard = memo(function ProductCard({ product, locale, onQuickV
   const derivedCapacity = deriveCapacity(product)
 
   return (
-    <div className="group relative hover:z-10 rounded-xl bg-white dark:bg-slate-800">
+    <div className="group relative hover:z-10 rounded-xl bg-white">
       {/* ── Nectar background-color-expand ───────────────────────────────── */}
       {/* Base layer: static idle shadow, only transform animates */}
       <div
         className={cn(
-          'absolute inset-0 rounded-xl bg-white dark:bg-slate-800 pointer-events-none scale-100',
+          'absolute inset-0 rounded-xl bg-white pointer-events-none scale-100',
           SHADOW_SCALE,
           'transition-transform duration-500 ease-[cubic-bezier(.2,.75,.5,1)]',
           NO_JITTER,
@@ -81,7 +81,7 @@ export const ProductCard = memo(function ProductCard({ product, locale, onQuickV
           <Link href={`/products/${product.slug}`} className="block">
             <div
               ref={imgRef}
-              className="relative aspect-square overflow-hidden bg-white dark:bg-slate-800 rounded-xl isolate"
+              className="relative aspect-square overflow-hidden bg-white rounded-xl isolate"
             >
               <ProductImage
                 src={product.image}
@@ -94,15 +94,12 @@ export const ProductCard = memo(function ProductCard({ product, locale, onQuickV
             </div>
           </Link>
 
-          {/* Quick View pill — OUTSIDE the Link so clicking it never navigates.
-              Ring deliberately breaks from the map's dark:ring-brand-navy default: this pill
-              sits on the product-photo slate-800 surface, and navy-on-slate contrasts under 2:1
-              (fails the 3:1 UI-component minimum) — sky-400 clears ~7:1 there. */}
+          {/* Quick View pill — OUTSIDE the Link so clicking it never navigates. */}
           {onQuickView && (
             <button
               type="button"
               className={cn(
-                'absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy dark:focus-visible:ring-sky-400 rounded-full',
+                'absolute bottom-3 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy rounded-full',
                 'opacity-0 pointer-events-none transition-opacity duration-75',
                 '[@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:duration-500',
                 'focus-visible:opacity-100 focus-visible:pointer-events-auto focus-visible:duration-500',
@@ -113,7 +110,7 @@ export const ProductCard = memo(function ProductCard({ product, locale, onQuickV
                 if (rect) onQuickView(product, rect)
               }}
             >
-              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 hover:bg-gray-200 dark:bg-brand-slate750 dark:hover:bg-slate-600 border border-gray-200 dark:border-slate-600 text-brand-navy dark:text-white text-xs font-semibold rounded-full shadow transition-colors">
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 hover:bg-gray-200 border border-gray-200 text-brand-navy text-xs font-semibold rounded-full shadow transition-colors">
                 <EyeIcon size={12} strokeWidth={2.5} />
                 {t('quickView')}
               </span>
@@ -125,10 +122,7 @@ export const ProductCard = memo(function ProductCard({ product, locale, onQuickV
         <div className="px-3 pt-2.5 pb-3">
           <Link
             href={`/products/${product.slug}`}
-            className={cn(
-              'block text-base font-bold leading-snug line-clamp-2 transition-colors duration-300',
-              'text-brand-navy dark:text-white [@media(hover:hover)]:group-hover:dark:text-sky-300',
-            )}
+            className="block text-base font-bold leading-snug line-clamp-2 text-brand-navy"
           >
             {name}
           </Link>
@@ -142,12 +136,12 @@ export const ProductCard = memo(function ProductCard({ product, locale, onQuickV
               <SpecBadge compact dir="ltr">{derivedCapacity}</SpecBadge>
             )}
             {colorCount > 1 && (
-              <span className="text-xs text-gray-400 dark:text-gray-400">
+              <span className="text-xs text-gray-400">
                 {t('colorCount', { count: colorCount })}
               </span>
             )}
             {sizeCount > 1 && (
-              <span className="text-xs text-gray-400 dark:text-gray-400">
+              <span className="text-xs text-gray-400">
                 {t('sizeCount', { count: sizeCount })}
               </span>
             )}

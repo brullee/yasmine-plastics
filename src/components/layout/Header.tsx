@@ -4,11 +4,10 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 import { useTranslations, useLocale } from 'next-intl'
-import { useTheme } from 'next-themes'
 import { Link, useRouter, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import { button, chrome } from '@/lib/theme'
-import { SunIcon, MoonIcon, MenuIcon, CloseIcon } from '@/components/ui/Icons'
+import { MenuIcon, CloseIcon } from '@/components/ui/Icons'
 
 type NavKey = 'home' | 'about' | 'products' | 'contact'
 const NAV_LINKS: { key: NavKey; href: string; wip?: boolean }[] = [
@@ -24,14 +23,11 @@ export function Header() {
   const t = useTranslations('nav')
   const tA11y = useTranslations('a11y')
   const [menuOpen, setMenuOpen] = useState(false)
-  const { resolvedTheme, setTheme } = useTheme()
-  const [themeMounted, setThemeMounted] = useState(false)
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
   const lastLocaleFixRef = useRef<string | null>(null)
 
-  const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
   const toggleLocale = () => {
     const newLocale = locale === 'ar' ? 'en' : 'ar'
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
@@ -63,17 +59,13 @@ export function Header() {
     }
   }, [pathname, locale])
 
-  // Avoid hydration mismatch - system theme is unknown during SSR
-  useEffect(() => setThemeMounted(true), [])
-
   return (
-    <header className={cn('sticky top-0 z-50 bg-white dark:bg-brand-navyDeep border-b shadow-sm', chrome.divider)}>
+    <header className={cn('sticky top-0 z-50 bg-white border-b shadow-sm', chrome.divider)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <img src="/YasmineLogo.svg" alt="Yasmine Plastics" className="h-8 sm:h-10 w-auto dark:hidden" />
-            <img src="/YasmineLogoDark.svg" alt="Yasmine Plastics" className="h-8 sm:h-10 w-auto hidden dark:block" />
+            <img src="/YasmineLogo.svg" alt="Yasmine Plastics" className="h-8 sm:h-10 w-auto" />
           </Link>
 
           {/* Desktop nav */}
@@ -85,13 +77,13 @@ export function Header() {
                 className={cn(
                   'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   wip
-                    ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
-                    : cn(chrome.navLink, 'hover:bg-gray-100 dark:hover:bg-brand-navyDark')
+                    ? 'text-gray-500 pointer-events-none cursor-default'
+                    : cn(chrome.navLink, 'hover:bg-gray-100')
                 )}
               >
                 {t(key)}
                 {wip && (
-                  <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">
+                  <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
                     {t('comingSoon')}
                   </span>
                 )}
@@ -101,13 +93,6 @@ export function Header() {
 
           {/* Right-side controls */}
           <div className="flex items-center gap-1">
-            {/* Theme toggle - rendered only after mount to avoid SSR/client mismatch */}
-            {themeMounted && (
-              <button onClick={toggleTheme} aria-label={tA11y('toggleTheme')} className={subtleBtn}>
-                {resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}
-              </button>
-            )}
-
             {/* Language toggle */}
             <button onClick={toggleLocale} aria-label={tA11y('switchLanguage')} className={cn(subtleBtn, 'text-xs font-medium tracking-wide')}>
               {locale === 'ar' ? 'EN' : 'AR'}
@@ -153,13 +138,13 @@ export function Header() {
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                 wip
-                  ? 'text-gray-500 dark:text-gray-400 pointer-events-none cursor-default'
-                  : cn(chrome.navLink, 'hover:bg-gray-100 dark:hover:bg-brand-navyDark')
+                  ? 'text-gray-500 pointer-events-none cursor-default'
+                  : cn(chrome.navLink, 'hover:bg-gray-100')
               )}
             >
               {t(key)}
               {wip && (
-                <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded-full">
+                <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
                   {t('comingSoon')}
                 </span>
               )}

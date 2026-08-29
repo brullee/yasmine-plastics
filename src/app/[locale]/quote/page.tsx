@@ -47,16 +47,16 @@ function QuoteFormSkeleton() {
     <div className="space-y-5 animate-pulse">
       {LABEL_WIDTHS.map((labelWidth, i) => (
         <div key={i} className="space-y-1.5">
-          <div className={`h-4 ${labelWidth} rounded bg-gray-200 dark:bg-gray-700`} />
-          <div className="h-[42px] rounded-lg bg-gray-100 dark:bg-gray-800" />
+          <div className={`h-4 ${labelWidth} rounded bg-gray-200`} />
+          <div className="h-[42px] rounded-lg bg-gray-100" />
         </div>
       ))}
       <div className="space-y-1.5">
-        <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700" />
-        <div className="h-[120px] rounded-lg bg-gray-100 dark:bg-gray-800" />
+        <div className="h-4 w-32 rounded bg-gray-200" />
+        <div className="h-[120px] rounded-lg bg-gray-100" />
       </div>
-      <div className="h-[65px] rounded-lg bg-gray-100 dark:bg-gray-800" />
-      <div className="h-12 rounded-lg bg-gray-200 dark:bg-gray-700" />
+      <div className="h-[65px] rounded-lg bg-gray-100" />
+      <div className="h-12 rounded-lg bg-gray-200" />
     </div>
   )
 }
@@ -79,9 +79,9 @@ export default async function QuotePage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16 items-start">
         <div className="lg:col-span-2">
           <div className="mb-10">
-            <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">{t('title')}</h1>
-            <p className="text-gray-500 dark:text-gray-400 mb-2">{t('subtitle')}</p>
-            <p className="text-sm text-gray-400 dark:text-gray-400">{t('priceNote')}</p>
+            <h1 className="text-4xl font-bold text-brand-navy mb-3">{t('title')}</h1>
+            <p className="text-gray-500 mb-2">{t('subtitle')}</p>
+            <p className="text-sm text-gray-400">{t('priceNote')}</p>
           </div>
           <Suspense fallback={<QuoteFormSkeleton />}>
             <QuoteForm products={products} categories={categories} />
@@ -89,17 +89,17 @@ export default async function QuotePage({ params }: Props) {
         </div>
 
         <div className="lg:sticky lg:top-24">
-          <div className="bg-brand-navy/10 dark:bg-brand-navy/20 rounded-2xl p-6">
-            <h2 className="text-base font-bold text-brand-navy dark:text-white mb-5 uppercase tracking-wide">
+          <div className="bg-brand-navy/10 rounded-2xl p-6">
+            <h2 className="text-base font-bold text-brand-navy mb-5 uppercase tracking-wide">
               {t('stepsTitle')}
             </h2>
             <ol className="space-y-4">
               {steps.map((step, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-navy text-white dark:bg-white dark:text-brand-navy text-sm font-bold flex items-center justify-center">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brand-navy text-white text-sm font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 pt-0.5 leading-relaxed">{step}</p>
+                  <p className="text-sm text-gray-700 pt-0.5 leading-relaxed">{step}</p>
                 </li>
               ))}
             </ol>

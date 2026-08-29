@@ -31,7 +31,6 @@ A website for my family's plastics manufacturing business. Buyers browse product
 - **Accessibility** - focus traps, translated ARIA labels, WCAG AA contrast, reduced-motion fallbacks
 - **SEO** - meta/OG/hreflang, JSON-LD product schema, sitemap/robots
 - **E2E tests** - Playwright covers the contact form, quote form, product pages, and language switch
-- **Dark mode** - full theme support via next-themes
 
 ## Stack
 
