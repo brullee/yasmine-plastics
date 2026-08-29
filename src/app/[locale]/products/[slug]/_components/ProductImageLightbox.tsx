@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { ChevronIcon, XIcon, ScrollWheelIcon } from '@/components/ui/Icons'
 import { ProductImage } from '@/components/ui/ProductImage'
-import { cn } from '@/lib/utils'
+import { cn, lockBodyScroll } from '@/lib/utils'
 
 // Shared "dark glass" pill treatment for the lightbox's own controls (close, prev, next):
 // idle bg-black/55 + ring, inverts to solid white/black on hover. `pillClassName` sizes the
@@ -84,26 +84,12 @@ export function ProductImageLightbox({ images, name, initialIndex, isOpen, onClo
   // Scroll lock + focus trap
   useEffect(() => {
     if (!isOpen) return
-    // html's global `scroll-behavior: smooth` (globals.css) animates the browser's own
-    // scrollTop-clamp when body leaves the flow here, which reads as the page sailing up
-    // to the top instead of staying put — suspended for the lock's duration so the
-    // position swap and restore are both instant.
-    const scrollY = window.scrollY
-    const htmlEl = document.documentElement
-    const prevScrollBehavior = htmlEl.style.scrollBehavior
-    htmlEl.style.scrollBehavior = 'auto'
-    document.body.style.position = 'fixed'
-    document.body.style.top      = `-${scrollY}px`
-    document.body.style.width    = '100%'
+    const unlock = lockBodyScroll()
     const root = document.getElementById('app-root')
     root?.setAttribute('inert', '')
     lightboxRef.current?.focus()
     return () => {
-      document.body.style.position = ''
-      document.body.style.top      = ''
-      document.body.style.width    = ''
-      window.scrollTo(0, scrollY)
-      htmlEl.style.scrollBehavior = prevScrollBehavior
+      unlock()
       root?.removeAttribute('inert')
     }
   }, [isOpen])

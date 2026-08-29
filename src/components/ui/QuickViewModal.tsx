@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { ProductImage } from '@/components/ui/ProductImage'
-import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
+import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion, lockBodyScroll } from '@/lib/utils'
 import { button } from '@/lib/theme'
 import { company } from '@/data/company'
 import { ArrowIcon, ChevronIcon, XIcon, WhatsAppIcon } from '@/components/ui/Icons'
@@ -56,6 +56,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
   const dialogRef  = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   // A lid (the "child" side of a pairing) has no pairing photos of its own — those
   // combined container+lid photos live on the container's gallery, keyed by lid slug
@@ -98,19 +99,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
   // Scroll lock + keyboard
   useEffect(() => {
-    // Plain overflow:hidden used to be here, but it let the header's position:sticky
-    // detach — same fixed-position/scroll-restore trick ProductImageLightbox already
-    // uses for its own scroll lock. html's global `scroll-behavior: smooth` (globals.css)
-    // animates the browser's own scrollTop-clamp when body leaves the flow, which reads
-    // as the page sailing up to the top instead of staying put — suspended for the
-    // duration of the lock so the position swap and restore are both instant.
-    const scrollY = window.scrollY
-    const htmlEl = document.documentElement
-    const prevScrollBehavior = htmlEl.style.scrollBehavior
-    htmlEl.style.scrollBehavior = 'auto'
-    document.body.style.position = 'fixed'
-    document.body.style.top      = `-${scrollY}px`
-    document.body.style.width    = '100%'
+    const unlock = lockBodyScroll(contentRef.current)
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape')     { handleClose(); return }
       if (e.key === 'ArrowLeft')  { prevImg(); return }
@@ -131,11 +120,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
     }
     window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.position = ''
-      document.body.style.top      = ''
-      document.body.style.width    = ''
-      window.scrollTo(0, scrollY)
-      htmlEl.style.scrollBehavior = prevScrollBehavior
+      unlock()
       window.removeEventListener('keydown', onKey)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -290,6 +275,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
           {/* Content side — bg-gray-50 keeps it distinct from the image side's plain white. */}
           <div
+            ref={contentRef}
             className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto bg-gray-50"
             style={{
               opacity:    contentVisible ? 1 : 0,
