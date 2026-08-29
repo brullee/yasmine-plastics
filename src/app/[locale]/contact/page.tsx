@@ -60,11 +60,11 @@ export default async function ContactPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema).replace(/</g, '\\u003c') }}
       />
       <div className="mb-12">
-        <h1 className="text-4xl font-bold text-brand-navy dark:text-white mb-3">
+        <h1 className="text-4xl font-bold text-brand-navy mb-3">
           {t('title')}
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">{t('subtitle')}</p>
-        <p className="text-sm text-gray-400 dark:text-gray-400">{t('priceNote')}</p>
+        <p className="text-gray-500 text-lg mb-2">{t('subtitle')}</p>
+        <p className="text-sm text-gray-400">{t('priceNote')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
@@ -75,11 +75,11 @@ export default async function ContactPage({ params }: Props) {
 
         {/* Right: contact info + map */}
         <div className="flex flex-col gap-8">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-6 space-y-5">
+          <div className="bg-gray-100 rounded-2xl p-6 space-y-5">
             <ContactItem label={t('info.phone')}>
               <div className="flex flex-col gap-1">
-                <a href={`tel:${company.phone}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start inline-block">{company.phone}</a>
-                <a href={`tel:${company.phone2}`} dir="ltr" className="text-brand-navy dark:text-blue-400 hover:underline font-medium rtl:self-start inline-block">{company.phone2}</a>
+                <a href={`tel:${company.phone}`} dir="ltr" className="text-brand-navy hover:underline font-medium rtl:self-start inline-block">{company.phone}</a>
+                <a href={`tel:${company.phone2}`} dir="ltr" className="text-brand-navy hover:underline font-medium rtl:self-start inline-block">{company.phone2}</a>
               </div>
             </ContactItem>
 
@@ -87,25 +87,25 @@ export default async function ContactPage({ params }: Props) {
               <a
                 href={`mailto:${company.email}`}
                 dir="ltr"
-                className="text-brand-navy dark:text-blue-400 hover:underline font-medium"
+                className="text-brand-navy hover:underline font-medium"
               >
                 {company.email}
               </a>
             </ContactItem>
 
             <ContactItem label={t('info.address')}>
-              <span className="text-gray-700 dark:text-gray-300">{address}</span>
+              <span className="text-gray-700">{address}</span>
             </ContactItem>
 
             <ContactItem label={t('info.hours')}>
-              <span className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+              <span className="text-gray-700 whitespace-pre-line">
                 {hours}
               </span>
             </ContactItem>
           </div>
 
           {/* Google Maps embed */}
-          <div className="flex-1 min-h-48 rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex-1 min-h-48 rounded-2xl overflow-hidden shadow-sm border border-gray-200">
             <iframe
               title="Yasmine Plastics location"
               src={company.mapEmbedUrl + `&hl=${locale === 'ar' ? 'ar' : 'en'}`}
@@ -131,7 +131,7 @@ function ContactItem({
 }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1">
+      <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-1">
         {label}
       </p>
       <div className="text-sm">{children}</div>

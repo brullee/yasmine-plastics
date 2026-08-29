@@ -3,23 +3,21 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
-import { useTheme } from 'next-themes'
 import { useContactForm } from '@/hooks/useContactForm'
 import { cn } from '@/lib/utils'
 import { button } from '@/lib/theme'
 import { SuccessBox } from '@/components/ui/SuccessBox'
 import { FormField } from '@/components/ui/FormField'
 
-const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy'
+const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-navy'
 const inputCls = (hasError: boolean | undefined) =>
-  cn(BASE_INPUT, hasError ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600')
+  cn(BASE_INPUT, hasError ? 'border-red-400' : 'border-gray-300')
 
 export function ContactForm() {
   const t = useTranslations('contact.form')
   const tVal = useTranslations('validation')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const { form, submitted, submitting, submitError, errors, isFormValid, handleChange, handleBlur, handleSubmit } = useContactForm()
-  const { resolvedTheme } = useTheme()
 
   if (submitted) {
     return <SuccessBox>{t('success')}</SuccessBox>
@@ -101,21 +99,21 @@ export function ContactForm() {
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? 'contact-message-error' : undefined}
           className={cn(
-            'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]',
-            errors.message ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600',
+            'w-full px-4 py-2.5 rounded-lg border bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-navy resize-y min-h-[120px]',
+            errors.message ? 'border-red-400' : 'border-gray-300',
           )}
         />
       </FormField>
 
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-        options={{ size: "flexible", theme: resolvedTheme === 'dark' ? 'dark' : 'light' }}
+        options={{ size: "flexible", theme: 'light' }}
         onSuccess={setTurnstileToken}
         onExpire={() => setTurnstileToken(null)}
       />
 
       {submitError && (
-        <p className="text-sm text-red-500 dark:text-red-400 text-center">{t('error')}</p>
+        <p className="text-sm text-red-500 text-center">{t('error')}</p>
       )}
 
       <button

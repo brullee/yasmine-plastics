@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { Turnstile } from '@marsidev/react-turnstile'
-import { useTheme } from 'next-themes'
 import { useQuoteForm } from '@/hooks/useQuoteForm'
 import type { Locale, Product, Category } from '@/types'
 import { cn, localizedName } from '@/lib/utils'
@@ -19,16 +18,16 @@ const CUSTOM = '__custom__'
 function SelectChevron() {
   return (
     <div className="pointer-events-none absolute inset-y-0 end-3 flex items-center">
-      <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <svg className="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
         <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
       </svg>
     </div>
   )
 }
 
-const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy'
+const BASE_INPUT = 'w-full px-4 py-2.5 rounded-lg border bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-navy'
 const inputCls = (hasError: boolean | undefined) =>
-  cn(BASE_INPUT, hasError ? 'border-red-400 dark:border-red-500' : 'border-gray-300 dark:border-gray-600')
+  cn(BASE_INPUT, hasError ? 'border-red-400' : 'border-gray-300')
 
 interface Props {
   products: Product[]
@@ -64,8 +63,6 @@ export function QuoteForm({
     initialSize,
     initialLid,
   )
-  const { resolvedTheme } = useTheme()
-
   const filteredProducts = selectedCategory
     ? products.filter(p => p.category === selectedCategory)
     : products
@@ -191,7 +188,7 @@ export function QuoteForm({
               setField('size', '')
               setField('lid', '')
             }}
-            className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+            className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-navy"
           >
             <option value="">{t('selectCategory')}</option>
             {categories.map((c) => (
@@ -226,7 +223,7 @@ export function QuoteForm({
                 setPartnerColor(firstPartner?.options.colors?.[0]?.en ?? '')
                 setPartnerSize(firstPartner?.options.sizes?.[0] ?? '')
               }}
-              className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy"
+              className="w-full appearance-none px-4 pe-10 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-navy"
             >
               <option value="">{t('selectProduct')}</option>
               {filteredProducts.map((p) => (
@@ -242,7 +239,7 @@ export function QuoteForm({
 
       {/* Product-specific options */}
       {(colorOptions.length > 0 || sizeOptions.length > 0) && (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-4">
           {colorOptions.length > 0 && (
             <ChipRow
               label={tOpts('color')}
@@ -272,7 +269,7 @@ export function QuoteForm({
 
       {/* Paired product section */}
       {lidOptions.length > 0 && (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-4">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-4">
           <ChipRow
             label={locale === 'ar' ? 'مرفوق مع' : 'Paired With'}
             value={form.lid ? lidOptions.find(l => l.slug === form.lid)?.name : undefined}
@@ -355,19 +352,19 @@ export function QuoteForm({
           value={form.details}
           onChange={handleChange}
           placeholder={t('placeholderDetails')}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-navy dark:focus:ring-brand-navy resize-y min-h-[120px]"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-navy resize-y min-h-[120px]"
         />
       </FormField>
 
       <Turnstile
         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-        options={{ size: "flexible", theme: resolvedTheme === 'dark' ? 'dark' : 'light' }}
+        options={{ size: "flexible", theme: 'light' }}
         onSuccess={setTurnstileToken}
         onExpire={() => setTurnstileToken(null)}
       />
 
       {submitError && (
-        <p className="text-sm text-red-500 dark:text-red-400 text-center">{t('error')}</p>
+        <p className="text-sm text-red-500 text-center">{t('error')}</p>
       )}
 
       <button

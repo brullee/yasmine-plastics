@@ -1,20 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { useTheme } from 'next-themes'
+import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 
 export function BottomFade() {
-  const [mounted, setMounted] = useState(false)
   const divRef = useRef<HTMLDivElement>(null)
-  const { resolvedTheme } = useTheme()
   const pathname = usePathname()
 
-  useEffect(() => { setMounted(true) }, [])
-
   useEffect(() => {
-    if (!mounted) return
-
     const update = () => {
       const el = divRef.current
       if (!el) return
@@ -45,11 +38,7 @@ export function BottomFade() {
       window.removeEventListener('scroll', update)
       window.removeEventListener('resize', update)
     }
-  }, [mounted, pathname])
-
-  if (!mounted) return null
-
-  const color = resolvedTheme === 'dark' ? '13, 27, 42' : '255, 255, 255'
+  }, [pathname])
 
   return (
     <div
@@ -57,19 +46,12 @@ export function BottomFade() {
       className="pointer-events-none fixed bottom-0 left-0 right-0 h-24 sm:h-40 z-30 opacity-40 sm:opacity-100"
       style={{
         opacity: 1,
-        background: resolvedTheme === 'dark'
-          ? `linear-gradient(to top,
-              rgba(${color}, 0.95) 0%,
-              rgba(${color}, 0.7) 18%,
-              rgba(${color}, 0.3) 38%,
-              rgba(${color}, 0.07) 55%,
-              rgba(${color}, 0) 65%)`
-          : `linear-gradient(to top,
-              rgba(${color}, 0.88) 0%,
-              rgba(${color}, 0.55) 18%,
-              rgba(${color}, 0.22) 38%,
-              rgba(${color}, 0.05) 55%,
-              rgba(${color}, 0) 65%)`,
+        background: `linear-gradient(to top,
+              rgba(255, 255, 255, 0.88) 0%,
+              rgba(255, 255, 255, 0.55) 18%,
+              rgba(255, 255, 255, 0.22) 38%,
+              rgba(255, 255, 255, 0.05) 55%,
+              rgba(255, 255, 255, 0) 65%)`,
       }}
     />
   )

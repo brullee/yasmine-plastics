@@ -104,23 +104,23 @@ export default async function HomePage({
       </section>
 
       {/* Custom manufacturing emphasis */}
-      <section className="py-20 bg-brand-navy/10 dark:bg-brand-navy/20">
+      <section className="py-20 bg-brand-navy/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <ScrollReveal direction="left">
               <div>
-                <span className="inline-block text-xs font-bold tracking-widest uppercase text-brand-navy dark:text-blue-300 mb-4">
+                <span className="inline-block text-xs font-bold tracking-widest uppercase text-brand-navy mb-4">
                   {t('custom.eyebrow')}
                 </span>
-                <h2 className="text-3xl md:text-4xl font-bold text-brand-navy dark:text-white mb-5 leading-tight">
+                <h2 className="text-3xl md:text-4xl font-bold text-brand-navy mb-5 leading-tight">
                   {t('custom.headline')}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-8">
+                <p className="text-gray-600 text-lg leading-relaxed mb-8">
                   {t('custom.body')}
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center px-7 py-3 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyHover dark:bg-white dark:text-brand-navy dark:hover:bg-gray-300 transition-colors text-base"
+                  className="inline-flex items-center px-7 py-3 bg-brand-navy text-white font-semibold rounded-lg hover:bg-brand-navyHover transition-colors text-base"
                 >
                   {t('custom.cta')}
                 </Link>
@@ -136,10 +136,10 @@ export default async function HomePage({
                 ] as const
               ).map(({ icon, title, text }, i) => (
                 <ScrollReveal key={title} direction="up" delay={i * 80}>
-                  <div className="p-5 bg-white dark:bg-brand-navy/40 rounded-xl h-full">
-                    <div className="mb-3 text-brand-navy dark:text-blue-300">{icon}</div>
-                    <h3 className="font-semibold text-brand-navy dark:text-white mb-1 text-sm">{title}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{text}</p>
+                  <div className="p-5 bg-white rounded-xl h-full">
+                    <div className="mb-3 text-brand-navy">{icon}</div>
+                    <h3 className="font-semibold text-brand-navy mb-1 text-sm">{title}</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed">{text}</p>
                   </div>
                 </ScrollReveal>
               ))}
@@ -149,26 +149,26 @@ export default async function HomePage({
       </section>
 
       {/* Why choose us */}
-      <section className="py-20 bg-white dark:bg-brand-navyDeep">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-brand-navy dark:text-white mb-14">
+          <h2 className="text-3xl font-bold text-center text-brand-navy mb-14">
             {t('whyUs.title')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {(
               [
-                { icon: <ManufacturingIcon className="w-12 h-12 text-brand-navy dark:text-blue-300" />, title: t('whyUs.item1Title'), text: t('whyUs.item1Text'), dir: 'left'  },
-                { icon: <YearsIcon         className="w-12 h-12 text-brand-navy dark:text-blue-300" />, title: t('whyUs.item2Title'), text: t('whyUs.item2Text'), dir: 'up'    },
-                { icon: <RangeIcon         className="w-12 h-12 text-brand-navy dark:text-blue-300" />, title: t('whyUs.item3Title'), text: t('whyUs.item3Text'), dir: 'right' },
+                { icon: <ManufacturingIcon className="w-12 h-12 text-brand-navy" />, title: t('whyUs.item1Title'), text: t('whyUs.item1Text'), dir: 'left'  },
+                { icon: <YearsIcon         className="w-12 h-12 text-brand-navy" />, title: t('whyUs.item2Title'), text: t('whyUs.item2Text'), dir: 'up'    },
+                { icon: <RangeIcon         className="w-12 h-12 text-brand-navy" />, title: t('whyUs.item3Title'), text: t('whyUs.item3Text'), dir: 'right' },
               ] as const
             ).map(({ icon, title, text, dir }, i) => (
               <ScrollReveal key={title} direction={dir} delay={i * 100}>
                 <div className="flex flex-col items-center text-center gap-4">
-                  <div className="p-3 bg-brand-navy/10 dark:bg-brand-navy/40 rounded-full">
+                  <div className="p-3 bg-brand-navy/10 rounded-full">
                     {icon}
                   </div>
-                  <h3 className="text-xl font-semibold text-brand-navy dark:text-white">{title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{text}</p>
+                  <h3 className="text-xl font-semibold text-brand-navy">{title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{text}</p>
                 </div>
               </ScrollReveal>
             ))}
@@ -177,9 +177,9 @@ export default async function HomePage({
       </section>
 
       {/* Product categories grid */}
-      <section className="py-20 bg-brand-navy/10 dark:bg-brand-navy/20">
+      <section className="py-20 bg-brand-navy/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-brand-navy dark:text-white mb-14">
+          <h2 className="text-3xl font-bold text-center text-brand-navy mb-14">
             {t('categories.title')}
           </h2>
           <CategoryGrid categories={categories} products={products} locale={locale} reveal />

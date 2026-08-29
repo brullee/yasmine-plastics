@@ -7,7 +7,6 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'class',
   theme: {
     screens: {
       sm: '640px',
@@ -22,11 +21,9 @@ const config: Config = {
           navy: '#005496',
           navyHover: '#004378',
           navyDark: '#003d6e',
-          navyHoverDark: '#004982',
           navyDeep: '#0d1b2a',
           blue: '#ed145b',
           blueDeep: '#c4114a',
-          slate750: '#293548',
         },
       },
       fontFamily: {

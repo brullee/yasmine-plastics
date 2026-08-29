@@ -32,14 +32,9 @@
 }
 
 @layer base {
-  /* Card hover shadow — dark mode uses a ring + strong drop instead of light shadow */
   :root {
     --card-shadow-idle:   0 1px 4px rgba(0,0,0,.11), 0 6px 18px rgba(0,0,0,.10);
     --card-shadow-hover:  0 50px 95px -15px rgba(0,0,0,.22);
-  }
-  .dark {
-    --card-shadow-idle:   0 1px 4px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.25);
-    --card-shadow-hover:  0 0 0 1px rgba(255,255,255,.07), 0 25px 60px rgba(0,0,0,.65);
   }
 
   html {
@@ -50,10 +45,5 @@
 body {
     @apply text-gray-900 bg-white;
     overflow-x: clip;
-  }
-
-  .dark body {
-    @apply text-gray-100;
-    background-color: #0d1b2a;
   }
 }

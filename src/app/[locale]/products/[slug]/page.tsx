@@ -107,7 +107,7 @@ export default async function ProductDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-brand-navyDeep min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema).replace(/</g, '\\u003c') }}
@@ -137,7 +137,7 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* Related items */}
         {related.length > 0 && (
           <section className="mt-20">
-            <h2 className="text-2xl font-bold text-brand-navy dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-2xl font-bold text-brand-navy mb-6 pb-4 border-b border-gray-200">
               {t('relatedItems')}
             </h2>
             <ProductsGrid products={related} allProducts={allProducts} locale={locale} />

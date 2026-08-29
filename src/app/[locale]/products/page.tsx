@@ -43,19 +43,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function ProductsPageSkeleton() {
   return (
     <>
-      <div className="bg-brand-navy dark:bg-brand-navyDeep border-b border-brand-navyDark dark:border-gray-700 py-10">
+      <div className="bg-brand-navy border-b border-brand-navyDark py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="h-9 w-56 mx-auto rounded bg-white/10 animate-pulse" />
         </div>
       </div>
-      <div className="bg-gray-50 dark:bg-gray-950 min-h-[60vh]">
+      <div className="bg-gray-50 min-h-[60vh]">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex flex-wrap justify-center gap-5 animate-pulse">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(25%-0.9375rem)]">
-                <div className="aspect-square rounded-xl bg-gray-200 dark:bg-gray-800" />
-                <div className="mt-3 h-5 w-3/4 rounded bg-gray-200 dark:bg-gray-800" />
-                <div className="mt-2 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-800" />
+                <div className="aspect-square rounded-xl bg-gray-200" />
+                <div className="mt-3 h-5 w-3/4 rounded bg-gray-200" />
+                <div className="mt-2 h-4 w-1/2 rounded bg-gray-200" />
               </div>
             ))}
           </div>

@@ -8,9 +8,9 @@ import './globals.css'
 // invalid locale segment (e.g. /fr/...) — not a real link a visitor would
 // ever click. Like global-error.tsx, it stands in for the root layout, which
 // is deliberately bare (see [locale]/layout.tsx), so it supplies its own
-// <html>/<body> and can't rely on next-intl locale/dir/theme context being
-// resolved. Uses the Deep gradient (theme.ts) since there's no next-themes
-// provider here to toggle light/dark.
+// <html>/<body> and can't rely on next-intl locale/dir context being
+// resolved. Uses the Deep gradient (theme.ts), which is always dark
+// regardless of page context.
 export default function NotFound() {
   return (
     <html lang="en">

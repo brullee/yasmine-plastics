@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { ProductImage } from '@/components/ui/ProductImage'
-import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion } from '@/lib/utils'
+import { cn, buildWhatsAppUrl, localizedName, deriveCapacity, prefersReducedMotion, lockBodyScroll } from '@/lib/utils'
 import { button } from '@/lib/theme'
 import { company } from '@/data/company'
 import { ArrowIcon, ChevronIcon, XIcon, WhatsAppIcon } from '@/components/ui/Icons'
@@ -56,6 +56,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
   const dialogRef  = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   // A lid (the "child" side of a pairing) has no pairing photos of its own — those
   // combined container+lid photos live on the container's gallery, keyed by lid slug
@@ -98,19 +99,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
   // Scroll lock + keyboard
   useEffect(() => {
-    // Plain overflow:hidden used to be here, but it let the header's position:sticky
-    // detach — same fixed-position/scroll-restore trick ProductImageLightbox already
-    // uses for its own scroll lock. html's global `scroll-behavior: smooth` (globals.css)
-    // animates the browser's own scrollTop-clamp when body leaves the flow, which reads
-    // as the page sailing up to the top instead of staying put — suspended for the
-    // duration of the lock so the position swap and restore are both instant.
-    const scrollY = window.scrollY
-    const htmlEl = document.documentElement
-    const prevScrollBehavior = htmlEl.style.scrollBehavior
-    htmlEl.style.scrollBehavior = 'auto'
-    document.body.style.position = 'fixed'
-    document.body.style.top      = `-${scrollY}px`
-    document.body.style.width    = '100%'
+    const unlock = lockBodyScroll(contentRef.current)
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape')     { handleClose(); return }
       if (e.key === 'ArrowLeft')  { prevImg(); return }
@@ -131,11 +120,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
     }
     window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.position = ''
-      document.body.style.top      = ''
-      document.body.style.width    = ''
-      window.scrollTo(0, scrollY)
-      htmlEl.style.scrollBehavior = prevScrollBehavior
+      unlock()
       window.removeEventListener('keydown', onKey)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -236,11 +221,8 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
 
       {/* Animated box */}
       <div ref={dialogRef} tabIndex={-1} style={boxStyle} className="outline-none" role="dialog" aria-modal="true" aria-label={name}>
-        <div className="flex h-full bg-white dark:bg-slate-900">
+        <div className="flex h-full bg-white">
 
-          {/* Image side — always white, no dark variant: product photos are shot
-              on a white canvas regardless of site theme, so a dark placeholder
-              background here would contrast against the photo instead of blending. */}
           <div
             className="relative shrink-0 overflow-hidden bg-white"
             style={
@@ -262,11 +244,11 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {hasMany && (
               <>
                 <button onClick={prevImg} aria-label={tA11y('previousImage')}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 flex items-center justify-center rounded-full bg-white dark:bg-slate-900/80 border border-gray-200 dark:border-transparent shadow text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-900 transition-colors">
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow text-gray-600 hover:bg-gray-100 transition-colors">
                   <ChevronIcon direction="left" />
                 </button>
                 <button onClick={nextImg} aria-label={tA11y('nextImage')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 flex items-center justify-center rounded-full bg-white dark:bg-slate-900/80 border border-gray-200 dark:border-transparent shadow text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-900 transition-colors">
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow text-gray-600 hover:bg-gray-100 transition-colors">
                   <ChevronIcon direction="right" />
                 </button>
 
@@ -278,9 +260,6 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
                       aria-label={tA11y('goToImage', { n: i + 1 })}
                       aria-current={i === imgIndex}
                       className={cn(
-                        // Image panel is always white regardless of theme (see comment
-                        // above), so these dots stay in their light-mode colors too —
-                        // a dark: swap here would render white-on-white and vanish.
                         'w-2 h-2 rounded-full transition-colors',
                         i === imgIndex ? 'bg-brand-navy' : 'bg-black/25'
                       )}
@@ -292,13 +271,12 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
           </div>
 
           {/* Explicit 1px divider — intentional, not an artifact. */}
-          <div className="w-px shrink-0 bg-gray-200 dark:bg-slate-800" />
+          <div className="w-px shrink-0 bg-gray-200" />
 
-          {/* Content side — bg-gray-50 gives it a light-mode tone distinct from
-              the image side's plain white, matching how dark mode already
-              contrasts white image vs slate-900 content. */}
+          {/* Content side — bg-gray-50 keeps it distinct from the image side's plain white. */}
           <div
-            className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900"
+            ref={contentRef}
+            className="flex flex-col gap-4 p-6 min-w-0 flex-1 overflow-y-auto bg-gray-50"
             style={{
               opacity:    contentVisible ? 1 : 0,
               transition: contentVisible ? 'opacity 0.14s ease' : 'none',
@@ -308,19 +286,19 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             <button
               onClick={handleClose}
               aria-label={tA11y('close')}
-              className="absolute top-3 end-3 z-10 p-2 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-transparent hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-300"
+              className="absolute top-3 end-3 z-10 p-2 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:bg-gray-100 transition-colors text-gray-600"
             >
               <XIcon size={16} />
             </button>
 
             {/* Category pill — static label, not a selection/hover state, so it doesn't
                 need to match the sky-400/300/200 selected-accent scale used elsewhere. */}
-            <span className="self-start text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-900/40 px-2.5 py-1 rounded-full uppercase tracking-wide">
+            <span className="self-start text-xs font-semibold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full uppercase tracking-wide">
               {product.category}
             </span>
 
             {/* Name */}
-            <h2 className="text-xl font-bold text-brand-navy dark:text-white leading-snug">
+            <h2 className="text-xl font-bold text-brand-navy leading-snug">
               {name}
             </h2>
 
@@ -336,7 +314,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {/* Colors */}
             {product.options.colors && product.options.colors.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   {t('availableColors')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -352,7 +330,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {/* Sizes */}
             {product.options.sizes && product.options.sizes.length > 1 && (
               <div>
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   {t('availableSizes')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -368,7 +346,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {/* Compatible lids */}
             {resolvedLids.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   {t('compatibleLids')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -384,7 +362,7 @@ export function QuickViewModal({ product, locale, originRect, onClose, allProduc
             {/* Fits these containers */}
             {fitsContainers.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   {t('fitsContainers')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">

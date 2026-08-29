@@ -32,9 +32,9 @@ const sections: SectionKey[] = ['story', 'mission', 'vision', 'values']
 
 const cardStyles: { bg: string; title: string; body: string }[] = [
   { bg: 'bg-gradient-to-br from-brand-navy to-brand-navyDark', title: 'text-white',                      body: 'text-blue-200' },
-  { bg: 'bg-[#d3e2ef] dark:bg-brand-navy/20 shadow-[0_6px_24px_rgba(0,0,0,.15)] dark:shadow-none', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-300' },
+  { bg: 'bg-[#d3e2ef] shadow-[0_6px_24px_rgba(0,0,0,.15)]', title: 'text-brand-navy', body: 'text-gray-600' },
   { bg: 'bg-gradient-to-br from-brand-navy to-brand-navyDark', title: 'text-white',                      body: 'text-blue-200' },
-  { bg: 'bg-[#d3e2ef] dark:bg-brand-navy/20 shadow-[0_6px_24px_rgba(0,0,0,.15)] dark:shadow-none', title: 'text-brand-navy dark:text-white', body: 'text-gray-600 dark:text-gray-300' },
+  { bg: 'bg-[#d3e2ef] shadow-[0_6px_24px_rgba(0,0,0,.15)]', title: 'text-brand-navy', body: 'text-gray-600' },
 ]
 
 export default async function AboutPage({
@@ -49,7 +49,7 @@ export default async function AboutPage({
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
       {/* Page title */}
-      <h1 className="text-4xl md:text-5xl font-bold text-brand-navy dark:text-white mb-10 text-center">
+      <h1 className="text-4xl md:text-5xl font-bold text-brand-navy mb-10 text-center">
         {t('title')}
       </h1>
 

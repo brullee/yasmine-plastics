@@ -5,12 +5,10 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
-import { Providers } from '@/components/Providers'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppFAB } from '@/components/ui/WhatsAppFAB'
 import { BottomFade } from '@/components/BottomFade'
-import { FaviconSwitcher } from '@/components/FaviconSwitcher'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '../globals.css'
@@ -84,26 +82,22 @@ export default async function LocaleLayout({ children, params }: Props) {
       dir={isRtl ? 'rtl' : 'ltr'}
       className={`${inter.variable} ${notoSansArabic.variable}`}
       data-scroll-behavior="smooth"
-      suppressHydrationWarning
     >
-      <body suppressHydrationWarning>
+      <body>
         <NextIntlClientProvider messages={clientMessages}>
-          <Providers>
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:start-2 focus:z-[100] focus:bg-white focus:text-brand-navy focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg dark:focus:bg-slate-900 dark:focus:text-white"
-            >
-              {t('skipToContent')}
-            </a>
-            <div id="app-root" className={`flex min-h-screen flex-col ${isRtl ? 'font-arabic' : 'font-sans'}`}>
-              <Header />
-              <main id="main-content" className="flex-1">{children}</main>
-              <Footer />
-              <WhatsAppFAB locale={locale} />
-              <BottomFade />
-              <FaviconSwitcher />
-            </div>
-          </Providers>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:start-2 focus:z-[100] focus:bg-white focus:text-brand-navy focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg"
+          >
+            {t('skipToContent')}
+          </a>
+          <div id="app-root" className={`flex min-h-screen flex-col ${isRtl ? 'font-arabic' : 'font-sans'}`}>
+            <Header />
+            <main id="main-content" className="flex-1">{children}</main>
+            <Footer />
+            <WhatsAppFAB locale={locale} />
+            <BottomFade />
+          </div>
           <Analytics />
           <SpeedInsights />
         </NextIntlClientProvider>

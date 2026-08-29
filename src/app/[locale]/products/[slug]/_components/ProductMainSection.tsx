@@ -210,10 +210,10 @@ export function ProductMainSection({
             {/* Up arrow + fade */}
             {thumbCanScrollUp && (
               <div className="absolute top-0 inset-x-0 z-10 flex flex-col items-center">
-                <div className="w-full h-10 bg-gradient-to-b from-white dark:from-brand-navyDeep to-transparent" />
+                <div className="w-full h-10 bg-gradient-to-b from-white to-transparent" />
                 <button
                   onClick={() => thumbStripRef.current?.scrollBy({ top: -200, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}
-                  className="absolute top-1 p-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-colors"
+                  className="absolute top-1 p-1 rounded-full bg-white/80 shadow text-gray-600 hover:bg-white transition-colors"
                   aria-label={tA11y('scrollUp')}
                 >
                   <ChevronIcon direction="up" />
@@ -241,10 +241,10 @@ export function ProductMainSection({
                   aria-current={i === carouselIndex}
                   aria-label={tA11y('goToImage', { n: i + 1 })}
                   className={cn(
-                    'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 bg-gray-100 dark:bg-gray-800 transition-colors',
+                    'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 bg-gray-100 transition-colors',
                     i === carouselIndex
-                      ? 'border-brand-navy dark:border-sky-400'
-                      : 'border-transparent hover:border-brand-navy dark:hover:border-sky-400'
+                      ? 'border-brand-navy'
+                      : 'border-transparent hover:border-brand-navy'
                   )}
                 >
                   <ProductImage
@@ -262,10 +262,10 @@ export function ProductMainSection({
             {/* Down arrow + fade */}
             {thumbCanScrollDown && (
               <div className="absolute bottom-0 inset-x-0 z-10 flex flex-col items-center">
-                <div className="w-full h-10 bg-gradient-to-t from-white dark:from-brand-navyDeep to-transparent" />
+                <div className="w-full h-10 bg-gradient-to-t from-white to-transparent" />
                 <button
                   onClick={() => thumbStripRef.current?.scrollBy({ top: 200, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}
-                  className="absolute bottom-1 p-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-colors"
+                  className="absolute bottom-1 p-1 rounded-full bg-white/80 shadow text-gray-600 hover:bg-white transition-colors"
                   aria-label={tA11y('scrollDown')}
                 >
                   <ChevronIcon direction="down" />
@@ -278,7 +278,7 @@ export function ProductMainSection({
         {/* Main image — offset by thumb strip width + gap when strip is present */}
         <div
           className={cn(
-            'relative rounded-2xl overflow-hidden aspect-square bg-gray-100 dark:bg-gray-800 shadow-md',
+            'relative rounded-2xl overflow-hidden aspect-square bg-gray-100 shadow-md',
             images.length > 1 && 'ms-[72px]'
           )}
           style={{ cursor: 'default' }}
@@ -326,7 +326,7 @@ export function ProductMainSection({
               type="button"
               onClick={() => { setLightboxOpenAt(carouselIndex); setLightboxOpen(true) }}
               aria-label={tA11y('viewFullImage')}
-              className="absolute top-3 right-3 z-10 p-1.5 flex items-center justify-center rounded-lg bg-white dark:bg-gray-900/75 border border-gray-200 dark:border-transparent hover:bg-gray-100 dark:hover:bg-gray-900 shadow transition-colors text-gray-600 dark:text-white"
+              className="absolute top-3 right-3 z-10 p-1.5 flex items-center justify-center rounded-lg bg-white border border-gray-200 hover:bg-gray-100 shadow transition-colors text-gray-600"
             >
               <ExpandIcon />
             </button>
@@ -340,19 +340,19 @@ export function ProductMainSection({
         {/* Name */}
         <div>
           {product.artCode && (
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1 font-mono">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-widest mb-1 font-mono">
               ART-{product.artCode}
             </p>
           )}
-          <h1 className="text-xl lg:text-4xl font-bold text-brand-navy dark:text-white leading-tight">
+          <h1 className="text-xl lg:text-4xl font-bold text-brand-navy leading-tight">
             {name}
           </h1>
         </div>
 
         {/* Category pill — desktop only */}
-        <div className="hidden lg:inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5">
-          <span className="text-gray-500 dark:text-gray-400 text-sm">{t('category')}:</span>
-          <span className="text-brand-navy dark:text-white font-semibold text-sm">{categoryName}</span>
+        <div className="hidden lg:inline-flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-4 py-2.5">
+          <span className="text-gray-500 text-sm">{t('category')}:</span>
+          <span className="text-brand-navy font-semibold text-sm">{categoryName}</span>
         </div>
 
         <ProductActions
@@ -376,19 +376,19 @@ export function ProductMainSection({
 
         {/* Specifications */}
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
             {t('keyAttributes')}
           </h2>
-          <div className="grid grid-cols-2 gap-px bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-2 gap-px bg-gray-200 rounded-xl overflow-hidden border border-gray-200">
             {[
               { label: t('material'), value: product.material },
               { label: t('capacity'), value: derivedCapacity ? <span dir="ltr">{derivedCapacity}</span> : undefined },
               { label: t('piecesPerBox'), value: product.piecesPerBox?.toString() },
               { label: t('dimensions'), value: formatDimensions(product) },
             ].map(({ label, value }) => (
-              <div key={label} className="bg-white dark:bg-gray-800 px-4 py-3">
-                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
-                <p className="text-sm font-semibold text-brand-navy dark:text-white">{value || '-'}</p>
+              <div key={label} className="bg-white px-4 py-3">
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">{label}</p>
+                <p className="text-sm font-semibold text-brand-navy">{value || '-'}</p>
               </div>
             ))}
           </div>
