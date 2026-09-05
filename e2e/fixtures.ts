@@ -10,7 +10,10 @@ export const test = base.extend({
   // named `use(...)` as a React hook call regardless of where it comes from.
   context: async ({}, provide) => {
     const browser = await chromium.launch({
-      executablePath: '/usr/bin/helium-browser',
+      // Locally this environment has no bundled Playwright Chromium, so point at the
+      // system helium-browser. CI installs the real Playwright Chromium, so let
+      // Playwright pick it by leaving executablePath unset.
+      ...(process.env.CI ? {} : { executablePath: '/usr/bin/helium-browser' }),
       args: ['--disable-gpu'],
     })
     const context = await browser.newContext()
