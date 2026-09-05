@@ -835,6 +835,9 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL,
       allowExitOnIdle: true,
+      // Close idle connections well before Neon's server-side idle cutoff, so pg
+      // ends them cleanly instead of surfacing "Connection terminated unexpectedly".
+      idleTimeoutMillis: 30000,
     },
   }),
   editor: lexicalEditor({}),

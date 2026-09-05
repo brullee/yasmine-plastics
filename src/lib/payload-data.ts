@@ -1,5 +1,6 @@
 import { getPayload as _getPayload } from 'payload'
 import type { BasePayload } from 'payload'
+import * as Sentry from '@sentry/nextjs'
 import config from '@payload-config'
 import type { Product, Category } from '@/types'
 
@@ -8,13 +9,21 @@ const g = global as typeof globalThis & { __payload?: BasePayload }
 async function getPayload(): Promise<BasePayload> {
   if (!g.__payload) {
     g.__payload = await _getPayload({ config })
-    if (process.env.VERCEL) {
-      try {
-        const { attachDatabasePool } = await import('@vercel/functions')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const pool = (g.__payload.db as any).pool
-        if (pool) attachDatabasePool(pool)
-      } catch {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pool = (g.__payload.db as any).pool
+    if (pool) {
+      // When Neon drops an idle connection, the pg pool emits 'error'; with no
+      // listener Node escalates it to an uncaught exception and kills the function.
+      // Capture it instead — the next query just opens a fresh connection.
+      if (pool.listenerCount('error') === 0) {
+        pool.on('error', (err: Error) => Sentry.captureException(err))
+      }
+      if (process.env.VERCEL) {
+        try {
+          const { attachDatabasePool } = await import('@vercel/functions')
+          attachDatabasePool(pool)
+        } catch {}
+      }
     }
   }
   return g.__payload
