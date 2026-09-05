@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Metadata } from 'next'
 import { Inter, Readex_Pro } from 'next/font/google'
-import { NextIntlClientProvider } from 'next-intl'
+import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
@@ -25,6 +25,11 @@ const notoSansArabic = Readex_Pro({
   weight: ['300', '400', '500', '700'],
   display: 'swap',
 })
+
+// Locales are a closed set of two — anything else (a bot probing /favicon.ico,
+// /.env, etc. that Next maps onto the [locale] segment) gets the static root
+// not-found without ever booting this layout.
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
@@ -67,11 +72,16 @@ interface Props {
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params
 
-  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
+  // Must run before any other next-intl call — getMessages() here, and
+  // getTranslations() in not-found.tsx if this render falls through to the 404
+  // boundary. Without it next-intl resolves the locale by reading headers(),
+  // which turns this statically-generated route dynamic at request time and throws.
+  setRequestLocale(locale)
+
+  if (!hasLocale(routing.locales, locale)) {
     notFound()
   }
 
-  setRequestLocale(locale)
   const { meta: _meta, ...clientMessages } = await getMessages()
   const t = await getTranslations({ locale, namespace: 'a11y' })
   const isRtl = locale === 'ar'
