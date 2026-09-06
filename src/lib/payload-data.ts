@@ -14,9 +14,10 @@ async function getPayload(): Promise<BasePayload> {
     if (pool) {
       // When Neon drops an idle connection, the pg pool emits 'error'; with no
       // listener Node escalates it to an uncaught exception and kills the function.
-      // Capture it instead — the next query just opens a fresh connection.
+      // It's a connection we weren't using and the next query opens a fresh one
+      // (see withDbRetry below), so log it as a warning rather than let it crash.
       if (pool.listenerCount('error') === 0) {
-        pool.on('error', (err: Error) => Sentry.captureException(err))
+        pool.on('error', (err: Error) => Sentry.captureException(err, { level: 'warning' }))
       }
       if (process.env.VERCEL) {
         try {
@@ -171,26 +172,44 @@ function transformCategory(doc: any): Category {
   }
 }
 
+// Neon's serverless compute suspends after a few minutes idle, dropping every
+// connection; a request that arrives during the wake-up race gets a dead pooled
+// connection and the query fails with "Connection terminated". The pool opens a
+// fresh connection on the next call, so one retry clears it. Non-connection
+// errors rethrow straight away.
+async function withDbRetry<T>(run: () => Promise<T>, attempts = 3): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await run()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : ''
+      const transient = /Connection terminated|ECONNRESET|ETIMEDOUT|connection error/i.test(message)
+      if (!transient || attempt >= attempts) throw err
+      await new Promise((resolve) => setTimeout(resolve, 200 * attempt))
+    }
+  }
+}
+
 export async function getProducts(): Promise<Product[]> {
   const p = await getPayload()
-  const result = await p.find({ collection: 'products', limit: 1000, depth: 2 })
+  const result = await withDbRetry(() => p.find({ collection: 'products', limit: 1000, depth: 2 }))
   return result.docs.map(transformProduct).filter((p) => !!p.slug)
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const p = await getPayload()
-  const result = await p.find({ collection: 'products', where: { slug: { equals: slug } }, depth: 2, limit: 1 })
+  const result = await withDbRetry(() => p.find({ collection: 'products', where: { slug: { equals: slug } }, depth: 2, limit: 1 }))
   return result.docs[0] ? transformProduct(result.docs[0]) : null
 }
 
 export async function getCategories(): Promise<Category[]> {
   const p = await getPayload()
-  const result = await p.find({ collection: 'categories', depth: 1, limit: 100 })
+  const result = await withDbRetry(() => p.find({ collection: 'categories', depth: 1, limit: 100 }))
   return result.docs.map(transformCategory)
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
   const p = await getPayload()
-  const result = await p.find({ collection: 'categories', where: { slug: { equals: slug } }, depth: 1, limit: 1 })
+  const result = await withDbRetry(() => p.find({ collection: 'categories', where: { slug: { equals: slug } }, depth: 1, limit: 1 }))
   return result.docs[0] ? transformCategory(result.docs[0]) : undefined
 }
