@@ -69,8 +69,12 @@ export default buildConfig({
       clientUploads: true,
       collections: {
         media: {
+          // encodeURIComponent matches @payloadcms/storage-s3's own default generateURL —
+          // an unencoded filename containing e.g. '#' truncates the URL at that character
+          // when any consumer (the browser, opengraph-image, the BG-removal fetch) parses
+          // it, silently breaking the image.
           generateFileURL: ({ filename }) =>
-            `${process.env.R2_PUBLIC_URL ?? ''}/${filename}`,
+            `${process.env.R2_PUBLIC_URL ?? ''}/${encodeURIComponent(filename)}`,
         },
       },
       bucket: process.env.R2_BUCKET ?? '',

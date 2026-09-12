@@ -109,7 +109,10 @@ export async function normalizeMediaAfterUpload(
   }
   let imageBuffer: Buffer = Buffer.concat(chunks)
 
-  const imageUrl = `${process.env.R2_PUBLIC_URL ?? ''}/${filename}`
+  // Matches generateFileURL in payload.config.ts — without this, a filename containing
+  // e.g. '#' truncates the URL, and the Modal fetch below silently 404s (caught, treated
+  // as "no background to remove" with no error surfaced to the admin).
+  const imageUrl = `${process.env.R2_PUBLIC_URL ?? ''}/${encodeURIComponent(filename)}`
   const t0 = Date.now()
   const bgRemoved = await removeBackground(imageUrl)
   if (bgRemoved) {

@@ -52,6 +52,9 @@ function mediaUrl(media: unknown): string {
       if (m.url.includes('/api/media/file/')) {
         try { return new URL(m.url).pathname } catch { return m.url }
       }
+      // R2 URLs are encoded once, at upload time, by generateFileURL in
+      // payload.config.ts — re-encoding an already-encoded URL here would
+      // double-encode it (e.g. %23 -> %2523), so this is returned as-is.
       return m.url
     }
     if (m.filename && typeof m.filename === 'string')
