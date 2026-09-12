@@ -11,6 +11,7 @@ import { forgotPasswordEmailHtml, newDeviceSignInEmailHtml } from '@/lib/emailTe
 import { MAIL_FROM_NOREPLY, sendMail } from '@/lib/mailer'
 import { getIP, loginRateLimit, newDeviceAlertRateLimit } from '@/lib/ratelimit'
 import { TRUST_COOKIE_NAME, verifyToken, verifyTotpCode } from '@/lib/totp'
+import { LID_CATEGORY_SLUGS } from '@/lib/lidCategories'
 import { parseCookies } from 'payload/shared'
 
 // Fire-and-forget security notice sent the moment a correct password is used from a
@@ -814,12 +815,7 @@ export default buildConfig({
                     },
                   },
                   filterOptions: {
-                    or: [
-                      { 'category.slug': { equals: 'lids' } },
-                      { 'category.slug': { equals: 'lid' } },
-                      { 'category.slug': { equals: 'papercup-lids' } },
-                      { 'category.slug': { equals: 'papercup-lid' } },
-                    ],
+                    or: LID_CATEGORY_SLUGS.map((slug) => ({ 'category.slug': { equals: slug } })),
                   },
                 },
               ],
@@ -878,12 +874,7 @@ export default buildConfig({
                         },
                       },
                       filterOptions: {
-                        or: [
-                          { 'category.slug': { equals: 'lids' } },
-                          { 'category.slug': { equals: 'lid' } },
-                          { 'category.slug': { equals: 'papercup-lids' } },
-                          { 'category.slug': { equals: 'papercup-lid' } },
-                        ],
+                        or: LID_CATEGORY_SLUGS.map((slug) => ({ 'category.slug': { equals: slug } })),
                       },
                     },
                     {
