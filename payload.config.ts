@@ -452,7 +452,10 @@ export default buildConfig({
             description: 'The URL name for this category page. Examples: "cups", "food-containers", "papercup-lids". Lowercase only, hyphens(-) instead of spaces.',
             components: { Field: '@/components/payload/LowercaseText#LowercaseText' },
           },
-          hooks: { beforeChange: [({ value }) => value?.toLowerCase().replace(/\s+/g, '-')] },
+          // .trim() before the space-to-hyphen replace, not after — otherwise a leading or
+          // trailing space becomes a leading or trailing hyphen baked into every URL under
+          // this category instead of being discarded.
+          hooks: { beforeChange: [({ value }) => value?.trim().toLowerCase().replace(/\s+/g, '-')] },
         },
         {
           name: 'slugPrefix',
@@ -463,7 +466,9 @@ export default buildConfig({
             description: 'Short singular word used to build each product\'s URL code. Examples: "cup" → cup-501, "container" → container-201, "lid" → lid-101. Must be singular (cup, not cups).',
             components: { Field: '@/components/payload/LowercaseText#LowercaseText' },
           },
-          hooks: { beforeChange: [({ value }) => value?.toLowerCase().replace(/\s+/g, '-')] },
+          // Feeds directly into every product's slug/URL in this category (see the products
+          // beforeChange hook below) — same trim-before-hyphenate reasoning as `slug` above.
+          hooks: { beforeChange: [({ value }) => value?.trim().toLowerCase().replace(/\s+/g, '-')] },
         },
         { name: 'image', type: 'upload', relationTo: 'media' },
         {
