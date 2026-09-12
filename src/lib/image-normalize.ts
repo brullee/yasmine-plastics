@@ -49,7 +49,10 @@ async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL
   input = await sharp(input).rotate().toBuffer()
 
   const meta = await sharp(input).metadata()
-  const hasAlpha = (meta.channels ?? 3) === 4
+  // sharp reports these as two separate, independent fields — channels is 4 for both
+  // CMYK (no alpha) and RGBA (alpha) images, so deriving hasAlpha from it misclassifies
+  // any CMYK-sourced photo as having alpha and routes it into the wrong trim path below.
+  const hasAlpha = meta.hasAlpha ?? false
 
   let toProcess: Buffer
   if (hasAlpha) {
