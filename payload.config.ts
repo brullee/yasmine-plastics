@@ -564,7 +564,26 @@ export default buildConfig({
                       type: 'row',
                       fields: [
                         { name: 'category', type: 'relationship', relationTo: 'categories', required: true },
-                        { name: 'artCode', type: 'text', required: true, admin: { description: 'Number only, not the full code. E.g. enter "501", not "ART-501".' } },
+                        {
+                          name: 'artCode',
+                          type: 'text',
+                          required: true,
+                          admin: {
+                            description: 'Number only, not the full code. E.g. enter "501", not "ART-501".',
+                            components: { Field: '@/components/payload/DigitsOnlyText#DigitsOnlyText' },
+                          },
+                          // Gets concatenated straight into the product slug/URL below — a stray
+                          // space here silently breaks the product link. DigitsOnlyText strips
+                          // anything non-numeric as it's typed; this validate is the backstop for
+                          // writes that skip the admin UI (API, import scripts).
+                          validate: (value: unknown, { required }: { required?: boolean }) => {
+                            if (!value) return required ? 'Art code is required.' : true
+                            if (typeof value !== 'string' || !/^\d+$/.test(value)) {
+                              return 'Art code must be numbers only, with no spaces (e.g. 501).'
+                            }
+                            return true
+                          },
+                        },
                       ],
                     },
                   ],
