@@ -9,8 +9,9 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml, newDeviceSignInEmailHtml } from '@/lib/emailTemplates'
 import { MAIL_FROM_NOREPLY, sendMail } from '@/lib/mailer'
-import { loginRateLimit, newDeviceAlertRateLimit } from '@/lib/ratelimit'
+import { getIP, loginRateLimit, newDeviceAlertRateLimit } from '@/lib/ratelimit'
 import { TRUST_COOKIE_NAME, verifyToken, verifyTotpCode } from '@/lib/totp'
+import { LID_CATEGORY_SLUGS } from '@/lib/lidCategories'
 import { parseCookies } from 'payload/shared'
 
 // Fire-and-forget security notice sent the moment a correct password is used from a
@@ -69,8 +70,12 @@ export default buildConfig({
       clientUploads: true,
       collections: {
         media: {
+          // encodeURIComponent matches @payloadcms/storage-s3's own default generateURL —
+          // an unencoded filename containing e.g. '#' truncates the URL at that character
+          // when any consumer (the browser, opengraph-image, the BG-removal fetch) parses
+          // it, silently breaking the image.
           generateFileURL: ({ filename }) =>
-            `${process.env.R2_PUBLIC_URL ?? ''}/${filename}`,
+            `${process.env.R2_PUBLIC_URL ?? ''}/${encodeURIComponent(filename)}`,
         },
       },
       bucket: process.env.R2_BUCKET ?? '',
@@ -88,7 +93,10 @@ export default buildConfig({
     {
       slug: 'users',
       auth: {
-        maxLoginAttempts: 0,
+        // Payload's own account lockout — the sole protection against password guessing.
+        // The beforeLogin hook below only ever runs *after* a correct password (that's how
+        // Payload's login operation works), so it cannot substitute for this.
+        maxLoginAttempts: 5,
         forgotPassword: {
           generateEmailHTML: (args) => {
             const token = args?.token ?? ''
@@ -102,10 +110,7 @@ export default buildConfig({
       hooks: {
         beforeLogin: [
           async ({ req, user }) => {
-            const ip =
-              req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-              req.headers.get('x-real-ip') ??
-              'unknown'
+            const ip = getIP(req.headers)
 
             // Rate-limit only genuine failures (wrong/missing 2FA code below), not every
             // request — a successful login, and the expected first step of a 2FA login
@@ -116,8 +121,17 @@ export default buildConfig({
             // "code required" once by design), so use Payload's own APIError with a real 4xx
             // status instead.
             const fail = async (message: string): Promise<never> => {
-              const { success } = await loginRateLimit.limit(ip)
-              if (!success) throw new APIError('Too many login attempts. Please try again later.', 429)
+              // Fail open like every sibling rate-limit call site — if Upstash is down, a
+              // routine wrong/missing code should still produce a clean 401, not a raw
+              // Upstash error surfacing as an unexpected 500.
+              let limited = false
+              try {
+                const { success } = await loginRateLimit.limit(ip)
+                limited = !success
+              } catch (err) {
+                console.error('[beforeLogin] rate-limit check failed:', err)
+              }
+              if (limited) throw new APIError('Too many login attempts. Please try again later.', 429)
               throw new APIError(message, 401)
             }
 
@@ -141,7 +155,11 @@ export default buildConfig({
             // alongside email/password — this hook runs after password verification
             // succeeds but before a token is issued, so this is the right place to gate
             // on it.
-            const code = (req.data as Record<string, unknown> | undefined)?.twoFactorCode as string | undefined
+            // Lowercased once here so a recovery code retyped in a different case (common on
+            // mobile, e.g. auto-capitalized) still matches — generateRecoveryCodes always
+            // produces lowercase hex, and hashToken is case-sensitive. No effect on a live
+            // TOTP code, which is digits only.
+            const code = ((req.data as Record<string, unknown> | undefined)?.twoFactorCode as string | undefined)?.toLowerCase()
             if (!code) {
               // The password was correct but this device has never passed 2FA on this
               // account — let the account holder know, in case it wasn't them. Scheduled
@@ -276,13 +294,17 @@ export default buildConfig({
             if (!doc.normalizeImage || !doc.filename) return
 
             const isCreate = operation === 'create'
-            // File replaced on an existing record (not our own normalizer's update,
-            // which sets width/height to 1400).
+            // File replaced on an existing record. Our own normalizer's recursive update
+            // (see image-normalize.ts) only ever writes width/height/filesize, never
+            // filename, so the filename comparison alone already excludes it — an earlier
+            // extra "not already 1400x1400" check was redundant for that purpose and
+            // instead caused a real replacement to be skipped whenever the new image
+            // happened to already be exactly 1400x1400 (e.g. re-uploading a previously
+            // normalized file).
             const isFileReplacement =
               operation === 'update' &&
               !!previousDoc?.filename &&
-              doc.filename !== previousDoc.filename &&
-              !(doc.width === 1400 && doc.height === 1400)
+              doc.filename !== previousDoc.filename
 
             if (!isCreate && !isFileReplacement) return
 
@@ -337,6 +359,15 @@ export default buildConfig({
       slug: 'colors',
       admin: { useAsTitle: 'nameEn' },
       access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      // These names are used as the product-options lookup key on the storefront
+      // (colorImageMap in src/lib/payload-data.ts) — an untrimmed "Red " and "Red" look
+      // identical in the admin list but are different keys, so a gallery image tagged
+      // with one silently never matches the product's own (differently-typed) option.
+      hooks: { beforeChange: [({ data }) => {
+        if (typeof data.nameEn === 'string') data.nameEn = data.nameEn.trim()
+        if (typeof data.nameAr === 'string') data.nameAr = data.nameAr.trim()
+        return data
+      }] },
       fields: [
         {
           type: 'row',
@@ -359,6 +390,11 @@ export default buildConfig({
       slug: 'sizes',
       admin: { useAsTitle: 'label' },
       access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      // Same reasoning as colors above — sizeImageMap keys off this label verbatim.
+      hooks: { beforeChange: [({ data }) => {
+        if (typeof data.label === 'string') data.label = data.label.trim()
+        return data
+      }] },
       fields: [
         { name: 'label', label: 'Size', type: 'text', required: true },
       ],
@@ -367,6 +403,10 @@ export default buildConfig({
       slug: 'units',
       admin: { useAsTitle: 'label' },
       access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      hooks: { beforeChange: [({ data }) => {
+        if (typeof data.label === 'string') data.label = data.label.trim()
+        return data
+      }] },
       fields: [
         { name: 'label', label: 'Unit', type: 'text', required: true },
       ],
@@ -374,6 +414,27 @@ export default buildConfig({
     {
       slug: 'categories',
       admin: { useAsTitle: 'nameEn' },
+      hooks: {
+        // Payload doesn't restrict/cascade relationship deletes on its own — without this,
+        // deleting a category still referenced by products leaves them with a nulled-out
+        // category (renders as a blank breadcrumb, drops silently out of every
+        // category-filtered view) instead of a clear error telling the admin to reassign
+        // those products first.
+        beforeDelete: [
+          async ({ id, req }) => {
+            const { totalDocs } = await req.payload.count({
+              collection: 'products',
+              where: { category: { equals: id } },
+            })
+            if (totalDocs > 0) {
+              throw new APIError(
+                `Can't delete this category — ${totalDocs} product${totalDocs === 1 ? '' : 's'} still use${totalDocs === 1 ? 's' : ''} it. Reassign or delete ${totalDocs === 1 ? 'it' : 'them'} first.`,
+                400,
+              )
+            }
+          },
+        ],
+      },
       fields: [
         {
           type: 'row',
@@ -392,7 +453,10 @@ export default buildConfig({
             description: 'The URL name for this category page. Examples: "cups", "food-containers", "papercup-lids". Lowercase only, hyphens(-) instead of spaces.',
             components: { Field: '@/components/payload/LowercaseText#LowercaseText' },
           },
-          hooks: { beforeChange: [({ value }) => value?.toLowerCase().replace(/\s+/g, '-')] },
+          // .trim() before the space-to-hyphen replace, not after — otherwise a leading or
+          // trailing space becomes a leading or trailing hyphen baked into every URL under
+          // this category instead of being discarded.
+          hooks: { beforeChange: [({ value }) => value?.trim().toLowerCase().replace(/\s+/g, '-')] },
         },
         {
           name: 'slugPrefix',
@@ -403,7 +467,9 @@ export default buildConfig({
             description: 'Short singular word used to build each product\'s URL code. Examples: "cup" → cup-501, "container" → container-201, "lid" → lid-101. Must be singular (cup, not cups).',
             components: { Field: '@/components/payload/LowercaseText#LowercaseText' },
           },
-          hooks: { beforeChange: [({ value }) => value?.toLowerCase().replace(/\s+/g, '-')] },
+          // Feeds directly into every product's slug/URL in this category (see the products
+          // beforeChange hook below) — same trim-before-hyphenate reasoning as `slug` above.
+          hooks: { beforeChange: [({ value }) => value?.trim().toLowerCase().replace(/\s+/g, '-')] },
         },
         { name: 'image', type: 'upload', relationTo: 'media' },
         {
@@ -441,13 +507,29 @@ export default buildConfig({
             if (data.capacityAutoGenerate !== false) {
               const sizeIds: unknown[] = data.sizes ?? []
               if (sizeIds.length) {
-                const labels = await Promise.all(
-                  sizeIds.map(async (id) => {
-                    if (typeof id === 'object' && id !== null && 'label' in id) return (id as { label: string }).label
-                    const s = await req.payload.findByID({ collection: 'sizes', id: id as string })
-                    return (s as { label?: string }).label ?? ''
+                const alreadyPopulated = new Map<string, string>()
+                const idsToFetch: string[] = []
+                for (const id of sizeIds) {
+                  if (typeof id === 'object' && id !== null && 'label' in id) {
+                    const size = id as Record<string, unknown>
+                    alreadyPopulated.set(String(size.id), size.label as string)
+                  } else {
+                    idsToFetch.push(id as string)
+                  }
+                }
+                // One batched query instead of one findByID per unpopulated size.
+                if (idsToFetch.length) {
+                  const { docs } = await req.payload.find({
+                    collection: 'sizes',
+                    where: { id: { in: idsToFetch } },
+                    limit: idsToFetch.length,
                   })
-                )
+                  for (const doc of docs) alreadyPopulated.set(String(doc.id), doc.label ?? '')
+                }
+                const labels = sizeIds.map((id) => {
+                  const key = typeof id === 'object' && id !== null ? String((id as { id: unknown }).id) : String(id)
+                  return alreadyPopulated.get(key) ?? ''
+                })
                 const nums = labels.map(l => parseFloat(l)).filter(n => !isNaN(n)).sort((a, b) => a - b)
                 if (nums.length) {
                   let unitLabel = ''
@@ -495,16 +577,20 @@ export default buildConfig({
             collect(doc)
             collect(previousDoc)
 
-            await Promise.all(
-              Array.from(lidIds).map(async (id) => {
-                try {
-                  const lid = await req.payload.findByID({ collection: 'products', id, depth: 0 })
-                  if (!lid?.slug) return
-                  revalidatePath(`/products/${lid.slug}`)
-                  revalidatePath(`/en/products/${lid.slug}`)
-                } catch {}
-              })
-            )
+            if (lidIds.size) {
+              // One batched query instead of one findByID per affected lid.
+              const { docs: lids } = await req.payload.find({
+                collection: 'products',
+                where: { id: { in: Array.from(lidIds) } },
+                depth: 0,
+                limit: lidIds.size,
+              }).catch(() => ({ docs: [] }))
+              for (const lid of lids) {
+                if (!lid.slug) continue
+                revalidatePath(`/products/${lid.slug}`)
+                revalidatePath(`/en/products/${lid.slug}`)
+              }
+            }
           },
         ],
       },
@@ -564,7 +650,26 @@ export default buildConfig({
                       type: 'row',
                       fields: [
                         { name: 'category', type: 'relationship', relationTo: 'categories', required: true },
-                        { name: 'artCode', type: 'text', required: true, admin: { description: 'Number only, not the full code. E.g. enter "501", not "ART-501".' } },
+                        {
+                          name: 'artCode',
+                          type: 'text',
+                          required: true,
+                          admin: {
+                            description: 'Number only, not the full code. E.g. enter "501", not "ART-501".',
+                            components: { Field: '@/components/payload/DigitsOnlyText#DigitsOnlyText' },
+                          },
+                          // Gets concatenated straight into the product slug/URL below — a stray
+                          // space here silently breaks the product link. DigitsOnlyText strips
+                          // anything non-numeric as it's typed; this validate is the backstop for
+                          // writes that skip the admin UI (API, import scripts).
+                          validate: (value: unknown, { required }: { required?: boolean }) => {
+                            if (!value) return required ? 'Art code is required.' : true
+                            if (typeof value !== 'string' || !/^\d+$/.test(value)) {
+                              return 'Art code must be numbers only, with no spaces (e.g. 501).'
+                            }
+                            return true
+                          },
+                        },
                       ],
                     },
                   ],
@@ -710,12 +815,7 @@ export default buildConfig({
                     },
                   },
                   filterOptions: {
-                    or: [
-                      { 'category.slug': { equals: 'lids' } },
-                      { 'category.slug': { equals: 'lid' } },
-                      { 'category.slug': { equals: 'papercup-lids' } },
-                      { 'category.slug': { equals: 'papercup-lid' } },
-                    ],
+                    or: LID_CATEGORY_SLUGS.map((slug) => ({ 'category.slug': { equals: slug } })),
                   },
                 },
               ],
@@ -774,12 +874,7 @@ export default buildConfig({
                         },
                       },
                       filterOptions: {
-                        or: [
-                          { 'category.slug': { equals: 'lids' } },
-                          { 'category.slug': { equals: 'lid' } },
-                          { 'category.slug': { equals: 'papercup-lids' } },
-                          { 'category.slug': { equals: 'papercup-lid' } },
-                        ],
+                        or: LID_CATEGORY_SLUGS.map((slug) => ({ 'category.slug': { equals: slug } })),
                       },
                     },
                     {

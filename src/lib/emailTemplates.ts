@@ -69,7 +69,7 @@ export function contactEmailHtml({ fullName, email, phone, message }: {
         <!-- Message -->
         <tr><td style="background:${BG};padding:24px 32px;">
           <p style="margin:0 0 10px;font-size:12px;color:${NAVY};text-transform:uppercase;letter-spacing:1px;font-weight:600;">Message</p>
-          <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;">${message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+          <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;">${esc(message)}</p>
         </td></tr>
 
         <!-- Footer -->
@@ -101,7 +101,7 @@ export function forgotPasswordEmailHtml({ resetURL, userEmail }: {
         <!-- Body -->
         <tr><td style="background:#ffffff;padding:32px;">
           <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.6;">
-            We received a request to reset the password for <strong>${userEmail}</strong>.
+            We received a request to reset the password for <strong>${esc(userEmail)}</strong>.
             Click the button below to choose a new password.
           </p>
           <table cellpadding="0" cellspacing="0" style="margin:24px 0;">
@@ -242,7 +242,7 @@ export function quoteEmailHtml({ fullName, company, email, phone, productName, p
             ${row('Delivery', delivery)}
             ${details ? `<tr><td colspan="2" style="padding:10px 16px;">
               <p style="margin:0 0 6px;font-size:13px;color:${NAVY};font-weight:600;">Notes</p>
-              <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;">${details.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+              <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;">${esc(details)}</p>
             </td></tr>` : ''}
           </table>
         </td></tr>` : ''}

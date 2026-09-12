@@ -30,7 +30,9 @@ export function Header() {
 
   const toggleLocale = () => {
     const newLocale = locale === 'ar' ? 'en' : 'ar'
-    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`
+    // next-intl's router sets NEXT_LOCALE itself on any { locale } navigation, using the
+    // maxAge/path configured on localeCookie in src/i18n/routing.ts — setting it here too
+    // would just be overwritten by that same call a moment later.
     router.replace(`${pathname}${window.location.search}`, { locale: newLocale })
   }
 

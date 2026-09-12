@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { verifyToken, verifyTotpCode } from '@/lib/totp'
+import { getIP, loginRateLimit } from '@/lib/ratelimit'
 
 export async function POST(req: Request) {
   try {
@@ -9,8 +10,17 @@ export async function POST(req: Request) {
     const { user } = await payload.auth({ headers: req.headers })
     if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
-    const { code } = await req.json()
-    if (!code) return NextResponse.json({ error: 'Code required' }, { status: 400 })
+    const { code: rawCode } = await req.json()
+    if (!rawCode || typeof rawCode !== 'string') return NextResponse.json({ error: 'Code required' }, { status: 400 })
+    // Lowercased so a recovery code retyped in a different case still matches (see
+    // generateRecoveryCodes/hashToken in src/lib/totp.ts — always lowercase hex, checked
+    // case-sensitively). No effect on a live TOTP code, which is digits only.
+    const code = rawCode.toLowerCase()
+
+    // Someone with only a hijacked session, not the 2FA device itself, could otherwise
+    // guess TOTP/recovery codes here at network speed with no throttling at all.
+    const { success } = await loginRateLimit.limit(getIP(req)).catch(() => ({ success: true }))
+    if (!success) return NextResponse.json({ error: 'Too many attempts. Please try again later.' }, { status: 429 })
 
     const fullUser = await payload.findByID({ collection: 'users', id: user.id, overrideAccess: true })
     const encryptedSecret = (fullUser as Record<string, unknown>).twoFactorSecret as string | undefined

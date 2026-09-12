@@ -48,7 +48,10 @@ export function SizesField() {
           const res = await fetch('/api/sizes', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ label: item.label }),
+            // isValidNewOption below checks the trimmed label for duplicates, so create
+            // must persist that same trimmed value or a later "12" no longer matches an
+            // already-created "12 " and gets waved through as a fresh duplicate.
+            body:    JSON.stringify({ label: item.label.trim() }),
           })
           const { doc } = await res.json()
           const newOpt  = { label: doc.label, value: String(doc.id) }
@@ -77,7 +80,7 @@ export function SizesField() {
           const res = await fetch('/api/units', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ label: next.label }),
+            body:    JSON.stringify({ label: next.label.trim() }),
           })
           const { doc } = await res.json()
           const newOpt = { label: doc.label, value: String(doc.id) }

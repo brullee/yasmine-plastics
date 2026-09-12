@@ -9,9 +9,10 @@ export function UrlCell({ cellData }: { cellData?: string }) {
   if (!cellData) return null
 
   function copy() {
-    navigator.clipboard.writeText(cellData!)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+    navigator.clipboard.writeText(cellData!).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    }).catch(() => {})
   }
 
   return (

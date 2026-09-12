@@ -2,6 +2,7 @@
 
 import { ReactSelect, useField, useFormFields } from '@payloadcms/ui'
 import { useEffect, useState } from 'react'
+import { LID_CATEGORY_SLUGS } from '@/lib/lidCategories'
 
 type ProductDoc = {
   id: number
@@ -11,9 +12,6 @@ type ProductDoc = {
 }
 
 type Option = { label: string; value: string }
-
-// Same lid categories as these fields' `filterOptions` in payload.config.ts.
-const LID_CATEGORY_SLUGS = ['lids', 'lid', 'papercup-lids', 'papercup-lid']
 
 // The default relationship picker shows `nameEn` (the products collection's global
 // useAsTitle) — several lids can share a near-identical customer-facing name, making

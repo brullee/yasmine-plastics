@@ -3,7 +3,7 @@
 import { routing } from './i18n/routing'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { loginRateLimit } from './lib/ratelimit'
+import { getIP, loginRateLimit } from './lib/ratelimit'
 
 const handleI18nRouting = createMiddleware(routing)
 
@@ -23,8 +23,7 @@ export default async function proxy(req: NextRequest) {
   }
   if (req.nextUrl.pathname === '/api/users/forgot-password') {
     if (req.method === 'POST') {
-      const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? req.headers.get('x-real-ip') ?? 'unknown'
-      const { success } = await loginRateLimit.limit(ip)
+      const { success } = await loginRateLimit.limit(getIP(req))
       if (!success) return NextResponse.json({ errors: [{ message: 'Too many attempts. Try again later.' }] }, { status: 429 })
     }
     return NextResponse.next()

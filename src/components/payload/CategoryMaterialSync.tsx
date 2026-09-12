@@ -4,12 +4,13 @@ import { useField } from '@payloadcms/ui'
 import { useEffect } from 'react'
 
 const SLUG_TO_MATERIAL: Record<string, string> = {
-  cups:             'PP',
-  containers:       'PP',
-  buckets:          'PS',
-  lids:             'PP',
-  'papercup-lids':  'PS',
-  'paper-cup-lids': 'PS',
+  cups:            'PP',
+  containers:      'PP',
+  buckets:         'PS',
+  lids:            'PP',
+  lid:             'PP',
+  'papercup-lids': 'PS',
+  'papercup-lid':  'PS',
 }
 
 async function resolveMaterialId(name: string): Promise<string | number | null> {

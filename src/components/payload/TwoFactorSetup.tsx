@@ -26,6 +26,11 @@ export function TwoFactorSetup() {
     openModal(ENABLE_SLUG)
     setBusy(true)
     setError('')
+    // A previous attempt's recovery codes must not still be sitting in state — otherwise
+    // this modal would open straight to "Save Your Recovery Codes" showing the OLD codes
+    // instead of the new QR step, since that view is chosen purely by recoveryCodes.length.
+    setRecoveryCodes([])
+    setCode('')
     try {
       const res = await fetch('/api/2fa/setup', { method: 'POST' })
       const data = await res.json()
@@ -40,6 +45,10 @@ export function TwoFactorSetup() {
   }
 
   async function confirmSetup(codeValue: string = code) {
+    // Auto-submit at 6 digits and the visible Confirm button can otherwise both fire at
+    // once, sending two concurrent requests for the same code — whichever response
+    // resolves last silently overwrites the other's recovery codes in state.
+    if (busy) return
     setBusy(true)
     setError('')
     try {
@@ -59,6 +68,7 @@ export function TwoFactorSetup() {
   }
 
   async function disable(codeValue: string = code) {
+    if (busy) return
     setBusy(true)
     setError('')
     try {
@@ -135,7 +145,10 @@ export function TwoFactorSetup() {
         <Button buttonStyle="primary" onClick={startSetup}>Enable 2FA</Button>
       )}
 
-      <Modal className="confirmation-modal" slug={ENABLE_SLUG}>
+      {/* closeOnBlur=false: a stray click outside would otherwise dismiss this without
+          going through resetAndClose, losing the just-issued QR/recovery-codes state
+          (recovery codes especially — they're shown exactly once). */}
+      <Modal className="confirmation-modal" slug={ENABLE_SLUG} closeOnBlur={false}>
         <div className="confirmation-modal__wrapper">
           <div className="confirmation-modal__content">
             {recoveryCodes.length > 0 ? (
@@ -202,7 +215,7 @@ export function TwoFactorSetup() {
         </div>
       </Modal>
 
-      <Modal className="confirmation-modal" slug={DISABLE_SLUG}>
+      <Modal className="confirmation-modal" slug={DISABLE_SLUG} closeOnBlur={false}>
         <div className="confirmation-modal__wrapper">
           <div className="confirmation-modal__content">
             <h1>Disable Two-Factor Authentication</h1>

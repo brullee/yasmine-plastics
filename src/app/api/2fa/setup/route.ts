@@ -10,6 +10,15 @@ export async function POST(req: Request) {
     const { user } = await payload.auth({ headers: req.headers })
     if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
+    // Without this, anyone who gets hold of a session for an already-2FA-enabled account
+    // (a hijacked cookie, an unattended logged-in browser) could silently overwrite the
+    // live secret via this endpoint with no reauthentication — /disable requires a valid
+    // code, this route has to require 2FA not already being on instead.
+    const fullUser = await payload.findByID({ collection: 'users', id: user.id, overrideAccess: true })
+    if ((fullUser as Record<string, unknown>).twoFactorEnabled) {
+      return NextResponse.json({ error: 'Two-factor authentication is already enabled. Disable it first to set up again.' }, { status: 400 })
+    }
+
     const { base32, uri } = generateTotpSecret(user.email ?? String(user.id))
     const qrDataUrl = await QRCode.toDataURL(uri)
 
