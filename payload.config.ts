@@ -358,6 +358,15 @@ export default buildConfig({
       slug: 'colors',
       admin: { useAsTitle: 'nameEn' },
       access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      // These names are used as the product-options lookup key on the storefront
+      // (colorImageMap in src/lib/payload-data.ts) — an untrimmed "Red " and "Red" look
+      // identical in the admin list but are different keys, so a gallery image tagged
+      // with one silently never matches the product's own (differently-typed) option.
+      hooks: { beforeChange: [({ data }) => {
+        if (typeof data.nameEn === 'string') data.nameEn = data.nameEn.trim()
+        if (typeof data.nameAr === 'string') data.nameAr = data.nameAr.trim()
+        return data
+      }] },
       fields: [
         {
           type: 'row',
@@ -380,6 +389,11 @@ export default buildConfig({
       slug: 'sizes',
       admin: { useAsTitle: 'label' },
       access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      // Same reasoning as colors above — sizeImageMap keys off this label verbatim.
+      hooks: { beforeChange: [({ data }) => {
+        if (typeof data.label === 'string') data.label = data.label.trim()
+        return data
+      }] },
       fields: [
         { name: 'label', label: 'Size', type: 'text', required: true },
       ],
@@ -388,6 +402,10 @@ export default buildConfig({
       slug: 'units',
       admin: { useAsTitle: 'label' },
       access: { read: () => true, create: ({ req: { user } }) => !!user, update: ({ req: { user } }) => !!user, delete: ({ req: { user } }) => !!user },
+      hooks: { beforeChange: [({ data }) => {
+        if (typeof data.label === 'string') data.label = data.label.trim()
+        return data
+      }] },
       fields: [
         { name: 'label', label: 'Unit', type: 'text', required: true },
       ],
