@@ -5,7 +5,30 @@ on:
     branches: [dev]
 
 jobs:
+  # npm run sync fast-forwards local dev to whatever main already has (e.g. after a PR
+  # merge), and pushing that back up re-triggers this workflow on dev even though nothing
+  # beyond what main already ran is being tested. Skip check/e2e when the pushed commit is
+  # already reachable from main - only real, not-yet-merged dev work runs them.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: check
+        run: |
+          git fetch origin main
+          if git merge-base --is-ancestor "${{ github.sha }}" origin/main; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
   check:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -17,7 +40,8 @@ jobs:
       - run: npm run check
 
   e2e:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
