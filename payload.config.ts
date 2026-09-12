@@ -413,6 +413,27 @@ export default buildConfig({
     {
       slug: 'categories',
       admin: { useAsTitle: 'nameEn' },
+      hooks: {
+        // Payload doesn't restrict/cascade relationship deletes on its own — without this,
+        // deleting a category still referenced by products leaves them with a nulled-out
+        // category (renders as a blank breadcrumb, drops silently out of every
+        // category-filtered view) instead of a clear error telling the admin to reassign
+        // those products first.
+        beforeDelete: [
+          async ({ id, req }) => {
+            const { totalDocs } = await req.payload.count({
+              collection: 'products',
+              where: { category: { equals: id } },
+            })
+            if (totalDocs > 0) {
+              throw new APIError(
+                `Can't delete this category — ${totalDocs} product${totalDocs === 1 ? '' : 's'} still use${totalDocs === 1 ? 's' : ''} it. Reassign or delete ${totalDocs === 1 ? 'it' : 'them'} first.`,
+                400,
+              )
+            }
+          },
+        ],
+      },
       fields: [
         {
           type: 'row',
