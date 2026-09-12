@@ -9,7 +9,7 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import { resendAdapter } from '@payloadcms/email-resend'
 import { forgotPasswordEmailHtml, newDeviceSignInEmailHtml } from '@/lib/emailTemplates'
 import { MAIL_FROM_NOREPLY, sendMail } from '@/lib/mailer'
-import { loginRateLimit, newDeviceAlertRateLimit } from '@/lib/ratelimit'
+import { getIP, loginRateLimit, newDeviceAlertRateLimit } from '@/lib/ratelimit'
 import { TRUST_COOKIE_NAME, verifyToken, verifyTotpCode } from '@/lib/totp'
 import { parseCookies } from 'payload/shared'
 
@@ -88,7 +88,10 @@ export default buildConfig({
     {
       slug: 'users',
       auth: {
-        maxLoginAttempts: 0,
+        // Payload's own account lockout — the sole protection against password guessing.
+        // The beforeLogin hook below only ever runs *after* a correct password (that's how
+        // Payload's login operation works), so it cannot substitute for this.
+        maxLoginAttempts: 5,
         forgotPassword: {
           generateEmailHTML: (args) => {
             const token = args?.token ?? ''
@@ -102,10 +105,7 @@ export default buildConfig({
       hooks: {
         beforeLogin: [
           async ({ req, user }) => {
-            const ip =
-              req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-              req.headers.get('x-real-ip') ??
-              'unknown'
+            const ip = getIP(req.headers)
 
             // Rate-limit only genuine failures (wrong/missing 2FA code below), not every
             // request — a successful login, and the expected first step of a 2FA login
@@ -116,8 +116,17 @@ export default buildConfig({
             // "code required" once by design), so use Payload's own APIError with a real 4xx
             // status instead.
             const fail = async (message: string): Promise<never> => {
-              const { success } = await loginRateLimit.limit(ip)
-              if (!success) throw new APIError('Too many login attempts. Please try again later.', 429)
+              // Fail open like every sibling rate-limit call site — if Upstash is down, a
+              // routine wrong/missing code should still produce a clean 401, not a raw
+              // Upstash error surfacing as an unexpected 500.
+              let limited = false
+              try {
+                const { success } = await loginRateLimit.limit(ip)
+                limited = !success
+              } catch (err) {
+                console.error('[beforeLogin] rate-limit check failed:', err)
+              }
+              if (limited) throw new APIError('Too many login attempts. Please try again later.', 429)
               throw new APIError(message, 401)
             }
 
@@ -141,7 +150,11 @@ export default buildConfig({
             // alongside email/password — this hook runs after password verification
             // succeeds but before a token is issued, so this is the right place to gate
             // on it.
-            const code = (req.data as Record<string, unknown> | undefined)?.twoFactorCode as string | undefined
+            // Lowercased once here so a recovery code retyped in a different case (common on
+            // mobile, e.g. auto-capitalized) still matches — generateRecoveryCodes always
+            // produces lowercase hex, and hashToken is case-sensitive. No effect on a live
+            // TOTP code, which is digits only.
+            const code = ((req.data as Record<string, unknown> | undefined)?.twoFactorCode as string | undefined)?.toLowerCase()
             if (!code) {
               // The password was correct but this device has never passed 2FA on this
               // account — let the account holder know, in case it wasn't them. Scheduled

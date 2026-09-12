@@ -6,14 +6,16 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 })
 
-// 5 requests per 10 minutes — contact / quote forms
+// 3 requests per 10 minutes — contact / quote forms
 export const formRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(3, '10 m'),
   prefix:  'rl:form',
 })
 
-// 10 attempts per 15 minutes — admin login brute-force protection
+// 5 attempts per 15 minutes — wrong/missing 2FA code and forgot-password guesses.
+// Password guessing itself is throttled separately, by Payload's own account lockout
+// (see maxLoginAttempts on the users collection in payload.config.ts).
 export const loginRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(5, '15 m'),
@@ -30,10 +32,14 @@ export const newDeviceAlertRateLimit = new Ratelimit({
   prefix:  'rl:2fa-alert',
 })
 
-export function getIP(req: Request): string {
+// Accepts either a Request or the Headers-like object next/headers() returns, so every
+// call site (route handlers, the proxy, the beforeLogin hook, server components) can
+// share this one implementation instead of re-deriving it.
+export function getIP(reqOrHeaders: Request | { get(name: string): string | null }): string {
+  const headers = 'headers' in reqOrHeaders ? reqOrHeaders.headers : reqOrHeaders
   return (
-    req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-    req.headers.get('x-real-ip') ??
+    headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    headers.get('x-real-ip') ??
     'unknown'
   )
 }
