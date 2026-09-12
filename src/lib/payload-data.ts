@@ -35,7 +35,14 @@ async function getPayload(): Promise<BasePayload> {
     // creating a separate pool per call — sharing the in-flight promise instead
     // guarantees a single Payload instance and a single pool.
     if (!g.__payloadInit) {
-      g.__payloadInit = initPayload()
+      // Clear the cached promise on failure so a later call can retry — otherwise, once
+      // initPayload() rejects once (e.g. the exact Neon cold-start drop this file is
+      // built to tolerate), every future call in this warm instance re-awaits the same
+      // stale rejection forever instead of trying again.
+      g.__payloadInit = initPayload().catch((err) => {
+        g.__payloadInit = undefined
+        throw err
+      })
     }
     g.__payload = await g.__payloadInit
   }
