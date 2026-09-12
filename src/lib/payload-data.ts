@@ -4,28 +4,40 @@ import * as Sentry from '@sentry/nextjs'
 import config from '@payload-config'
 import type { Product, Category } from '@/types'
 
-const g = global as typeof globalThis & { __payload?: BasePayload }
+const g = global as typeof globalThis & { __payload?: BasePayload; __payloadInit?: Promise<BasePayload> }
+
+async function initPayload(): Promise<BasePayload> {
+  const payload = await _getPayload({ config })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pool = (payload.db as any).pool
+  if (pool) {
+    // When Neon drops an idle connection, the pg pool emits 'error'; with no
+    // listener Node escalates it to an uncaught exception and kills the function.
+    // It's a connection we weren't using and the next query opens a fresh one
+    // (see withDbRetry below), so log it as a warning rather than let it crash.
+    if (pool.listenerCount('error') === 0) {
+      pool.on('error', (err: Error) => Sentry.captureException(err, { level: 'warning' }))
+    }
+    if (process.env.VERCEL) {
+      try {
+        const { attachDatabasePool } = await import('@vercel/functions')
+        attachDatabasePool(pool)
+      } catch {}
+    }
+  }
+  return payload
+}
 
 async function getPayload(): Promise<BasePayload> {
   if (!g.__payload) {
-    g.__payload = await _getPayload({ config })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const pool = (g.__payload.db as any).pool
-    if (pool) {
-      // When Neon drops an idle connection, the pg pool emits 'error'; with no
-      // listener Node escalates it to an uncaught exception and kills the function.
-      // It's a connection we weren't using and the next query opens a fresh one
-      // (see withDbRetry below), so log it as a warning rather than let it crash.
-      if (pool.listenerCount('error') === 0) {
-        pool.on('error', (err: Error) => Sentry.captureException(err, { level: 'warning' }))
-      }
-      if (process.env.VERCEL) {
-        try {
-          const { attachDatabasePool } = await import('@vercel/functions')
-          attachDatabasePool(pool)
-        } catch {}
-      }
+    // Callers that fire concurrently (e.g. the Promise.all in page.tsx files) would
+    // otherwise each see __payload unset and independently call _getPayload(),
+    // creating a separate pool per call — sharing the in-flight promise instead
+    // guarantees a single Payload instance and a single pool.
+    if (!g.__payloadInit) {
+      g.__payloadInit = initPayload()
     }
+    g.__payload = await g.__payloadInit
   }
   return g.__payload
 }
