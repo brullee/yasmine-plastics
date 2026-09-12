@@ -293,13 +293,17 @@ export default buildConfig({
             if (!doc.normalizeImage || !doc.filename) return
 
             const isCreate = operation === 'create'
-            // File replaced on an existing record (not our own normalizer's update,
-            // which sets width/height to 1400).
+            // File replaced on an existing record. Our own normalizer's recursive update
+            // (see image-normalize.ts) only ever writes width/height/filesize, never
+            // filename, so the filename comparison alone already excludes it — an earlier
+            // extra "not already 1400x1400" check was redundant for that purpose and
+            // instead caused a real replacement to be skipped whenever the new image
+            // happened to already be exactly 1400x1400 (e.g. re-uploading a previously
+            // normalized file).
             const isFileReplacement =
               operation === 'update' &&
               !!previousDoc?.filename &&
-              doc.filename !== previousDoc.filename &&
-              !(doc.width === 1400 && doc.height === 1400)
+              doc.filename !== previousDoc.filename
 
             if (!isCreate && !isFileReplacement) return
 
