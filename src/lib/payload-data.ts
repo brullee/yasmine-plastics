@@ -220,7 +220,10 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const p = await getPayload()
-  const result = await withDbRetry(() => p.find({ collection: 'products', where: { slug: { equals: slug } }, depth: 2, limit: 1 }))
+  // Slugs are always generated lowercase, but the route param comes from the URL as
+  // typed/shared/autocapitalized — lowercase it so a differently-cased link to a real
+  // product 404s only if it's actually wrong, not just differently cased.
+  const result = await withDbRetry(() => p.find({ collection: 'products', where: { slug: { equals: slug.toLowerCase() } }, depth: 2, limit: 1 }))
   return result.docs[0] ? transformProduct(result.docs[0]) : null
 }
 
