@@ -506,13 +506,29 @@ export default buildConfig({
             if (data.capacityAutoGenerate !== false) {
               const sizeIds: unknown[] = data.sizes ?? []
               if (sizeIds.length) {
-                const labels = await Promise.all(
-                  sizeIds.map(async (id) => {
-                    if (typeof id === 'object' && id !== null && 'label' in id) return (id as { label: string }).label
-                    const s = await req.payload.findByID({ collection: 'sizes', id: id as string })
-                    return (s as { label?: string }).label ?? ''
+                const alreadyPopulated = new Map<string, string>()
+                const idsToFetch: string[] = []
+                for (const id of sizeIds) {
+                  if (typeof id === 'object' && id !== null && 'label' in id) {
+                    const size = id as Record<string, unknown>
+                    alreadyPopulated.set(String(size.id), size.label as string)
+                  } else {
+                    idsToFetch.push(id as string)
+                  }
+                }
+                // One batched query instead of one findByID per unpopulated size.
+                if (idsToFetch.length) {
+                  const { docs } = await req.payload.find({
+                    collection: 'sizes',
+                    where: { id: { in: idsToFetch } },
+                    limit: idsToFetch.length,
                   })
-                )
+                  for (const doc of docs) alreadyPopulated.set(String(doc.id), doc.label ?? '')
+                }
+                const labels = sizeIds.map((id) => {
+                  const key = typeof id === 'object' && id !== null ? String((id as { id: unknown }).id) : String(id)
+                  return alreadyPopulated.get(key) ?? ''
+                })
                 const nums = labels.map(l => parseFloat(l)).filter(n => !isNaN(n)).sort((a, b) => a - b)
                 if (nums.length) {
                   let unitLabel = ''
@@ -560,16 +576,20 @@ export default buildConfig({
             collect(doc)
             collect(previousDoc)
 
-            await Promise.all(
-              Array.from(lidIds).map(async (id) => {
-                try {
-                  const lid = await req.payload.findByID({ collection: 'products', id, depth: 0 })
-                  if (!lid?.slug) return
-                  revalidatePath(`/products/${lid.slug}`)
-                  revalidatePath(`/en/products/${lid.slug}`)
-                } catch {}
-              })
-            )
+            if (lidIds.size) {
+              // One batched query instead of one findByID per affected lid.
+              const { docs: lids } = await req.payload.find({
+                collection: 'products',
+                where: { id: { in: Array.from(lidIds) } },
+                depth: 0,
+                limit: lidIds.size,
+              }).catch(() => ({ docs: [] }))
+              for (const lid of lids) {
+                if (!lid.slug) continue
+                revalidatePath(`/products/${lid.slug}`)
+                revalidatePath(`/en/products/${lid.slug}`)
+              }
+            }
           },
         ],
       },
