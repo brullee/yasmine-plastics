@@ -4,7 +4,7 @@ import { FieldDescription, FieldError, FieldLabel, TextInput, useField } from '@
 import type { ChangeEvent } from 'react'
 import type { TextFieldClientComponent } from 'payload'
 
-export const DigitsOnlyText: TextFieldClientComponent = ({ field, path, readOnly }) => {
+export const ArtCodeText: TextFieldClientComponent = ({ field, path, readOnly }) => {
   const { value, setValue, showError, errorMessage } = useField<string>({ path })
 
   const description =
@@ -18,7 +18,9 @@ export const DigitsOnlyText: TextFieldClientComponent = ({ field, path, readOnly
       <TextInput
         path={path}
         value={value ?? ''}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.replace(/\D/g, ''))}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
+        }
         readOnly={readOnly}
         showError={showError}
       />

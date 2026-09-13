@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ProductsGrid } from '@/components/ui/ProductsGrid'
 import { ProductMainSection } from './_components/ProductMainSection'
 import { Breadcrumb } from '@/components/ui/Breadcrumb'
-import { getProductBySlug, getProducts, getCategoryBySlug } from '@/lib/payload-data'
+import { getProducts, getCategoryBySlug } from '@/lib/payload-data'
 import { company } from '@/data/company'
 import { localizedName } from '@/lib/utils'
 import { pageAlternates, localeUrl, brandName } from '@/lib/seo'
@@ -26,7 +26,10 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params
-  const product = await getProductBySlug(slug)
+  // Shares the request-scoped getProducts() call with the page component below
+  // (both are cache()'d) instead of doing its own separate single-row lookup.
+  const products = await getProducts()
+  const product = products.find((p) => p.slug === slug.toLowerCase()) ?? null
   if (!product) return {}
 
   const name = locale === 'ar' ? product.nameAr : product.nameEn
@@ -60,10 +63,8 @@ export default async function ProductDetailPage({ params }: Props) {
   const { locale: localeRaw, slug } = await params
   const locale = localeRaw as Locale
   setRequestLocale(locale)
-  const [product, allProducts] = await Promise.all([
-    getProductBySlug(slug),
-    getProducts(),
-  ])
+  const allProducts = await getProducts()
+  const product = allProducts.find((p) => p.slug === slug.toLowerCase()) ?? null
 
   if (!product) notFound()
 

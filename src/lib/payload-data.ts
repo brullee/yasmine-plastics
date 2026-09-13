@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { getPayload as _getPayload } from 'payload'
 import type { BasePayload } from 'payload'
 import * as Sentry from '@sentry/nextjs'
@@ -212,29 +213,29 @@ async function withDbRetry<T>(run: () => Promise<T>, attempts = 3): Promise<T> {
   }
 }
 
-export async function getProducts(): Promise<Product[]> {
+export const getProducts = cache(async (): Promise<Product[]> => {
   const p = await getPayload()
-  const result = await withDbRetry(() => p.find({ collection: 'products', limit: 1000, depth: 2 }))
+  const result = await withDbRetry(() => p.find({ collection: 'products', limit: 1000, depth: 1 }))
   return result.docs.map(transformProduct).filter((p) => !!p.slug)
-}
+})
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export const getProductBySlug = cache(async (slug: string): Promise<Product | null> => {
   const p = await getPayload()
   // Slugs are always generated lowercase, but the route param comes from the URL as
   // typed/shared/autocapitalized — lowercase it so a differently-cased link to a real
   // product 404s only if it's actually wrong, not just differently cased.
-  const result = await withDbRetry(() => p.find({ collection: 'products', where: { slug: { equals: slug.toLowerCase() } }, depth: 2, limit: 1 }))
+  const result = await withDbRetry(() => p.find({ collection: 'products', where: { slug: { equals: slug.toLowerCase() } }, depth: 1, limit: 1 }))
   return result.docs[0] ? transformProduct(result.docs[0]) : null
-}
+})
 
-export async function getCategories(): Promise<Category[]> {
+export const getCategories = cache(async (): Promise<Category[]> => {
   const p = await getPayload()
   const result = await withDbRetry(() => p.find({ collection: 'categories', depth: 1, limit: 100 }))
   return result.docs.map(transformCategory)
-}
+})
 
-export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
+export const getCategoryBySlug = cache(async (slug: string): Promise<Category | undefined> => {
   const p = await getPayload()
   const result = await withDbRetry(() => p.find({ collection: 'categories', where: { slug: { equals: slug } }, depth: 1, limit: 1 }))
   return result.docs[0] ? transformCategory(result.docs[0]) : undefined
-}
+})
