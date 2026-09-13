@@ -6,6 +6,7 @@ import { FileSizeCell as FileSizeCell_c816670353bd67c7fafe5c222443570b } from '@
 import { LowercaseText as LowercaseText_0889b483c4555e77039b3dc2be1fe0b6 } from '@/components/payload/LowercaseText'
 import { CategoryLidSync as CategoryLidSync_753a7c062c5a663ddd14176a32acc322 } from '@/components/payload/CategoryLidSync'
 import { CategoryMaterialSync as CategoryMaterialSync_a192553eba787fcd9bfc5dcb8c33cfde } from '@/components/payload/CategoryMaterialSync'
+import { ArtCodeText as ArtCodeText_45a725a6b9e067fc8a9be54707322d8e } from '@/components/payload/ArtCodeText'
 import { SizesField as SizesField_f579635e15412ccef7f851e5391a7387 } from '@/components/payload/SizesField'
 import { CompatibleLidsField as CompatibleLidsField_b998478d9f9c5f4b7c602144c372fe11 } from '@/components/payload/PairedLidField'
 import { MainImageColorsField as MainImageColorsField_f91c1b3aa56fc0d6e2a0618e45246a2a } from '@/components/payload/MainImageColorsField'
@@ -31,6 +32,7 @@ export const importMap = {
   "@/components/payload/LowercaseText#LowercaseText": LowercaseText_0889b483c4555e77039b3dc2be1fe0b6,
   "@/components/payload/CategoryLidSync#CategoryLidSync": CategoryLidSync_753a7c062c5a663ddd14176a32acc322,
   "@/components/payload/CategoryMaterialSync#CategoryMaterialSync": CategoryMaterialSync_a192553eba787fcd9bfc5dcb8c33cfde,
+  "@/components/payload/ArtCodeText#ArtCodeText": ArtCodeText_45a725a6b9e067fc8a9be54707322d8e,
   "@/components/payload/SizesField#SizesField": SizesField_f579635e15412ccef7f851e5391a7387,
   "@/components/payload/PairedLidField#CompatibleLidsField": CompatibleLidsField_b998478d9f9c5f4b7c602144c372fe11,
   "@/components/payload/MainImageColorsField#MainImageColorsField": MainImageColorsField_f91c1b3aa56fc0d6e2a0618e45246a2a,

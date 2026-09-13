@@ -500,7 +500,10 @@ export default buildConfig({
               if (categoryId) {
                 const cat = await req.payload.findByID({ collection: 'categories', id: categoryId })
                 const prefix = (cat as Record<string, unknown>).slugPrefix ?? cat.slug
-                data.slug = `${prefix}-${data.artCode}`
+                // getProductBySlug() lowercases the incoming URL param before comparing, on the
+                // assumption that stored slugs are always lowercase — enforce that here too, since
+                // artCode's own validation only constrains the field's own value, not this join.
+                data.slug = `${prefix}-${data.artCode}`.toLowerCase()
                 data.hasCompatibleLids = !!(cat as Record<string, unknown>).supportsCompatibleLids
               }
             }
@@ -655,17 +658,19 @@ export default buildConfig({
                           type: 'text',
                           required: true,
                           admin: {
-                            description: 'Number only, not the full code. E.g. enter "501", not "ART-501".',
-                            components: { Field: '@/components/payload/DigitsOnlyText#DigitsOnlyText' },
+                            description: 'Not the full code. Lowercase letters, digits and hyphens only, e.g. "116-200" or "116-h1".',
+                            components: { Field: '@/components/payload/ArtCodeText#ArtCodeText' },
                           },
                           // Gets concatenated straight into the product slug/URL below — a stray
-                          // space here silently breaks the product link. DigitsOnlyText strips
-                          // anything non-numeric as it's typed; this validate is the backstop for
-                          // writes that skip the admin UI (API, import scripts).
+                          // space here silently breaks the product link, and stray uppercase breaks
+                          // it too (the slug lookup lowercases the incoming URL param before
+                          // comparing). ArtCodeText lowercases and strips anything else as it's
+                          // typed; this validate is the backstop for writes that skip the admin UI
+                          // (API, import scripts).
                           validate: (value: unknown, { required }: { required?: boolean }) => {
                             if (!value) return required ? 'Art code is required.' : true
-                            if (typeof value !== 'string' || !/^\d+$/.test(value)) {
-                              return 'Art code must be numbers only, with no spaces (e.g. 501).'
+                            if (typeof value !== 'string' || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)) {
+                              return 'Art code must be lowercase letters, digits and hyphens only, with no spaces (e.g. 116-200).'
                             }
                             return true
                           },
