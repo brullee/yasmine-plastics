@@ -36,7 +36,11 @@ export const newDeviceAlertRateLimit = new Ratelimit({
 // call site (route handlers, the proxy, the beforeLogin hook, server components) can
 // share this one implementation instead of re-deriving it.
 export function getIP(reqOrHeaders: Request | { get(name: string): string | null }): string {
-  const headers = 'headers' in reqOrHeaders ? reqOrHeaders.headers : reqOrHeaders
+  // Check for .get rather than 'headers' in: Next's headers objects are proxies whose `in`
+  // checks can't be trusted to tell them apart from a Request.
+  const headers = 'get' in reqOrHeaders && typeof reqOrHeaders.get === 'function'
+    ? reqOrHeaders
+    : (reqOrHeaders as Request).headers
   return (
     headers.get('x-forwarded-for')?.split(',')[0].trim() ??
     headers.get('x-real-ip') ??
