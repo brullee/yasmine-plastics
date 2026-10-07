@@ -4,6 +4,11 @@ on:
   push:
     branches: [dev]
 
+# A newer push to dev makes an older, still-running run pointless - cancel it.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # npm run sync fast-forwards local dev to whatever main already has (e.g. after a PR
   # merge), and pushing that back up re-triggers this workflow on dev even though nothing

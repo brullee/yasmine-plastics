@@ -1,0 +1,20 @@
+version: 2
+
+# PRs target dev, like every other change - once merged there, CI runs on the push and the
+# update reaches main through the usual dev -> main PR. Monthly and grouped so a small team
+# gets one or two update PRs a month instead of one per package.
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: monthly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: monthly
