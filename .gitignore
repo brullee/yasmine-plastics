@@ -24,3 +24,6 @@ __pycache__/
 # Local dev
 scripts/readme-screenshots.js
 PLAN.md
+# Claude Code: .claude/ is shared, personal overrides are not
+.claude/settings.local.json
+CLAUDE.local.md
