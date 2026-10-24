@@ -40,7 +40,8 @@ async function getPayload(): Promise<BasePayload> {
       // initPayload() rejects once (e.g. the exact Neon cold-start drop this file is
       // built to tolerate), every future call in this warm instance re-awaits the same
       // stale rejection forever instead of trying again.
-      g.__payloadInit = initPayload().catch((err) => {
+      // Cold starts coincide with Neon waking up, so the first connection can drop too.
+      g.__payloadInit = withDbRetry(initPayload).catch((err) => {
         g.__payloadInit = undefined
         throw err
       })
@@ -200,14 +201,22 @@ function transformCategory(doc: any): Category {
 // connection and the query fails with "Connection terminated". The pool opens a
 // fresh connection on the next call, so one retry clears it. Non-connection
 // errors rethrow straight away.
+// Drizzle wraps pg errors as "Failed query: ..." with the real error on .cause.
+function isTransientDbError(err: unknown): boolean {
+  for (let e = err, depth = 0; e instanceof Error && depth < 5; e = e.cause, depth++) {
+    const code = (e as { code?: unknown }).code
+    if (code === 'ECONNRESET' || code === 'ETIMEDOUT') return true
+    if (/Connection terminated|ECONNRESET|ETIMEDOUT|connection error/i.test(e.message)) return true
+  }
+  return false
+}
+
 async function withDbRetry<T>(run: () => Promise<T>, attempts = 3): Promise<T> {
   for (let attempt = 1; ; attempt++) {
     try {
       return await run()
     } catch (err) {
-      const message = err instanceof Error ? err.message : ''
-      const transient = /Connection terminated|ECONNRESET|ETIMEDOUT|connection error/i.test(message)
-      if (!transient || attempt >= attempts) throw err
+      if (!isTransientDbError(err) || attempt >= attempts) throw err
       await new Promise((resolve) => setTimeout(resolve, 200 * attempt))
     }
   }
