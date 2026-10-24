@@ -31,6 +31,19 @@ async function notifyNewDevice({ to, ip, userAgent }: { to: string; ip: string; 
   }
 }
 
+// Payload rejects `initializing` when connecting fails but only transactions await it,
+// so a failed connect also surfaces as an unhandled rejection.
+function handleInitRejection(db: ReturnType<typeof postgresAdapter>): ReturnType<typeof postgresAdapter> {
+  return {
+    ...db,
+    init: (args) => {
+      const adapter = db.init(args)
+      adapter.initializing.catch(() => {})
+      return adapter
+    },
+  }
+}
+
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
   upload: { limits: { fileSize: 10485760 } },
@@ -931,7 +944,7 @@ export default buildConfig({
       ],
     },
   ],
-  db: postgresAdapter({
+  db: handleInitRejection(postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL,
       allowExitOnIdle: true,
@@ -939,7 +952,7 @@ export default buildConfig({
       // ends them cleanly instead of surfacing "Connection terminated unexpectedly".
       idleTimeoutMillis: 30000,
     },
-  }),
+  })),
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET ?? '',
   typescript: {
