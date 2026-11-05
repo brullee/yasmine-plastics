@@ -54,9 +54,61 @@ A website for my family's plastics manufacturing business. Buyers browse product
 | Hosting | Vercel |
 | Analytics | Vercel Analytics + Speed Insights |
 
+## Architecture
+
+Diagrams follow the [C4 model](https://c4model.com), from the whole system down to the components inside the web application. Sources are in [`docs/architecture`](docs/architecture).
+
+### System context
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/dark/1-context.png">
+  <img alt="System context: buyers and admins use the Yasmine Plastics website, which depends on Cloudflare, Turnstile, Google Maps, WhatsApp, Sentry and Resend" src="docs/architecture/1-context.png">
+</picture>
+
+### Containers
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/dark/2-containers.png">
+  <img alt="Containers: a Next.js web application on Vercel with Neon Postgres, Cloudflare R2, Upstash Redis and a Modal background-removal function" src="docs/architecture/2-containers.png">
+</picture>
+
+### Components
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/dark/3-components-general.png">
+  <img alt="Components (general): every component of the web application and how they connect" src="docs/architecture/3-components-general.png">
+</picture>
+
+<details>
+<summary>Detailed component views</summary>
+<br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/dark/4-components-overview.png">
+  <img alt="Components (overview): the public, admin login and image pipeline flows side by side" src="docs/architecture/4-components-overview.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/dark/5-components-public.png">
+  <img alt="Components: public storefront and forms" src="docs/architecture/5-components-public.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/dark/6-components-auth.png">
+  <img alt="Components: admin login and 2FA" src="docs/architecture/6-components-auth.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/dark/7-components-images.png">
+  <img alt="Components: catalog editing and image pipeline" src="docs/architecture/7-components-images.png">
+</picture>
+
+</details>
+
 ## Technical Notes
 
 - Product images run through an automatic pipeline: background removal, EXIF correction, centering, WebP conversion, direct-to-R2 upload
+- Forms fail open: if the rate limiter or spam check is down, submissions still go through, since a lost lead costs more than some spam
 - Static generation is kept on pages that read query params (usually forces client-side rendering) via a shaped `<Suspense>` skeleton instead
 - Recurring color/style combinations live in `src/lib/theme.ts`, not scattered inline classes
 - GitHub Actions runs type-check and lint on every push and pull request
