@@ -122,7 +122,7 @@ export const ProductCard = memo(function ProductCard({ product, locale, onQuickV
         <div className="px-3 pt-2.5 pb-3">
           <Link
             href={`/products/${product.slug}`}
-            className="block text-base font-bold leading-snug line-clamp-2 text-brand-navy"
+            className="block text-base font-bold leading-normal rtl:leading-relaxed pb-0.5 line-clamp-2 text-brand-navy"
           >
             {name}
           </Link>

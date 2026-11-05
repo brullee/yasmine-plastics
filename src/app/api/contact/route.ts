@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { sendMail, MAIL_TO, verifyTurnstile } from '@/lib/mailer'
 import { contactEmailHtml } from '@/lib/emailTemplates'
 import { formRateLimit, getIP } from '@/lib/ratelimit'
+import { readFormBody } from '@/lib/formBody'
 
 export async function POST(req: Request) {
   try {
@@ -9,7 +10,9 @@ export async function POST(req: Request) {
     if (!success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   } catch {}
 
-  const { fullName, email, phone, message, honeypot, _token } = await req.json()
+  const body = await readFormBody(req)
+  if (!body) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+  const { fullName, email, phone, message, honeypot, _token } = body
 
   if (honeypot) return NextResponse.json({ ok: true }) // silent drop
 

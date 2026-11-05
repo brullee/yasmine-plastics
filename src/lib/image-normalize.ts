@@ -42,7 +42,17 @@ async function removeBackground(imageUrl: string): Promise<Buffer | null> {
   }
 }
 
-async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL_STANDARD): Promise<Buffer> {
+type OutputFormat = 'webp' | 'jpeg' | 'png'
+
+// Payload can't rename the file, so encode in the format its name says.
+function formatFromFilename(filename: string): OutputFormat {
+  const ext = filename.split('.').pop()?.toLowerCase()
+  if (ext === 'png') return 'png'
+  if (ext === 'jpg' || ext === 'jpeg') return 'jpeg'
+  return 'webp'
+}
+
+async function normalizeBuffer(input: Buffer, format: OutputFormat, gentle = false, fillPercent = FILL_STANDARD): Promise<Buffer> {
   const subjectMax = Math.round(TARGET_SIZE * fillPercent)
 
   // Auto-rotate based on EXIF orientation, then strip the tag
@@ -88,7 +98,7 @@ async function normalizeBuffer(input: Buffer, gentle = false, fillPercent = FILL
       top:  Math.round((TARGET_SIZE - newH) / 2),
       left: Math.round((TARGET_SIZE - newW) / 2),
     }])
-    .jpeg({ quality: 92 })
+    .toFormat(format, format === 'png' ? {} : { quality: 92 })
     .toBuffer()
 }
 
@@ -124,7 +134,8 @@ export async function normalizeMediaAfterUpload(
   }
 
   const t1 = Date.now()
-  const normalized = await normalizeBuffer(imageBuffer, gentle, fillPercent)
+  const format = formatFromFilename(filename)
+  const normalized = await normalizeBuffer(imageBuffer, format, gentle, fillPercent)
   const normMeta = await sharp(normalized).metadata()
   console.log(`[image-normalize] Done in ${Date.now() - t1}ms → ${normMeta.width}x${normMeta.height} (${(normalized.length / 1024).toFixed(0)} KB)`)
 
@@ -132,7 +143,7 @@ export async function normalizeMediaAfterUpload(
     Bucket:      bucket,
     Key:         filename,
     Body:        normalized,
-    ContentType: 'image/jpeg',
+    ContentType: `image/${format}`,
   }))
 
   await payload.update({

@@ -6,7 +6,7 @@ import { generateTrustToken, hashToken, TRUST_COOKIE_NAME, TRUST_DEVICE_DAYS } f
 
 // Called by the login form (src/components/payload/LoginViewForm.tsx) right after a
 // successful 2FA login, so this device can skip the code prompt next time — see the
-// beforeLogin hook in payload.config.ts for the other half of this flow.
+// beforeLogin hook in src/collections/Users.ts for the other half of this flow.
 export async function POST(req: Request) {
   try {
     const payload = await getPayload({ config })

@@ -22,7 +22,7 @@ const OPTIONS: { label: string; value: string }[] = [
 export const ProcessingModeField: RadioFieldClientComponent = ({ path }) => {
   const { value, setValue } = useField<string>({ path })
   // processingMode only matters at all when normalizeImage is true — the afterChange
-  // hook bails out immediately otherwise (payload.config.ts) — so this dim is only ever
+  // hook bails out immediately otherwise (src/collections/Media.ts) — so this dim is only ever
   // a UX hint, never load-bearing, and never blocks clicking either way.
   const { value: normalizeImage } = useField<boolean>({ path: 'normalizeImage' })
   const dimmed = normalizeImage === false

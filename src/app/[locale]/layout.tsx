@@ -93,7 +93,8 @@ export default async function LocaleLayout({ children, params }: Props) {
       className={`${inter.variable} ${notoSansArabic.variable}`}
       data-scroll-behavior="smooth"
     >
-      <body>
+      {/* On body, not #app-root: modals portal into body and would fall back to the browser font. */}
+      <body className={isRtl ? 'font-arabic' : 'font-sans'}>
         <NextIntlClientProvider messages={clientMessages}>
           <a
             href="#main-content"
@@ -101,7 +102,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           >
             {t('skipToContent')}
           </a>
-          <div id="app-root" className={`flex min-h-screen flex-col ${isRtl ? 'font-arabic' : 'font-sans'}`}>
+          <div id="app-root" className="flex min-h-screen flex-col">
             <Header />
             <main id="main-content" className="flex-1">{children}</main>
             <Footer />
