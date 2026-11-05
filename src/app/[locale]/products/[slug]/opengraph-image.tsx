@@ -20,13 +20,33 @@ async function logoDataUri() {
   return { src: `data:image/png;base64,${pngBuffer.toString('base64')}`, w: logoW, h: logoH }
 }
 
+// The OG renderer can't decode WebP, which is how product images are stored.
+async function productImageDataUri(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const jpeg = await sharp(Buffer.from(await res.arrayBuffer())).jpeg({ quality: 90 }).toBuffer()
+    return `data:image/jpeg;base64,${jpeg.toString('base64')}`
+  } catch {
+    return null
+  }
+}
+
 export default async function Image({ params }: Props) {
   const { slug } = await params
   const product = await getProductBySlug(slug)
 
   let imageUrl = product?.image
 
-  if (!imageUrl) {
+  // Relative paths only appear in dev (local Payload storage). Make them absolute.
+  if (imageUrl?.startsWith('/')) {
+    const base = process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000'
+    imageUrl = `${base}${imageUrl}`
+  }
+
+  const imageSrc = imageUrl ? await productImageDataUri(imageUrl) : null
+
+  if (!imageSrc) {
     const logo = await logoDataUri()
     return new ImageResponse(
       (
@@ -36,12 +56,6 @@ export default async function Image({ params }: Props) {
       ),
       { ...size }
     )
-  }
-
-  // Relative paths only appear in dev (local Payload storage). Make them absolute.
-  if (imageUrl.startsWith('/')) {
-    const base = process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000'
-    imageUrl = `${base}${imageUrl}`
   }
 
   return new ImageResponse(
@@ -56,7 +70,7 @@ export default async function Image({ params }: Props) {
           justifyContent: 'center',
         }}
       >
-        <img src={imageUrl} width={630} height={630} alt="" />
+        <img src={imageSrc} width={630} height={630} alt="" />
       </div>
     ),
     { ...size }
