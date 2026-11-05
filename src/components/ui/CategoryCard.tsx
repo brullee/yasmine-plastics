@@ -72,19 +72,11 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
           style={{ boxShadow: 'var(--card-shadow-hover)' }}
         />
 
-        {/* overflow-hidden + border-radius lives here and never transforms.
-            No background of its own when a photo is loaded — the photo covers
-            it completely, so the persistent white base previously here was
-            only ever needed for two failsafe cases: no category.image at all,
-            or the image failing to load. `bg-white` is applied only for those,
-            via `noPhoto`. This also means the corner-rounding artifact
-            described up top (which reveals whatever's underneath the photo
-            for a frame during the hover-scale transition) has nothing but
-            page background to reveal in the normal case — no separate
-            hover-recolor patch needed for it. */}
+        {/* Hover tint = photo at 30% over a navy background, the same color as a navy/70 overlay.
+            A separate overlay layer didn't line up with the photo's edges and let its white show. */}
         <div className={cn(
           'absolute inset-0 rounded-xl overflow-hidden',
-          noPhoto && 'bg-white',
+          noPhoto ? 'bg-white' : '[@media(hover:hover)]:group-hover:bg-brand-navy transition-colors duration-500 ease-out',
           NO_JITTER,
         )}>
 
@@ -100,13 +92,16 @@ export function CategoryCard({ category, locale, productCount, className }: Prop
                 'object-cover',
                 NO_JITTER,
                 '[@media(hover:hover)_and_(prefers-reduced-motion:no-preference)]:group-hover:scale-110',
-                'transition-transform duration-500 ease-out',
+                !noPhoto && '[@media(hover:hover)]:group-hover:opacity-30',
+                'transition-[transform,opacity] duration-500 ease-out',
               )}
             />
           )}
 
-          {/* Navy tint */}
-          <div className="absolute inset-0 bg-brand-navy/70 opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity duration-500 ease-out" />
+          {/* No photo to fade, so the white fallback keeps a plain overlay tint. */}
+          {noPhoto && (
+            <div className="absolute inset-0 bg-brand-navy/70 opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity duration-500 ease-out" />
+          )}
 
           {/* Text */}
           <div className={cn('absolute bottom-0 inset-x-0 z-10 px-5 pb-5 pt-3', NO_JITTER)}>
