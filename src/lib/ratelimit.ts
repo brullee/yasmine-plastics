@@ -15,7 +15,7 @@ export const formRateLimit = new Ratelimit({
 
 // 5 attempts per 15 minutes — wrong/missing 2FA code and forgot-password guesses.
 // Password guessing itself is throttled separately, by Payload's own account lockout
-// (see maxLoginAttempts on the users collection in payload.config.ts).
+// (see maxLoginAttempts on the users collection in src/collections/Users.ts).
 export const loginRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(5, '15 m'),
