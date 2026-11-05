@@ -13,6 +13,7 @@ Product catalog site for a plastics manufacturer (Arabic default, English under 
 
 ## Commands
 - `npm run check` - type-check + lint. Before calling a code change done, use the `verify` skill (check + e2e + no weakened tests).
+- `npm test` - Vitest unit tests in `tests/unit/` (security logic: 2FA, login hook, forms, proxy). They mock Payload, Upstash and email, so they never touch production.
 - `npm run test:e2e` - Playwright against its own `next dev` on port 3901, separate `.next-e2e` dir. Forms are mocked with `page.route` so tests never send email or use up rate limits; do the same in new form tests.
 - `npm run dev` deletes `.next` first, which briefly breaks the editor's TypeScript types until it rebuilds.
 
@@ -21,4 +22,4 @@ Product catalog site for a plastics manufacturer (Arabic default, English under 
 - `payload.config.ts` can't be loaded by a standalone script (`npx payload run` fails on its `next/server` import). Test through the running dev server instead.
 - The admin login page only renders when logged out - an everyday logged-in session never shows it, so check it explicitly after touching auth.
 - Rate limits (`src/lib/ratelimit.ts`) fail open when Upstash is unreachable; CI has no Upstash credentials and logs warnings about it, which is expected.
-- Code comments here explain *why* (the incident or constraint behind the code) - match that when adding non-obvious code.
+- Comments are 1-2 short lines, only where the code can't explain itself; no em or en dashes anywhere. `.claude/hooks/comment-style.mjs` enforces both.

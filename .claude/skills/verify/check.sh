@@ -14,6 +14,7 @@ run_step() {
 }
 
 run_step "type-check + lint" npm run check
+run_step "unit tests" npm test
 
 if $quick; then
   echo "- e2e skipped (--quick)"
@@ -29,13 +30,13 @@ fi
 # itself added on this branch - the whole file just shows up as new.
 echo "--- tests not weakened ---"
 base=$(git merge-base HEAD origin/main 2>/dev/null || git rev-parse HEAD)
-diff=$(git diff HEAD -- e2e/; git diff "$base" HEAD -- e2e/)
-removed=$(grep -E '^-[^-].*(expect\(|test\()' <<< "$diff" || true)
-added_skips=$(grep -E '^\+[^+].*(\.(skip|only|fixme)\()' <<< "$diff" || true)
+diff=$(git diff HEAD -- e2e/ tests/; git diff "$base" HEAD -- e2e/ tests/)
+removed=$(grep -E '^-[^-].*(expect\(|test\(|it\()' <<< "$diff" || true)
+added_skips=$(grep -E '^\+[^+].*(\.(skip|only|fixme|todo)\()' <<< "$diff" || true)
 if [ -z "$removed$added_skips" ]; then
   echo "✓ no assertions or tests removed, nothing skipped"
 else
-  echo "⚠ review these e2e changes - justify each one:"
+  echo "⚠ review these test changes - justify each one:"
   [ -n "$removed" ] && printf '%s\n' "$removed"
   [ -n "$added_skips" ] && printf '%s\n' "$added_skips"
   status=1

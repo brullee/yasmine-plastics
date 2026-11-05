@@ -15,6 +15,16 @@
             "statusMessage": "Checking commit message length..."
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/comment-style.mjs",
+            "statusMessage": "Checking comment style..."
+          }
+        ]
       }
     ]
   }

@@ -23,7 +23,7 @@ export default async function proxy(req: NextRequest) {
   }
   if (req.nextUrl.pathname === '/api/users/forgot-password') {
     if (req.method === 'POST') {
-      const { success } = await loginRateLimit.limit(getIP(req))
+      const { success } = await loginRateLimit.limit(getIP(req)).catch(() => ({ success: true }))
       if (!success) return NextResponse.json({ errors: [{ message: 'Too many attempts. Try again later.' }] }, { status: 429 })
     }
     return NextResponse.next()
