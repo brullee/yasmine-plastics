@@ -1,6 +1,6 @@
 version: 2
 
-# PRs target dev, like every other change - once merged there, CI runs on the push and the
+# PRs target dev, like every other change - CI runs on the PR itself, and once merged the
 # update reaches main through the usual dev -> main PR. Monthly and grouped so a small team
 # gets one or two update PRs a month instead of one per package.
 updates:

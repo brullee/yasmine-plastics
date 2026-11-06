@@ -3,6 +3,9 @@ name: CI
 on:
   push:
     branches: [dev]
+  # Dependabot PRs read the Dependabot secrets store, not the Actions one.
+  pull_request:
+    branches: [dev]
 
 # A newer push to dev makes an older, still-running run pointless - cancel it.
 concurrency:

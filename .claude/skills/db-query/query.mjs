@@ -1,9 +1,9 @@
-// Read-only queries against the database in .env - which is production (see CLAUDE.md).
+// Read-only queries against the database in .env.local, the Neon dev branch (see CLAUDE.md).
 // Every query runs inside a READ ONLY transaction, so Postgres itself rejects any write.
 // Usage (from the repo root):
-//   node --env-file=.env .claude/skills/db-query/query.mjs "select slug from categories"
-//   node --env-file=.env .claude/skills/db-query/query.mjs --tables
-//   node --env-file=.env .claude/skills/db-query/query.mjs --columns products
+//   node --env-file=.env.local .claude/skills/db-query/query.mjs "select slug from categories"
+//   node --env-file=.env.local .claude/skills/db-query/query.mjs --tables
+//   node --env-file=.env.local .claude/skills/db-query/query.mjs --columns products
 import pg from 'pg'
 
 const MAX_ROWS = 50

@@ -24,9 +24,7 @@ export default defineConfig({
   },
   projects: [
     {
-      // Browser launch itself (executablePath -> helium-browser, since this
-      // environment has no bundled Playwright Chromium) happens in e2e/fixtures.ts,
-      // not here - see its comment for why.
+      // The browser itself is launched in e2e/fixtures.ts.
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },

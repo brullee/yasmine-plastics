@@ -14,4 +14,4 @@ Pass `--quick` to skip step 3 (e2e) when the change can't affect rendered pages 
 
 Report each step's actual result from the output - never summarize as "looks good". If step 4 flags anything, say which assertion or test changed and why that change is correct; a test loosened just to make it pass is a failure, not a fix.
 
-The e2e run reads the production database (see `CLAUDE.md`) but writes nothing - forms are mocked. Don't add a test that writes data.
+The e2e run reads the database in `.env.local` but writes nothing - forms are mocked. Don't add a test that writes data.
