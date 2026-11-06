@@ -19,8 +19,7 @@ run_step "unit tests" npm test
 if $quick; then
   echo "- e2e skipped (--quick)"
 else
-  # One worker, like CI: several parallel helium-browser instances locally crash with
-  # "Target page, context or browser has been closed" and fail tests that pass on their own.
+  # One worker, like CI: parallel browsers on a cold dev server time out on first compiles.
   # Upstash warnings are expected without credentials - drop them so real errors stand out.
   run_step "e2e" bash -c "npx playwright test --reporter=line --workers=1 2>&1 | grep -v 'Upstash Redis'; exit \${PIPESTATUS[0]}"
 fi
